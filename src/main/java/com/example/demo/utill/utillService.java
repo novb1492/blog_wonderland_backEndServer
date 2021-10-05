@@ -11,7 +11,7 @@ public class utillService {
     public static JSONObject makeJson(Boolean flag,String message) {
         JSONObject response=new JSONObject();
         response.put(Stringenums.flag.getString(), flag);
-        response.put(Stringenums.flag.getString(), message);
+        response.put(Stringenums.message.getString(), message);
         return response;
     }
     public static void throwRuntimeEX(Exception exception,String message,String methodName) {
