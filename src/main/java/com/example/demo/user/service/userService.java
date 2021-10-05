@@ -1,6 +1,6 @@
 package com.example.demo.user.service;
 
-import java.util.Optional;
+
 
 import com.example.demo.enums.Stringenums;
 import com.example.demo.user.model.principalDetail;
@@ -8,8 +8,6 @@ import com.example.demo.user.model.uservo;
 import com.example.demo.utill.utillService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -25,19 +23,19 @@ public class userService {
         
     }
     public uservo sendUserInfor() {
-        System.out.println("sendUserInfor");
-        uservo uservo=new uservo();
-        uservo.setEmail("kim@kim.com");
-        uservo.setPwd("1111");
-        uservo.setRole("user");
-
-        principalDetail principaldetail=new principalDetail(uservo);
-        Authentication authentication2=new UsernamePasswordAuthenticationToken(principaldetail,null,principaldetail.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(authentication2);
-        Authentication authentication=SecurityContextHolder.getContext().getAuthentication();
-        principalDetail principalDetail2=(principalDetail)authentication.getPrincipal();
-        Optional<uservo>optional=Optional.ofNullable(principalDetail2.getUservo());
-        optional.orElseThrow(()->new RuntimeException("비로그인 사용자입니다"));
-        return optional.get();
+        String methodName="sendUserInfor";
+        System.out.println(methodName);
+        try {
+            principalDetail principalDetail=(principalDetail)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            uservo uservo=principalDetail.getUservo();
+            uservo.setPwd(null);
+            return uservo;
+        } catch (ClassCastException e) {
+            utillService.throwRuntimeEX(e,"비로그인 사용자입니다", methodName);
+          
+        }catch (Exception e){
+            utillService.throwRuntimeEX(e,"로그인 정보 조회에 실패했습니다", methodName);
+        }
+        return null;
     }
 }

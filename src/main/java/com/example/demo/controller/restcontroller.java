@@ -21,7 +21,7 @@ public class restcontroller {
     }
     @PostMapping("/auth/checkLogin")
     public JSONObject checkLogin(HttpServletRequest request,HttpServletResponse response) {
-        System.out.println("checkLogin");
+        System.out.println("checkLogin restcontroller");
         return userService.checkLogin();
     }
 }

@@ -14,4 +14,9 @@ public class utillService {
         response.put(Stringenums.flag.getString(), message);
         return response;
     }
+    public static void throwRuntimeEX(Exception exception,String message,String methodName) {
+        System.out.println("throwRuntimeEX");
+        System.out.println(methodName+"error "+exception.getMessage());
+        throw new RuntimeException(message);
+    }
 }
