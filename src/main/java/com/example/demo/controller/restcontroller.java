@@ -3,6 +3,7 @@ package com.example.demo.controller;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.example.demo.confrim.service.confrimService;
 import com.example.demo.user.service.userService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
@@ -15,6 +16,8 @@ public class restcontroller {
     
     @Autowired
     private userService userService;
+    @Autowired
+    private confrimService confrimService;
     @PostMapping("/auth/test")
     public void test() {
         System.out.println("test");
@@ -23,5 +26,10 @@ public class restcontroller {
     public JSONObject checkLogin(HttpServletRequest request,HttpServletResponse response) {
         System.out.println("checkLogin restcontroller");
         return userService.checkLogin();
+    }
+    @PostMapping("/auth/sendSms")
+    public JSONObject sendSms(HttpServletRequest request,HttpServletResponse response) {
+        System.out.println("sendSms restcontroller");
+        return confrimService.sendPhone();
     }
 }
