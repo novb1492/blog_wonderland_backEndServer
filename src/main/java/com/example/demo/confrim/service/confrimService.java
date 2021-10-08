@@ -8,12 +8,15 @@ import com.example.demo.confrim.model.phone.phoneDao;
 import com.example.demo.confrim.model.phone.phoneVo;
 import com.example.demo.confrim.model.phone.sendPhoneInter;
 import com.example.demo.confrim.model.phone.trySendSmsDto;
+import com.example.demo.sendPhoneAndEmail.sendMessage;
 import com.example.demo.utill.utillService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import net.nurigo.java_sdk.Coolsms;
 
 @Service
 public class confrimService {
@@ -31,9 +34,9 @@ public class confrimService {
     public JSONObject sendPhone(trySendSmsDto sendSmsDto) {
         System.out.println("sendPhone");
         System.out.println(sendSmsDto.getPhone());
-        phoneVo phoneVo=phoneDao.findByPhoneNum(sendSmsDto.getPhone()).orElseGet(() -> new phoneVo().builder().pcount(1).pcreated(Timestamp.valueOf(LocalDateTime.now())).phoneNum(sendSmsDto.getPhone()).build());
+        phoneVo phoneVo=phoneDao.findByPhoneNum(sendSmsDto.getPhone()).orElseGet(() -> new phoneVo().builder().pcount(0).pcreated(Timestamp.valueOf(LocalDateTime.now())).phoneNum(sendSmsDto.getPhone()).build());
         System.out.println("문자메세지 전송"+phoneVo);
-        sendRandNumInter sendRandNumInter=new sendPhoneInter(phoneVo.getPcount()+1,phoneVo.getPhoneNum(),phoneVo.getPcreated(),utillService.getRandomNum(numLength));
+        sendRandNumInter sendRandNumInter=new sendPhoneInter(phoneVo.getPcount(),phoneVo.getPhoneNum(),phoneVo.getPcreated(),utillService.getRandomNum(numLength));
         sendRandNum(sendRandNumInter);
         return utillService.makeJson(true, "인증번호 전송");
     }
@@ -41,8 +44,9 @@ public class confrimService {
         System.out.println("sendRandNum");
         int reuqestCount=sendRandNumInter.getCount();
         LocalDateTime firstRequest=sendRandNumInter.getCreated().toLocalDateTime();
+        System.out.println(reuqestCount+1+"번째 요청시도");
         try {
-            if(reuqestCount==1){
+            if(reuqestCount==0){
                 System.out.println("첫 인증번호 요청");
             }else if(firstRequest.isBefore(firstRequest.plusDays(limitDay))){
                 System.out.println("첫 요청후 하루가 지나지않음");
@@ -50,6 +54,7 @@ public class confrimService {
                     System.out.println(maxReuqest+"회 이하입니다");
                     update(sendRandNumInter);
                     System.out.println("요청 db 수정완료");
+                    //sendMessage.sendMessege("01091443409",sendRandNumInter.getRandNum());
                 }else{
                     System.out.println("첫 요청 후 하루가 지나지않고 최대 회수 초과한 상태");
                     utillService.throwRuntimeEX(new RuntimeException(),"하루 최대 요청 횟수는 "+maxReuqest+"입니다","sendRandNum");
@@ -61,6 +66,7 @@ public class confrimService {
                 System.out.println("전날 요청 기록 삭제완료");
             }
             insert(sendRandNumInter);
+            //sendMessage.sendMessege("01091443409",sendRandNumInter.getRandNum());
         }catch (RuntimeException e) {
             utillService.throwRuntimeEX(e,e.getMessage(), "sendRandNum");
         }catch (Exception e) {
@@ -86,15 +92,13 @@ public class confrimService {
         System.out.println("update");
         if(sendRandNumInter.getUnit().equals("phone")){
             System.out.println("핸드폰 요청 횟수 증가");
-            phoneDao.updatePhoneNative(sendRandNumInter.getCount(),sendRandNumInter.getEmailOrPhone());
+            phoneDao.updatePhoneNative(sendRandNumInter.getCount()+1,sendRandNumInter.getEmailOrPhone());
         }
-        
-
     }
     private phoneVo interToVo(sendRandNumInter sendRandNumInter){
         System.out.println("interToVo");
         phoneVo vo=phoneVo.builder()
-        .pcount(sendRandNumInter.getCount())
+        .pcount(sendRandNumInter.getCount()+1)
         .phoneNum(sendRandNumInter.getEmailOrPhone())
         .randNum(sendRandNumInter.getRandNum())
         .donePhone(noDoneNum)
