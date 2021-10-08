@@ -30,9 +30,10 @@ public class confrimService {
     @Transactional(rollbackFor = Exception.class)
     public JSONObject sendPhone(trySendSmsDto sendSmsDto) {
         System.out.println("sendPhone");
+        System.out.println(sendSmsDto.getPhone());
         phoneVo phoneVo=phoneDao.findByPhoneNum(sendSmsDto.getPhone()).orElseGet(() -> new phoneVo().builder().pcount(1).pcreated(Timestamp.valueOf(LocalDateTime.now())).phoneNum(sendSmsDto.getPhone()).build());
         System.out.println("문자메세지 전송"+phoneVo);
-        sendRandNumInter sendRandNumInter=new sendPhoneInter(phoneVo.getPcount(),phoneVo.getPhoneNum(),phoneVo.getPcreated(),utillService.getRandomNum(numLength));
+        sendRandNumInter sendRandNumInter=new sendPhoneInter(phoneVo.getPcount()+1,phoneVo.getPhoneNum(),phoneVo.getPcreated(),utillService.getRandomNum(numLength));
         sendRandNum(sendRandNumInter);
         return utillService.makeJson(true, "인증번호 전송");
     }
@@ -45,9 +46,9 @@ public class confrimService {
                 System.out.println("첫 인증번호 요청");
             }else if(firstRequest.isBefore(firstRequest.plusDays(limitDay))){
                 System.out.println("첫 요청후 하루가 지나지않음");
-                if(reuqestCount>maxReuqest){
+                if(reuqestCount<=maxReuqest){
                     System.out.println(maxReuqest+"회 이하입니다");
-
+                    update(sendRandNumInter);
                     System.out.println("요청 db 수정완료");
                 }else{
                     System.out.println("첫 요청 후 하루가 지나지않고 최대 회수 초과한 상태");
@@ -81,8 +82,13 @@ public class confrimService {
             return;
         }
     }
-    private void update(sendPhoneInter sendPhoneInter){
+    private void update(sendRandNumInter sendRandNumInter){
         System.out.println("update");
+        if(sendRandNumInter.getUnit().equals("phone")){
+            System.out.println("핸드폰 요청 횟수 증가");
+            phoneDao.updatePhoneNative(sendRandNumInter.getCount(),sendRandNumInter.getEmailOrPhone());
+        }
+        
 
     }
     private phoneVo interToVo(sendRandNumInter sendRandNumInter){
