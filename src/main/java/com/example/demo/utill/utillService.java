@@ -1,5 +1,7 @@
 package com.example.demo.utill;
 
+import java.util.Random;
+
 import com.example.demo.enums.Stringenums;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
@@ -19,4 +21,12 @@ public class utillService {
         System.out.println(methodName+"error "+exception.getMessage());
         throw new RuntimeException(message);
     }
+    public static String getRandomNum(int end) {
+        String num="";
+        Random random=new Random();
+        for(int i=0;i<end;i++){
+            num+=Integer.toString(random.nextInt(10));
+        }
+        return num;
+    } 
 }

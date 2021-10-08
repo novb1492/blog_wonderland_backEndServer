@@ -25,7 +25,7 @@ import lombok.NoArgsConstructor;
 public class phoneVo {
     
     @Id
-    @Column(name="id",nullable = false)
+    @Column(name="pid",nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int pid;
 
@@ -34,6 +34,12 @@ public class phoneVo {
 
     @Column(name = "phoneNum",nullable = false,length = 20)
     private String phoneNum;
+
+    @Column(name = "prandNum",nullable = false,length = 20)
+    private String randNum;
+
+    @Column(name = "donePhone",nullable = false)
+    private int donePhone;
 
     @Column(name = "pcreated")
     @CreationTimestamp
