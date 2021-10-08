@@ -7,6 +7,7 @@ import com.example.demo.confrim.model.sendRandNumInter;
 import com.example.demo.confrim.model.phone.phoneDao;
 import com.example.demo.confrim.model.phone.phoneVo;
 import com.example.demo.confrim.model.phone.sendPhoneInter;
+import com.example.demo.confrim.model.phone.tryConfrimRandNumDto;
 import com.example.demo.confrim.model.phone.trySendSmsDto;
 import com.example.demo.sendPhoneAndEmail.sendMessage;
 import com.example.demo.utill.utillService;
@@ -104,5 +105,15 @@ public class confrimService {
         .donePhone(noDoneNum)
         .build();
         return vo;
+    }
+    public JSONObject checkRandNum(tryConfrimRandNumDto tryConfrimRandNumDto) {
+        System.out.println("checkRandNum");
+        try {
+            
+        }catch (IllegalArgumentException e) {
+            utillService.throwRuntimeEX(e, e.getMessage(), "checkRandNum");
+        }catch (Exception e) {
+            utillService.throwRuntimeEX(e, "인증번호 검증 오류", "checkRandNum");
+        }
     }
 }
