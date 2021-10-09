@@ -1,16 +1,19 @@
 package com.example.demo.filters;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.example.demo.jwt.jwtService;
+import com.example.demo.jwt.service.jwtService;
+import com.example.demo.user.model.principalDetail;
 import com.example.demo.user.model.tryLoginDto;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
+import com.example.demo.user.model.uservo;
+import com.example.demo.utill.utillService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.springframework.security.core.Authentication;
@@ -41,6 +44,13 @@ public class loginFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,Authentication authResult) throws IOException, ServletException {
         System.out.println("successfulAuthentication 로그인성공");
+        principalDetail principalDetail=(principalDetail)authResult.getPrincipal();
+        uservo uservo=principalDetail.getUservo();
+        Map<String,Object>makeCookies=new HashMap<>();
+        makeCookies.put("accessToken",jwtService.makeAccessToken(uservo.getName()));
+        makeCookies.put("httpOnly", true);
+        utillService.makeCookie(makeCookies, response);
+        chain.doFilter(request, response);
     }
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,AuthenticationException failed) throws IOException, ServletException {

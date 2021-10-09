@@ -1,10 +1,15 @@
 package com.example.demo.utill;
 
+
+import java.util.Map;
 import java.util.Random;
+
+import javax.servlet.http.HttpServletResponse;
 
 import com.example.demo.enums.Stringenums;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -29,4 +34,19 @@ public class utillService {
         }
         return num;
     } 
+    public static void makeCookie(Map<String,Object>infor,HttpServletResponse response) {
+        System.out.println("makeCookie");
+        for(String key:infor.keySet()){
+            ResponseCookie cookie = ResponseCookie.from(key,infor.get(key).toString()) 
+            .sameSite("None") 
+            .secure(true) 
+            .path("/") 
+            .build(); 
+            if((boolean)infor.get("httpOnly")){
+                response.addHeader("Set-Cookie", cookie.toString()+";HttpOnly");  
+            }else{
+                response.addHeader("Set-Cookie", cookie.toString()); 
+            } 
+        }
+    }
 }

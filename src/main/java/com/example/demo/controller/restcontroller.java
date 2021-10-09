@@ -47,5 +47,10 @@ public class restcontroller {
         System.out.println("tryJoin restcontroller");
         return userService.insert(tryJoinDto);
     }
+    @PostMapping("/login")
+    public void login(HttpServletRequest request ,HttpServletResponse response) {
+        System.out.println("login restcontroller");
+        
+    }
 
 }
