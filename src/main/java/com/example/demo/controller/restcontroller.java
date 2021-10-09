@@ -4,8 +4,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import com.example.demo.confrim.model.phone.tryConfrimRandNumDto;
 import com.example.demo.confrim.model.phone.trySendSmsDto;
 import com.example.demo.confrim.service.confrimService;
+import com.example.demo.user.model.tryJoinDto;
 import com.example.demo.user.service.userService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
@@ -35,4 +37,15 @@ public class restcontroller {
         System.out.println("sendSms restcontroller");
         return confrimService.sendPhone(trySendSmsDto);
     }
+    @PostMapping("/auth/checkRandNum")
+    public JSONObject checkRandNum(@Valid @RequestBody tryConfrimRandNumDto tryConfrimRandNumDto ,HttpServletResponse response) {
+        System.out.println("checkRandNum restcontroller");
+        return confrimService.checkRandNum(tryConfrimRandNumDto);
+    }
+    @PostMapping("/auth/tryJoin")
+    public void tryJoin(@Valid @RequestBody tryJoinDto tryJoinDto ,HttpServletResponse response) {
+        System.out.println("tryJoin restcontroller");
+       
+    }
+
 }

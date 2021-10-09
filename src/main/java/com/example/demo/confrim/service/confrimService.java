@@ -106,14 +106,29 @@ public class confrimService {
         .build();
         return vo;
     }
-    public JSONObject checkRandNum(tryConfrimRandNumDto tryConfrimRandNumDto) {
+    @Transactional
+    public JSONObject checkRandNum(tryConfrimRandNumDto tryConfrimRandNumDto) throws IllegalArgumentException {
         System.out.println("checkRandNum");
         try {
-            
-        }catch (IllegalArgumentException e) {
+            if(tryConfrimRandNumDto.getUnit().equals("phone")){
+                phoneVo phoneVo=phoneDao.findByPhoneNum(tryConfrimRandNumDto.getPhone()).orElseThrow(()->new IllegalArgumentException("인증 요청 내역이 존재 하지 않습니다"));
+                confrimNum(tryConfrimRandNumDto.getRandNum(), phoneVo.getRandNum());
+                phoneVo.setDonePhone(doneNum);
+            }
+            return utillService.makeJson(true, "인증이 완료되었습니다");
+        }catch (RuntimeException e) {
             utillService.throwRuntimeEX(e, e.getMessage(), "checkRandNum");
         }catch (Exception e) {
             utillService.throwRuntimeEX(e, "인증번호 검증 오류", "checkRandNum");
         }
+        return null;
+    }
+    private void confrimNum(String submitNum,String dbNum) {
+        System.out.println("confrimNuM");
+        if(submitNum.equals(dbNum.trim())){
+            System.out.println("인증번호 일치");
+            return;
+        }
+        new RuntimeException("인증번호 불일치");
     }
 }
