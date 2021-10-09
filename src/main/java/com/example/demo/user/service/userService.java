@@ -69,11 +69,10 @@ public class userService {
                             confrimService.delete(tryJoinDto.getPhone());
                             return utillService.makeJson(true, "회원가입을 축하드립니다");
         }catch (RuntimeException e) {
-            utillService.throwRuntimeEX(e, e.getMessage(), "insert");
+            return utillService.makeJson(false, e.getMessage());
         } catch (Exception e) {
-            utillService.throwRuntimeEX(e,"회원가입에 실패했습니다", "insert");
+            return utillService.makeJson(false, e.getMessage());
         }
-        return null;
     }
     private void confrim(tryJoinDto tryJoinDto) {
         System.out.println("checkPhoneConfrim");

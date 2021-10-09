@@ -1,6 +1,7 @@
 package com.example.demo.config;
 
 import com.example.demo.config.webconfig.corsconfig;
+import com.example.demo.filters.loginFilter;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -37,8 +38,9 @@ public class securityConfig extends WebSecurityConfigurerAdapter {
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
             .addFilter(corsconfig.crosfilter())
+            .addFilter(new loginFilter())
             .csrf().disable().formLogin().disable().httpBasic().disable()
-            .authorizeRequests().antMatchers("/auth/**","/static/**,/login").permitAll().anyRequest().authenticated();
+            .authorizeRequests().antMatchers("/auth/**","/static/**").permitAll().anyRequest().authenticated();
 
     }
 }

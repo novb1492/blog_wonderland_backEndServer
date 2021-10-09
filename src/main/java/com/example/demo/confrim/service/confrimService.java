@@ -97,7 +97,7 @@ public class confrimService {
     private phoneVo interToVo(sendRandNumInter sendRandNumInter){
         System.out.println("interToVo");
         phoneVo vo=phoneVo.builder()
-        .pcount(sendRandNumInter.getCount()+1)
+        .pcount(1)
         .phoneNum(sendRandNumInter.getEmailOrPhone())
         .randNum(sendRandNumInter.getRandNum())
         .donePhone(noDoneNum)
@@ -115,11 +115,10 @@ public class confrimService {
             }
             return utillService.makeJson(true, "인증이 완료되었습니다");
         }catch (RuntimeException e) {
-            utillService.throwRuntimeEX(e, e.getMessage(), "checkRandNum");
+            return utillService.makeJson(false,  e.getMessage());
         }catch (Exception e) {
-            utillService.throwRuntimeEX(e, "인증번호 검증 오류", "checkRandNum");
+            return utillService.makeJson(false, "인증번호 검증 오류");
         }
-        return null;
     }
     private void confrimNum(String submitNum,String dbNum) {
         System.out.println("confrimNuM");

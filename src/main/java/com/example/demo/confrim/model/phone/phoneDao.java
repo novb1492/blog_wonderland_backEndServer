@@ -13,7 +13,7 @@ public interface phoneDao extends JpaRepository<phoneVo,Integer> {
 
     void deleteByPhoneNum(String phone);
 
-      
+  
     @Modifying
     @Transactional
     @Query(value = "update requestphone set pcount=? where phone_num=?",nativeQuery = true)
