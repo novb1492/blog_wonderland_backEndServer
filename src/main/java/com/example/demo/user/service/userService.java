@@ -2,6 +2,8 @@ package com.example.demo.user.service;
 
 
 
+import com.example.demo.config.securityConfig;
+import com.example.demo.confrim.service.confrimService;
 import com.example.demo.enums.Stringenums;
 import com.example.demo.user.model.inserConfrimInter;
 import com.example.demo.user.model.principalDetail;
@@ -14,6 +16,7 @@ import com.nimbusds.jose.shaded.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class userService {
@@ -21,6 +24,10 @@ public class userService {
 
     @Autowired
     private userDao userDao;
+    @Autowired
+    private securityConfig securityConfig;
+    @Autowired
+    private confrimService confrimService;
 
     public JSONObject checkLogin() {
         System.out.println("checkLogin");
@@ -45,6 +52,7 @@ public class userService {
         }
         return null;
     }
+    @Transactional(rollbackFor = Exception.class)
     public JSONObject insert(tryJoinDto tryJoinDto) {
         System.out.println("insert");
         try {
@@ -53,11 +61,12 @@ public class userService {
                             .email(tryJoinDto.getEmail())
                             .name(tryJoinDto.getName())
                             .phoneNum(tryJoinDto.getPhone())
-                            .pwd(tryJoinDto.getPwd())
+                            .pwd(securityConfig.pwdEncoder().encode(tryJoinDto.getPwd()))
                             .address(tryJoinDto.getPostcode()+","+tryJoinDto.getAddress()+","+tryJoinDto.getDetailAddess())
                             .role(Stringenums.role_user.getString())
                             .build();
                             userDao.save(vo);
+                            confrimService.delete(tryJoinDto.getPhone());
                             return utillService.makeJson(true, "회원가입을 축하드립니다");
         }catch (RuntimeException e) {
             utillService.throwRuntimeEX(e, e.getMessage(), "insert");
@@ -76,8 +85,8 @@ public class userService {
                 System.out.println("인증되지 않은 핸든폰입니다");
                 message="인증되지 않은 핸든폰입니다";
             }else if(count!=0){
-                System.out.println("이미 존재하는 핸드폰 입니다");
-                message="이미 존재하는 핸드폰 입니다";
+                System.out.println("이미 존재하는 이메일 입니다");
+                message="이미 존재하는 이메일 입니다";
             }else if(!tryJoinDto.getPwd().equals(tryJoinDto.getPwd2())){
                 System.out.println("비밀번호가 일치하지 않습니다");
                 message="비밀번호가 일치하지 않습니다";

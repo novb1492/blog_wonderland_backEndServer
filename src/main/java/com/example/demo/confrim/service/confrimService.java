@@ -17,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import net.nurigo.java_sdk.Coolsms;
 
 @Service
 public class confrimService {
@@ -39,6 +38,7 @@ public class confrimService {
         System.out.println("문자메세지 전송"+phoneVo);
         sendRandNumInter sendRandNumInter=new sendPhoneInter(phoneVo.getPcount(),phoneVo.getPhoneNum(),phoneVo.getPcreated(),utillService.getRandomNum(numLength));
         sendRandNum(sendRandNumInter);
+        //sendMessage.sendMessege("01091443409",sendRandNumInter.getRandNum());
         return utillService.makeJson(true, "인증번호 전송");
     }
     private void sendRandNum(sendRandNumInter sendRandNumInter){
@@ -55,7 +55,6 @@ public class confrimService {
                     System.out.println(maxReuqest+"회 이하입니다");
                     update(sendRandNumInter);
                     System.out.println("요청 db 수정완료");
-                    //sendMessage.sendMessege("01091443409",sendRandNumInter.getRandNum());
                 }else{
                     System.out.println("첫 요청 후 하루가 지나지않고 최대 회수 초과한 상태");
                     utillService.throwRuntimeEX(new RuntimeException(),"하루 최대 요청 횟수는 "+maxReuqest+"입니다","sendRandNum");
@@ -67,7 +66,6 @@ public class confrimService {
                 System.out.println("전날 요청 기록 삭제완료");
             }
             insert(sendRandNumInter);
-            //sendMessage.sendMessege("01091443409",sendRandNumInter.getRandNum());
         }catch (RuntimeException e) {
             utillService.throwRuntimeEX(e,e.getMessage(), "sendRandNum");
         }catch (Exception e) {
@@ -129,7 +127,12 @@ public class confrimService {
             System.out.println("인증번호 일치");
             return;
         }
-        new RuntimeException("인증번호 불일치");
+        System.out.println("인증번호 불일치");
+        throw new RuntimeException("인증번호 불일치");
+    }
+    public void delete(String phone) {
+        System.out.println("delete"+phone);
+        phoneDao.deleteByPhoneNum(phone);
     }
     
 }
