@@ -43,9 +43,9 @@ public class restcontroller {
         return confrimService.checkRandNum(tryConfrimRandNumDto);
     }
     @PostMapping("/auth/tryJoin")
-    public void tryJoin(@Valid @RequestBody tryJoinDto tryJoinDto ,HttpServletResponse response) {
+    public JSONObject tryJoin(@Valid @RequestBody tryJoinDto tryJoinDto ,HttpServletResponse response) {
         System.out.println("tryJoin restcontroller");
-       
+        return userService.insert(tryJoinDto);
     }
 
 }

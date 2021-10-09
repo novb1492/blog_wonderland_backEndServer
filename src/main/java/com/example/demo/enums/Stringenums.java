@@ -1,6 +1,7 @@
 package com.example.demo.enums;
 
 public enum Stringenums {
+    role_user("role_user"),
     flag("flag"),
     message("message"),
     data("data"),
