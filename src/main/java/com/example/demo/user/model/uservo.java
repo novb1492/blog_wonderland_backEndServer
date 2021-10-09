@@ -37,6 +37,9 @@ public class uservo {
     @Column(name = "pwd",nullable = false,length = 255)
     private String pwd;
 
+    @Column(name = "provider",length = 30)
+    private String provider;
+
     @Column(name = "phoneNum",nullable = false,length = 30)
     private String phoneNum;
 

@@ -2,6 +2,7 @@ package com.example.demo.config;
 
 import com.example.demo.config.webconfig.corsconfig;
 import com.example.demo.filters.loginFilter;
+import com.example.demo.jwt.jwtService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -21,9 +22,13 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class securityConfig extends WebSecurityConfigurerAdapter {
+    
     @Autowired
     private corsconfig corsconfig;
 
+    @Autowired
+    private jwtService jwtService;
+    
     @Bean
     @Override
     protected AuthenticationManager authenticationManager() throws Exception {
@@ -38,7 +43,7 @@ public class securityConfig extends WebSecurityConfigurerAdapter {
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
             .addFilter(corsconfig.crosfilter())
-            .addFilter(new loginFilter())
+            .addFilter(new loginFilter(jwtService))
             .csrf().disable().formLogin().disable().httpBasic().disable()
             .authorizeRequests().antMatchers("/auth/**","/static/**").permitAll().anyRequest().authenticated();
 
