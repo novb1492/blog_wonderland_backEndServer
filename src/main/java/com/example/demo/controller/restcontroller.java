@@ -1,5 +1,7 @@
 package com.example.demo.controller;
 
+import java.io.IOException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -74,6 +76,17 @@ public class restcontroller {
     public void naverLoginCallback(HttpServletRequest request ,HttpServletResponse response) {
         System.out.println("naverLoginCallback restcontroller");
         naverService.tryNaverLogin(request, response);
+        doRedirect(response, "http://localhost:3030/doneLogin");
+    }
+    private void doRedirect(HttpServletResponse response,String url) {
+        System.out.println("doRedirect");
+        System.out.println(url+"리다이렉트 요청 url");
+        try {
+            response.sendRedirect(url);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("doRedirect error"+e.getMessage());
+        }
     }
 
 }

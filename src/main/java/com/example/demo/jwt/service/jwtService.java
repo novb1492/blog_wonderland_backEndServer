@@ -63,7 +63,7 @@ public class jwtService {
     public String getAccessToken(String email) {
         System.out.println("getAccessToken");
         System.out.println("토큰 email: "+email);
-        return JWT.create().withSubject(accessTokenName).withExpiresAt(new Date(System.currentTimeMillis()+1000*accessTokenExpire)).withClaim("email",email).sign(Algorithm.HMAC512(jwtSing));
+        return JWT.create().withSubject(accessTokenName).withExpiresAt(new Date(System.currentTimeMillis()+secondOfDay*accessTokenExpire)).withClaim("email",email).sign(Algorithm.HMAC512(jwtSing));
     }
     public String getRefreshToken() {
         System.out.println("getRefreshToken");

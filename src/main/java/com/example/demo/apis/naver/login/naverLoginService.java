@@ -36,13 +36,12 @@ public class naverLoginService {
             throw new RuntimeException("naverLogin 오류 발생");
         } 
     }
-    public void tryNaverLogin(JSONObject tokens,HttpServletResponse response) {
+    public uservo tryNaverLogin(JSONObject tokens,HttpServletResponse response) {
         System.out.println("tryNaverLogin naverLoginService");
         System.out.println(tokens);
         JSONObject getNaver=naverService.requestToNaver((String)tokens.get("access_token"),"https://openapi.naver.com/v1/nid/me");
         System.out.println(getNaver);
-        uservo uservo=userService.insertOauth(makeVo((LinkedHashMap<String,Object>)getNaver.get("response")));
-
+        return userService.insertOauth(makeVo((LinkedHashMap<String,Object>)getNaver.get("response")));
     }
     private uservo makeVo(LinkedHashMap<String,Object> getNaver) {
         System.out.println("makeVo");
@@ -55,7 +54,7 @@ public class naverLoginService {
                         .pwd("oauthPwd")
                         .role(Stringenums.role_user.getString())
                         .build();
-                        
+        System.out.println("통과");                
         return vo;
     }
 
