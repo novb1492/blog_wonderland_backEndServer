@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -97,21 +98,20 @@ public class jwtService {
     }
     public JSONObject reGetAccessToken(HttpServletRequest request,HttpServletResponse response ){
         System.out.println("reGetAccessToken");
-        String refreshToken=findRefreshTokenAndGetEmail(utillService.getCookieValue(request, refreshTokenName));
+        String refreshToken=findRefreshTokenAndGetEmail(utillService.getCookieValue(request, refreshTokenName)).orElseThrow(()->new IllegalArgumentException("재로그인 부탁드립니다"));
         Map<String,Object>map=new HashMap<>();
         map.put(accessTokenName,getAccessToken(refreshToken));
         utillService.makeCookie(map, response);
         return utillService.makeJson(false, "newAccessToken");
     }
-    private String findRefreshTokenAndGetEmail(String refreshToken) {
+    private Optional<String> findRefreshTokenAndGetEmail(String refreshToken) {
         System.out.println("findRefreshToken");
         try {
             jwtVo jwtVo=jwtDao.findByTokenName(refreshToken).orElseThrow(()->new IllegalArgumentException("리프레쉬 토큰 존재하지 않음"));
             jwtDao.updateTokenExpire(Timestamp.valueOf(LocalDateTime.now().plusDays(refreshTokenExpire)),Timestamp.valueOf(LocalDateTime.now()), refreshToken);
-            return jwtVo.getTemail();
+            return Optional.ofNullable(jwtVo.getTemail());
         } catch (Exception e) {
-            utillService.throwRuntimeEX(e, "재 로그인 부탁드립니다", "findRefreshToken");
+            return null;
         }
-        return null;
     }
 }
