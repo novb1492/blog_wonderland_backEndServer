@@ -107,6 +107,7 @@ public class jwtService {
         System.out.println("findRefreshToken");
         try {
             jwtVo jwtVo=jwtDao.findByTokenName(refreshToken).orElseThrow(()->new IllegalArgumentException("리프레쉬 토큰 존재하지 않음"));
+            jwtDao.updateTokenExpire(Timestamp.valueOf(LocalDateTime.now().plusDays(refreshTokenExpire)),Timestamp.valueOf(LocalDateTime.now()), refreshToken);
             return jwtVo.getTemail();
         } catch (Exception e) {
             utillService.throwRuntimeEX(e, "재 로그인 부탁드립니다", "findRefreshToken");
