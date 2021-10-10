@@ -74,4 +74,8 @@ public class jwtService {
                 .build();
                 jwtDao.save(vo);
     }
+    public int openJwt(String accessToken) {
+        System.out.println("openJwt");
+        return JWT.require(Algorithm.HMAC512(jwtSing)).build().verify(accessToken).getClaim("id").asInt();
+    }
 }

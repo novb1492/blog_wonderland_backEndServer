@@ -9,7 +9,6 @@ import com.example.demo.confrim.model.phone.phoneVo;
 import com.example.demo.confrim.model.phone.sendPhoneInter;
 import com.example.demo.confrim.model.phone.tryConfrimRandNumDto;
 import com.example.demo.confrim.model.phone.trySendSmsDto;
-import com.example.demo.sendPhoneAndEmail.sendMessage;
 import com.example.demo.utill.utillService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 

@@ -9,6 +9,7 @@ import com.example.demo.confrim.model.phone.trySendSmsDto;
 import com.example.demo.confrim.service.confrimService;
 import com.example.demo.user.model.tryJoinDto;
 import com.example.demo.user.service.userService;
+import com.example.demo.utill.utillService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +52,11 @@ public class restcontroller {
     public JSONObject login(HttpServletRequest request ,HttpServletResponse response) {
         System.out.println("login restcontroller");
         return userService.checkSucLogin();
+    }
+    @PostMapping("/auth/jwtex")
+    public JSONObject jwtex(HttpServletRequest request ,HttpServletResponse response) {
+        System.out.println("jwtex restcontroller");
+        return utillService.makeJson(true, "message");
     }
 
 }

@@ -26,7 +26,6 @@ public class securityConfig extends WebSecurityConfigurerAdapter {
     
     @Autowired
     private corsconfig corsconfig;
-
     @Autowired
     private jwtService jwtService;
     
@@ -45,7 +44,7 @@ public class securityConfig extends WebSecurityConfigurerAdapter {
             .and()
             .addFilter(corsconfig.crosfilter())
             .addFilter(new loginFilter(jwtService))
-            .addFilter(new authorizationFilter(authenticationManager()))
+            .addFilter(new authorizationFilter(authenticationManager(),jwtService))
             .csrf().disable().formLogin().disable().httpBasic().disable()
             .authorizeRequests().antMatchers("/auth/**","/static/**","/login").permitAll().anyRequest().authenticated();
 
