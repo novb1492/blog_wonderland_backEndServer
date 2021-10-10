@@ -36,7 +36,7 @@ public class jwtVo {
     private String tokenName;
     
     @Column(name = "tuid",nullable = false,length = 20)
-    private String tuid;
+    private int tuid;
 
     @Column(name = "tcreated")
     @CreationTimestamp

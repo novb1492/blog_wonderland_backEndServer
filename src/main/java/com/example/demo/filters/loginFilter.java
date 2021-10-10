@@ -46,8 +46,11 @@ public class loginFilter extends UsernamePasswordAuthenticationFilter {
         System.out.println("successfulAuthentication 로그인성공");
         principalDetail principalDetail=(principalDetail)authResult.getPrincipal();
         uservo uservo=principalDetail.getUservo();
+        String refreshToken=jwtService.getRefreshToken();
+        jwtService.insert(uservo, refreshToken);
         Map<String,Object>makeCookies=new HashMap<>();
-        makeCookies.put("accessToken",jwtService.makeAccessToken(uservo.getName()));
+        makeCookies.put("accessToken",jwtService.getAccessToken(uservo.getName()));
+        makeCookies.put("refreshToken", refreshToken);
         makeCookies.put("httpOnly", true);
         utillService.makeCookie(makeCookies, response);
         chain.doFilter(request, response);

@@ -1,9 +1,14 @@
 package com.example.demo.jwt.service;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.example.demo.jwt.model.jwtDao;
+import com.example.demo.jwt.model.jwtVo;
+import com.example.demo.user.model.uservo;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,6 +17,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class jwtService {
@@ -28,6 +34,8 @@ public class jwtService {
     private int refreshTokenExpire;
     
     @Autowired
+    private jwtDao jwtDao;
+    @Autowired
     private AuthenticationManager authenticationManager;
 
     public Authentication confrimEmailPwd(String email,String pwd,String provider) {
@@ -41,10 +49,29 @@ public class jwtService {
         System.out.println("setSecuritySession");
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
-    public String makeAccessToken(String email) {
+    public String getAccessToken(String email) {
         return JWT.create().withSubject(accessTokenName).withExpiresAt(new Date(System.currentTimeMillis()+accessTokenExpire)).withClaim("id",email).sign(Algorithm.HMAC512(jwtSing));
     }
-    public String refreshToken() {
+    public String getRefreshToken() {
         return JWT.create().withSubject(refreshTokenName).withExpiresAt(new Date(System.currentTimeMillis()+refreshTokenExpire)).sign(Algorithm.HMAC512(jwtSing));
+    }
+    @Transactional
+    public void insert(uservo uservo,String refreshToken) {
+        System.out.println("insert");
+        jwtVo vo=jwtDao.findByTemail(uservo.getEmail());
+        Timestamp expireDate=Timestamp.valueOf(LocalDateTime.now().plusDays(refreshTokenExpire));
+        if(vo!=null){
+            vo.setTcreated(Timestamp.valueOf(LocalDateTime.now()));
+            vo.setTexpired(expireDate);
+            vo.setTokenName(refreshToken);
+            return;
+        }
+        vo=jwtVo.builder()
+                .temail(uservo.getEmail())
+                .texpired(expireDate)
+                .tokenName(refreshToken)
+                .tuid(uservo.getUid())
+                .build();
+                jwtDao.save(vo);
     }
 }
