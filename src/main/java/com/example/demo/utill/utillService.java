@@ -42,11 +42,7 @@ public class utillService {
             .secure(true) 
             .path("/") 
             .build(); 
-            if((boolean)infor.get("httpOnly")){
-                response.addHeader("Set-Cookie", cookie.toString()+";HttpOnly");  
-            }else{
-                response.addHeader("Set-Cookie", cookie.toString()); 
-            } 
+            response.addHeader("Set-Cookie", cookie.toString()+";HttpOnly");  
         }
     }
 }

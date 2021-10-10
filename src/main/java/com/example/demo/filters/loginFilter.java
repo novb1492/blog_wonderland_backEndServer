@@ -51,7 +51,6 @@ public class loginFilter extends UsernamePasswordAuthenticationFilter {
         Map<String,Object>makeCookies=new HashMap<>();
         makeCookies.put("accessToken",jwtService.getAccessToken(uservo.getName()));
         makeCookies.put("refreshToken", refreshToken);
-        makeCookies.put("httpOnly", true);
         utillService.makeCookie(makeCookies, response);
         chain.doFilter(request, response);
     }
