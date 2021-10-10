@@ -4,6 +4,7 @@ import com.example.demo.config.webconfig.corsconfig;
 import com.example.demo.filters.authorizationFilter;
 import com.example.demo.filters.loginFilter;
 import com.example.demo.jwt.service.jwtService;
+import com.example.demo.user.model.userDao;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -28,7 +29,9 @@ public class securityConfig extends WebSecurityConfigurerAdapter {
     private corsconfig corsconfig;
     @Autowired
     private jwtService jwtService;
-    
+    @Autowired
+    private userDao userDao;
+
     @Bean
     @Override
     protected AuthenticationManager authenticationManager() throws Exception {
@@ -44,7 +47,7 @@ public class securityConfig extends WebSecurityConfigurerAdapter {
             .and()
             .addFilter(corsconfig.crosfilter())
             .addFilter(new loginFilter(jwtService))
-            .addFilter(new authorizationFilter(authenticationManager(),jwtService))
+            .addFilter(new authorizationFilter(authenticationManager(),jwtService,userDao))
             .csrf().disable().formLogin().disable().httpBasic().disable()
             .authorizeRequests().antMatchers("/auth/**","/static/**","/login").permitAll().anyRequest().authenticated();
 

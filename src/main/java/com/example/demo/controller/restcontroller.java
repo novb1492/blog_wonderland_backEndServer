@@ -56,7 +56,7 @@ public class restcontroller {
     @PostMapping("/auth/jwtex")
     public JSONObject jwtex(HttpServletRequest request ,HttpServletResponse response) {
         System.out.println("jwtex restcontroller");
-        return utillService.makeJson(true, "message");
+        return utillService.makeJson(false, "newAccessToken");
     }
 
 }

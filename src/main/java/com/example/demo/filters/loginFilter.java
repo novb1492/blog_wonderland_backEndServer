@@ -51,7 +51,7 @@ public class loginFilter extends UsernamePasswordAuthenticationFilter {
         String refreshToken=jwtService.getRefreshToken();
         jwtService.insert(uservo, refreshToken);
         Map<String,Object>makeCookies=new HashMap<>();
-        makeCookies.put("accessToken",jwtService.getAccessToken(uservo.getName()));
+        makeCookies.put("accessToken",jwtService.getAccessToken(uservo.getEmail()));
         makeCookies.put("refreshToken", refreshToken);
         utillService.makeCookie(makeCookies, response);
         chain.doFilter(request, response);

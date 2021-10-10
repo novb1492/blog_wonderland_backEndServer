@@ -8,6 +8,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.example.demo.jwt.model.jwtDao;
 import com.example.demo.jwt.model.jwtVo;
+import com.example.demo.user.model.principalDetail;
 import com.example.demo.user.model.uservo;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,8 @@ public class jwtService {
     private String refreshTokenName;
     @Value("${jwt.refresh.expiration}")
     private int refreshTokenExpire;
+
+    private final int secondOfDay=86400;
     
     @Autowired
     private jwtDao jwtDao;
@@ -50,10 +53,13 @@ public class jwtService {
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
     public String getAccessToken(String email) {
-        return JWT.create().withSubject(accessTokenName).withExpiresAt(new Date(System.currentTimeMillis()+accessTokenExpire)).withClaim("id",email).sign(Algorithm.HMAC512(jwtSing));
+        System.out.println("getAccessToken");
+        System.out.println("토큰 email: "+email);
+        return JWT.create().withSubject(accessTokenName).withExpiresAt(new Date(System.currentTimeMillis()+secondOfDay*accessTokenExpire)).withClaim("email",email).sign(Algorithm.HMAC512(jwtSing));
     }
     public String getRefreshToken() {
-        return JWT.create().withSubject(refreshTokenName).withExpiresAt(new Date(System.currentTimeMillis()+refreshTokenExpire)).sign(Algorithm.HMAC512(jwtSing));
+        System.out.println("getRefreshToken");
+        return JWT.create().withSubject(refreshTokenName).withExpiresAt(new Date(System.currentTimeMillis()+secondOfDay*refreshTokenExpire)).sign(Algorithm.HMAC512(jwtSing));
     }
     @Transactional
     public void insert(uservo uservo,String refreshToken) {
@@ -74,8 +80,12 @@ public class jwtService {
                 .build();
                 jwtDao.save(vo);
     }
-    public int openJwt(String accessToken) {
+    public String openJwt(String accessToken) {
         System.out.println("openJwt");
-        return JWT.require(Algorithm.HMAC512(jwtSing)).build().verify(accessToken).getClaim("id").asInt();
+        return JWT.require(Algorithm.HMAC512(jwtSing)).build().verify(accessToken).getClaim("email").asString();
+    }
+    public Authentication makeAuthentication(principalDetail principalDetail) {
+        System.out.println("makeAuthentication 로그인한 회원"+ principalDetail.getUservo().getName());
+        return new UsernamePasswordAuthenticationToken(principalDetail, null, principalDetail.getAuthorities());
     }
 }

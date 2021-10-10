@@ -12,6 +12,9 @@ import javax.servlet.http.HttpServletResponse;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.example.demo.jwt.service.jwtService;
+import com.example.demo.user.model.principalDetail;
+import com.example.demo.user.model.userDao;
+import com.example.demo.user.model.uservo;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
@@ -19,11 +22,12 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 public class authorizationFilter extends BasicAuthenticationFilter  {
     
     private jwtService jwtService;
+    private userDao userDao;
 
-    public authorizationFilter(AuthenticationManager authenticationManager,jwtService jwtService) {
+    public authorizationFilter(AuthenticationManager authenticationManager,jwtService jwtService,userDao userDao) {
         super(authenticationManager);
         this.jwtService=jwtService;
-        
+        this.userDao=userDao;
     }
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)throws IOException, ServletException {
@@ -44,14 +48,19 @@ public class authorizationFilter extends BasicAuthenticationFilter  {
         }else{
             System.out.println("토큰발견");
             try {
-                int uid=jwtService.openJwt(accessToken);
+                String email=jwtService.openJwt(accessToken);
+                uservo uservo=userDao.findByEmail(email).orElseThrow(()->new IllegalArgumentException("잘못된 회원정보입니다"));
+                jwtService.setSecuritySession(jwtService.makeAuthentication(new principalDetail(uservo)));
+                chain.doFilter(request, response);
             } catch (TokenExpiredException e) {
                 System.out.println("토큰기간만료");
                 goToError("/auth/jwtex", request, response);
             }catch(JWTDecodeException e){
-                e.printStackTrace();
                 System.out.println("토큰변환실패");
                 goToError("/auth/failOpenToken", request, response);
+            }catch(IllegalArgumentException e){
+                System.out.println("존재하지 않는 회원");
+                goToError("/auth/failFindUser", request, response);
             }
            
         }
