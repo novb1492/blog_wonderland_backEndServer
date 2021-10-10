@@ -4,6 +4,8 @@ package com.example.demo.utill;
 import java.util.Map;
 import java.util.Random;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.example.demo.enums.Stringenums;
@@ -44,5 +46,15 @@ public class utillService {
             .build(); 
             response.addHeader("Set-Cookie", cookie.toString()+";HttpOnly");  
         }
+    }
+    public static String getCookieValue(HttpServletRequest request,String cookieName) {
+        System.out.println("getCookieValue");
+        Cookie[] cookies=request.getCookies();
+        for(Cookie c:cookies){
+            if(c.getName().equals(cookieName)){
+                return c.getValue();
+            }
+        }
+        return null;
     }
 }

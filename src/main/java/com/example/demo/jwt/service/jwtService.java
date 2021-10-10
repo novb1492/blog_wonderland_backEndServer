@@ -3,6 +3,11 @@ package com.example.demo.jwt.service;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -10,6 +15,8 @@ import com.example.demo.jwt.model.jwtDao;
 import com.example.demo.jwt.model.jwtVo;
 import com.example.demo.user.model.principalDetail;
 import com.example.demo.user.model.uservo;
+import com.example.demo.utill.utillService;
+import com.nimbusds.jose.shaded.json.JSONObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -55,7 +62,7 @@ public class jwtService {
     public String getAccessToken(String email) {
         System.out.println("getAccessToken");
         System.out.println("토큰 email: "+email);
-        return JWT.create().withSubject(accessTokenName).withExpiresAt(new Date(System.currentTimeMillis()+secondOfDay*accessTokenExpire)).withClaim("email",email).sign(Algorithm.HMAC512(jwtSing));
+        return JWT.create().withSubject(accessTokenName).withExpiresAt(new Date(System.currentTimeMillis()+1000*accessTokenExpire)).withClaim("email",email).sign(Algorithm.HMAC512(jwtSing));
     }
     public String getRefreshToken() {
         System.out.println("getRefreshToken");
@@ -87,5 +94,23 @@ public class jwtService {
     public Authentication makeAuthentication(principalDetail principalDetail) {
         System.out.println("makeAuthentication 로그인한 회원"+ principalDetail.getUservo().getName());
         return new UsernamePasswordAuthenticationToken(principalDetail, null, principalDetail.getAuthorities());
+    }
+    public JSONObject reGetAccessToken(HttpServletRequest request,HttpServletResponse response ){
+        System.out.println("reGetAccessToken");
+        String refreshToken=findRefreshTokenAndGetEmail(utillService.getCookieValue(request, refreshTokenName));
+        Map<String,Object>map=new HashMap<>();
+        map.put(accessTokenName,getAccessToken(refreshToken));
+        utillService.makeCookie(map, response);
+        return utillService.makeJson(false, "newAccessToken");
+    }
+    private String findRefreshTokenAndGetEmail(String refreshToken) {
+        System.out.println("findRefreshToken");
+        try {
+            jwtVo jwtVo=jwtDao.findByTokenName(refreshToken).orElseThrow(()->new IllegalArgumentException("리프레쉬 토큰 존재하지 않음"));
+            return jwtVo.getTemail();
+        } catch (Exception e) {
+            utillService.throwRuntimeEX(e, "재 로그인 부탁드립니다", "findRefreshToken");
+        }
+        return null;
     }
 }

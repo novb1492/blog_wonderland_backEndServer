@@ -7,6 +7,7 @@ import javax.validation.Valid;
 import com.example.demo.confrim.model.phone.tryConfrimRandNumDto;
 import com.example.demo.confrim.model.phone.trySendSmsDto;
 import com.example.demo.confrim.service.confrimService;
+import com.example.demo.jwt.service.jwtService;
 import com.example.demo.user.model.tryJoinDto;
 import com.example.demo.user.service.userService;
 import com.example.demo.utill.utillService;
@@ -24,6 +25,9 @@ public class restcontroller {
     private userService userService;
     @Autowired
     private confrimService confrimService;
+    @Autowired
+    private jwtService jwtService;
+
     @PostMapping("/auth/test")
     public void test() {
         System.out.println("test");
@@ -56,7 +60,7 @@ public class restcontroller {
     @PostMapping("/auth/jwtex")
     public JSONObject jwtex(HttpServletRequest request ,HttpServletResponse response) {
         System.out.println("jwtex restcontroller");
-        return utillService.makeJson(false, "newAccessToken");
+        return jwtService.reGetAccessToken(request, response);
     }
 
 }
