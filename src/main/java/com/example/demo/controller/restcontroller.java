@@ -35,7 +35,7 @@ public class restcontroller {
     @Autowired
     private naverService naverService;
 
-    @RequestMapping(value = "/user/checkLogin/**",method = RequestMethod.GET)
+    @RequestMapping(value = "/user/crud/**",method = RequestMethod.GET)
     public JSONObject checkLogin(HttpServletRequest request,HttpServletResponse response) {
         System.out.println("checkLogin restcontroller");
         return userService.checkLogin(request);
@@ -50,7 +50,7 @@ public class restcontroller {
         System.out.println("checkRandNum restcontroller");
         return confrimService.checkRandNum(tryConfrimRandNumDto);
     }
-    @RequestMapping(value = "/user/join",method = RequestMethod.POST)
+    @RequestMapping(value = "/user/crud/**",method = RequestMethod.POST)
     public JSONObject tryJoin(@Valid @RequestBody tryJoinDto tryJoinDto ,HttpServletResponse response) {
         System.out.println("tryJoin restcontroller");
         return userService.insert(tryJoinDto);

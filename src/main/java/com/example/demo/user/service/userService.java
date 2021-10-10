@@ -81,24 +81,25 @@ public class userService {
     }
     private void confrim(tryJoinDto tryJoinDto) {
         System.out.println("checkPhoneConfrim");
-            inserConfrimInter inserConfrimInter=userDao.findByEmailJoinConfrim(tryJoinDto.getEmail(), tryJoinDto.getPhone());
+            inserConfrimInter inserConfrimInter=userDao.findByEmailJoinConfrim(tryJoinDto.getPhone(),tryJoinDto.getEmail(), tryJoinDto.getPhone());
             int done=inserConfrimInter.getDone().orElseThrow(()->new IllegalArgumentException("요청내역이 존재하지 않습니다"));
-            int count=inserConfrimInter.getUcount();
             String message=null;
             if(done==0){
                 System.out.println("인증되지 않은 핸든폰입니다");
                 message="인증되지 않은 핸든폰입니다";
-            }else if(count!=0){
+            }else if(inserConfrimInter.getUcount()!=0){
                 System.out.println("이미 존재하는 이메일 입니다");
                 message="이미 존재하는 이메일 입니다";
             }else if(!tryJoinDto.getPwd().equals(tryJoinDto.getPwd2())){
                 System.out.println("비밀번호가 일치하지 않습니다");
                 message="비밀번호가 일치하지 않습니다";
+            }else if(inserConfrimInter.getPcount()>0){
+                System.out.println("이미 존재하는 핸드폰번호 입니다");
+                message="이미 존재하는 핸드폰번호 입니다";
             }else{
                 System.out.println("회원가입 유효성 통과");
                 return;
             }
-            System.out.println("rtun");
             throw new RuntimeException(message);  
     }
     public JSONObject checkSucLogin() {
