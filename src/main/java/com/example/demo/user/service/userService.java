@@ -105,6 +105,16 @@ public class userService {
         } catch (NullPointerException e) {
             return utillService.makeJson(false,"아이디 혹은 비밀번호가 일치 하지않습니다");
         }
-       
+    }
+    public uservo insertOauth(uservo uservo) {
+        System.out.println("insertOauth");
+        uservo dbVo=userDao.findByEmail(uservo.getEmail()).orElseGet(()-> new uservo());
+        if(dbVo.getUid()==0){
+            System.out.println(uservo.getProvider()+"로그인 회원가입시도");
+            uservo.setPwd(securityConfig.pwdEncoder().encode(uservo.getPwd()));
+            userDao.save(uservo);
+            dbVo=uservo;
+        }
+        return dbVo;
     }
 }

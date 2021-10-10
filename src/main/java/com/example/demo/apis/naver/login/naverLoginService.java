@@ -2,10 +2,14 @@ package com.example.demo.apis.naver.login;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.LinkedHashMap;
 
 import javax.servlet.http.HttpServletResponse;
 
 import com.example.demo.apis.naver.naverService;
+import com.example.demo.enums.Stringenums;
+import com.example.demo.user.model.uservo;
+import com.example.demo.user.service.userService;
 import com.example.demo.utill.utillService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
@@ -20,6 +24,8 @@ public class naverLoginService {
     private String loginCallback;
     @Autowired
     private naverService naverService;
+    @Autowired
+    private userService userService;
     
     public JSONObject getNaverLogin(String naverId) {
         String state="";
@@ -35,6 +41,22 @@ public class naverLoginService {
         System.out.println(tokens);
         JSONObject getNaver=naverService.requestToNaver((String)tokens.get("access_token"),"https://openapi.naver.com/v1/nid/me");
         System.out.println(getNaver);
+        uservo uservo=userService.insertOauth(makeVo((LinkedHashMap<String,Object>)getNaver.get("response")));
+
+    }
+    private uservo makeVo(LinkedHashMap<String,Object> getNaver) {
+        System.out.println("makeVo");
+        uservo vo=uservo.builder()
+                        .email((String)getNaver.get("email"))
+                        .name((String)getNaver.get("name"))
+                        .phoneNum(getNaver.get("mobile").toString().replace("-", ""))
+                        .address("테스트계정 주소 안줌")
+                        .provider("naver")
+                        .pwd("oauthPwd")
+                        .role(Stringenums.role_user.getString())
+                        .build();
+                        
+        return vo;
     }
 
 
