@@ -1,6 +1,7 @@
 package com.example.demo.config;
 
 import com.example.demo.config.webconfig.corsconfig;
+import com.example.demo.filters.authorizationFilter;
 import com.example.demo.filters.loginFilter;
 import com.example.demo.jwt.service.jwtService;
 
@@ -44,6 +45,7 @@ public class securityConfig extends WebSecurityConfigurerAdapter {
             .and()
             .addFilter(corsconfig.crosfilter())
             .addFilter(new loginFilter(jwtService))
+            .addFilter(new authorizationFilter(authenticationManager()))
             .csrf().disable().formLogin().disable().httpBasic().disable()
             .authorizeRequests().antMatchers("/auth/**","/static/**","/login").permitAll().anyRequest().authenticated();
 
