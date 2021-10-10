@@ -94,10 +94,17 @@ public class userService {
                 return;
             }
             System.out.println("rtun");
-            throw new RuntimeException(message);
-      
-            
-      
-        
+            throw new RuntimeException(message);  
+    }
+    public JSONObject checkSucLogin() {
+        System.out.println("checkSucLogin");
+        try {
+            principalDetail principalDetail=(principalDetail)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            System.out.println("로그인 성공:"+principalDetail.getUservo().getEmail());
+            return utillService.makeJson(true, "로그인 성공");
+        } catch (NullPointerException e) {
+            return utillService.makeJson(false,"아이디 혹은 비밀번호가 일치 하지않습니다");
+        }
+       
     }
 }

@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.FilterChain;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -36,7 +37,7 @@ public class loginFilter extends UsernamePasswordAuthenticationFilter {
             tryLoginDto tryLoginDto=objectMapper.readValue(request.getInputStream(), tryLoginDto.class);
             System.out.println("로그인시도 이메일: "+tryLoginDto.getEmail());
             return jwtService.confrimEmailPwd(tryLoginDto.getEmail(),tryLoginDto.getPwd(),null);
-        } catch (Exception e) {
+        } catch (IOException  e) {
             e.printStackTrace();
         }
         return null;    
@@ -44,6 +45,7 @@ public class loginFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,Authentication authResult) throws IOException, ServletException {
         System.out.println("successfulAuthentication 로그인성공");
+        jwtService.setSecuritySession(authResult);
         principalDetail principalDetail=(principalDetail)authResult.getPrincipal();
         uservo uservo=principalDetail.getUservo();
         String refreshToken=jwtService.getRefreshToken();
@@ -56,6 +58,9 @@ public class loginFilter extends UsernamePasswordAuthenticationFilter {
     }
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,AuthenticationException failed) throws IOException, ServletException {
-        System.out.println("successfulAuthentication 로그인실패");
+        System.out.println("unsuccessfulAuthentication 로그인실패");
+        System.out.println(failed.getCause()+failed.getLocalizedMessage()+failed.getStackTrace()+failed.getSuppressed());
+        RequestDispatcher dp=request.getRequestDispatcher("/login");
+		dp.forward(request, response);
     }
 }
