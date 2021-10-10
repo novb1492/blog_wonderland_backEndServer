@@ -75,7 +75,7 @@ public class restcontroller {
     @RequestMapping("/auth/naverLoginCallback")
     public void naverLoginCallback(HttpServletRequest request ,HttpServletResponse response) {
         System.out.println("naverLoginCallback restcontroller");
-        naverService.tryNaverLogin(request, response);
+        naverService.tryNaverLogin(request,response);
         doRedirect(response, "http://localhost:3030/doneLogin");
     }
     private void doRedirect(HttpServletResponse response,String url) {

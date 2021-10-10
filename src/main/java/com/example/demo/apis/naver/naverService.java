@@ -2,12 +2,11 @@ package com.example.demo.apis.naver;
 
 
 
+
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import com.example.demo.apis.naver.login.naverLoginService;
 import com.example.demo.jwt.service.jwtService;
 import com.example.demo.user.model.uservo;
@@ -37,14 +36,14 @@ public class naverService {
     @Value("${naver.loginCallback}")
     private String loginCallbackUrl;
 
-
     @Autowired
-    private naverLoginService naverLoginService; 
+    private naverLoginService naverLoginService;
     @Autowired
     private jwtService jwtService;
 
     public JSONObject getNaverLogin() {
-        return naverLoginService.getNaverLogin(naverId);
+       System.out.println("getNaverLogin");
+       return naverLoginService.getNaverLogin(naverId);
     }
     public void tryNaverLogin(HttpServletRequest request,HttpServletResponse response) {
         System.out.println("tryNaverLogin naverService");
@@ -67,6 +66,8 @@ public class naverService {
         } catch (HttpClientErrorException e) {
             e.printStackTrace();
             return utillService.makeJson(false, "네이버 통신에 실패했습니다");
+        }finally{
+            headers.clear();
         }
     }
     
