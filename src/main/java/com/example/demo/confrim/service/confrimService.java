@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 import com.example.demo.confrim.model.sendRandNumInter;
+import com.example.demo.confrim.model.phone.getRequestAndusersInter;
 import com.example.demo.confrim.model.phone.phoneDao;
 import com.example.demo.confrim.model.phone.phoneVo;
 import com.example.demo.confrim.model.phone.sendPhoneInter;
@@ -32,12 +33,30 @@ public class confrimService {
     @Transactional(rollbackFor = Exception.class)
     public JSONObject sendPhone(trySendSmsDto sendSmsDto) {
         System.out.println("sendPhone");
-        System.out.println(sendSmsDto.getPhone());
-        phoneVo phoneVo=phoneDao.findByPhoneNum(sendSmsDto.getPhone()).orElseGet(() -> new phoneVo().builder().pcount(0).pcreated(Timestamp.valueOf(LocalDateTime.now())).phoneNum(sendSmsDto.getPhone()).build());
+        String phone=sendSmsDto.getPhone();
+        System.out.println(phone);
+        getRequestAndusersInter getRequestAndusersInter=phoneDao.findByPhoneAndUsers(phone,phone);
+        if(getRequestAndusersInter.getAlready()>0){
+            return utillService.makeJson(false, "이미 존재하는 핸드폰입니다");
+        }
+        phoneVo phoneVo=new phoneVo();
+        if(getRequestAndusersInter.getPid()==0){
+            phoneVo.setDonePhone(noDoneNum);
+            phoneVo.setPcount(0);
+            phoneVo.setPcreated(Timestamp.valueOf(LocalDateTime.now()));
+            phoneVo.setPhoneNum(phone);
+        }else{
+            phoneVo.setDonePhone(getRequestAndusersInter.getDone_phone());
+            phoneVo.setPcount(getRequestAndusersInter.getPcount());
+            phoneVo.setPcreated(getRequestAndusersInter.getPcreated());
+            phoneVo.setPhoneNum(getRequestAndusersInter.getPhone_num());
+            phoneVo.setPid(getRequestAndusersInter.getPid());
+        }
+        
         System.out.println("문자메세지 전송"+phoneVo);
-        sendRandNumInter sendRandNumInter=new sendPhoneInter(phoneVo.getPcount(),phoneVo.getPhoneNum(),phoneVo.getPcreated(),utillService.getRandomNum(numLength));
+        sendRandNumInter sendRandNumInter=new sendPhoneInter(phoneVo.getPcount(),phoneVo.getPhoneNum(),phoneVo.getPcreated(),utillService.getRandomNum(numLength),phoneVo.getDonePhone());
         sendRandNum(sendRandNumInter);
-        //sendMessage.sendMessege("01091443409",sendRandNumInter.getRandNum());
+        //sendMessage.sendMessege(phoneVo.getPhoneNum(),sendRandNumInter.getRandNum());
         return utillService.makeJson(true, "인증번호 전송");
     }
     private void sendRandNum(sendRandNumInter sendRandNumInter){

@@ -49,7 +49,7 @@ public class securityConfig extends WebSecurityConfigurerAdapter {
             .addFilter(new loginFilter(jwtService))
             .addFilter(new authorizationFilter(authenticationManager(),jwtService,userDao))
             .csrf().disable().formLogin().disable().httpBasic().disable()
-            .authorizeRequests().antMatchers("/auth/**","/static/**","/login").permitAll().anyRequest().authenticated();
+            .authorizeRequests().antMatchers("/api/**").authenticated().anyRequest().permitAll();
 
     }
 }

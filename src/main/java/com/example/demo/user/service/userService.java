@@ -2,6 +2,8 @@ package com.example.demo.user.service;
 
 
 
+import javax.servlet.http.HttpServletRequest;
+
 import com.example.demo.config.securityConfig;
 import com.example.demo.confrim.service.confrimService;
 import com.example.demo.enums.Stringenums;
@@ -29,10 +31,13 @@ public class userService {
     @Autowired
     private confrimService confrimService;
 
-    public JSONObject checkLogin() {
+    public JSONObject checkLogin(HttpServletRequest request) {
         System.out.println("checkLogin");
         JSONObject response=utillService.makeJson(true,"로그인 사용자입니다" );
-        response.put(data, sendUserInfor());
+        uservo uservo=sendUserInfor();
+        if(request.getRequestURI().equals("/user/checkLogin&scope=all")){
+            response.put(data, uservo);
+        }
         return response;
         
     }

@@ -8,5 +8,6 @@ public interface sendRandNumInter {
     String getEmailOrPhone();
     Timestamp getCreated();
     String getRandNum();
+    int doneOrNot();
 
 }

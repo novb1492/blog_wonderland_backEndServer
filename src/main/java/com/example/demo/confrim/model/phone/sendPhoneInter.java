@@ -10,12 +10,14 @@ public class sendPhoneInter implements sendRandNumInter {
     private String addressOrNum;
     private Timestamp firstReuqest;
     private String randNum;
+    private int doneOrNot;
 
-    public sendPhoneInter(int count,String addressOrNum,Timestamp firstReuqest,String randNum){
+    public sendPhoneInter(int count,String addressOrNum,Timestamp firstReuqest,String randNum,int doneOrNot){
         this.count=count;
         this.addressOrNum=addressOrNum;
         this.firstReuqest=firstReuqest;
         this.randNum=randNum;
+        this.doneOrNot=doneOrNot;
     }
     @Override
     public String getUnit() {
@@ -39,6 +41,10 @@ public class sendPhoneInter implements sendRandNumInter {
     @Override
     public String getRandNum() {
         return randNum;
+    }
+    @Override
+    public int doneOrNot() {
+        return doneOrNot;
     }
     
 }

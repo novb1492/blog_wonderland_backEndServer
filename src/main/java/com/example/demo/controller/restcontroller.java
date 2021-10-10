@@ -16,9 +16,11 @@ import com.example.demo.user.service.userService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -33,26 +35,22 @@ public class restcontroller {
     @Autowired
     private naverService naverService;
 
-    @PostMapping("/auth/test")
-    public void test() {
-        System.out.println("test");
-    }
-    @PostMapping("/auth/checkLogin")
+    @RequestMapping(value = "/user/checkLogin/**",method = RequestMethod.GET)
     public JSONObject checkLogin(HttpServletRequest request,HttpServletResponse response) {
         System.out.println("checkLogin restcontroller");
-        return userService.checkLogin();
+        return userService.checkLogin(request);
     }
-    @PostMapping("/auth/sendSms")
+    @RequestMapping(value = "/send/**",method = RequestMethod.POST)
     public JSONObject sendSms(@Valid @RequestBody trySendSmsDto trySendSmsDto ,HttpServletResponse response) {
         System.out.println("sendSms restcontroller");
         return confrimService.sendPhone(trySendSmsDto);
     }
-    @PostMapping("/auth/checkRandNum")
+    @PostMapping("/user/checkNum")
     public JSONObject checkRandNum(@Valid @RequestBody tryConfrimRandNumDto tryConfrimRandNumDto ,HttpServletResponse response) {
         System.out.println("checkRandNum restcontroller");
         return confrimService.checkRandNum(tryConfrimRandNumDto);
     }
-    @PostMapping("/auth/tryJoin")
+    @RequestMapping(value = "/user/join",method = RequestMethod.POST)
     public JSONObject tryJoin(@Valid @RequestBody tryJoinDto tryJoinDto ,HttpServletResponse response) {
         System.out.println("tryJoin restcontroller");
         return userService.insert(tryJoinDto);
@@ -67,7 +65,7 @@ public class restcontroller {
         System.out.println("jwtex restcontroller");
         return jwtService.reGetAccessToken(request, response);
     }
-    @PostMapping("/auth/showNaverLoginPage")
+    @GetMapping("/auth/showNaverLoginPage")
     public JSONObject showNaverLoginPage(HttpServletRequest request ,HttpServletResponse response) {
         System.out.println("showNaverLoginPage restcontroller");
         return naverService.getNaverLogin();
