@@ -4,18 +4,19 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import com.example.demo.apis.naver.naverService;
 import com.example.demo.confrim.model.phone.tryConfrimRandNumDto;
 import com.example.demo.confrim.model.phone.trySendSmsDto;
 import com.example.demo.confrim.service.confrimService;
 import com.example.demo.jwt.service.jwtService;
 import com.example.demo.user.model.tryJoinDto;
 import com.example.demo.user.service.userService;
-import com.example.demo.utill.utillService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -27,6 +28,8 @@ public class restcontroller {
     private confrimService confrimService;
     @Autowired
     private jwtService jwtService;
+    @Autowired
+    private naverService naverService;
 
     @PostMapping("/auth/test")
     public void test() {
@@ -61,6 +64,16 @@ public class restcontroller {
     public JSONObject jwtex(HttpServletRequest request ,HttpServletResponse response) {
         System.out.println("jwtex restcontroller");
         return jwtService.reGetAccessToken(request, response);
+    }
+    @PostMapping("/auth/showNaverLoginPage")
+    public JSONObject showNaverLoginPage(HttpServletRequest request ,HttpServletResponse response) {
+        System.out.println("showNaverLoginPage restcontroller");
+        return naverService.getNaverLogin();
+    }
+    @RequestMapping("/auth/naverLoginCallback")
+    public void naverLoginCallback(HttpServletRequest request ,HttpServletResponse response) {
+        System.out.println("naverLoginCallback restcontroller");
+        naverService.tryNaverLogin(request, response);
     }
 
 }

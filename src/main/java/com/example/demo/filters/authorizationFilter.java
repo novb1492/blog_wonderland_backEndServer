@@ -31,7 +31,7 @@ public class authorizationFilter extends BasicAuthenticationFilter  {
     }
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)throws IOException, ServletException {
-        System.out.println("doFilterInternal 페이지요청 발생");
+        System.out.println("doFilterInternal 페이지요청 발생 "+request.getRequestURI());
         String accessToken=null;
         try {
             Cookie[] cookies=request.getCookies();
