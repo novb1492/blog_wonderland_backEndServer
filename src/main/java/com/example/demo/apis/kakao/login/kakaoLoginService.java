@@ -1,9 +1,14 @@
 package com.example.demo.apis.kakao.login;
 
+import java.util.LinkedHashMap;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.example.demo.apis.requestTo;
+import com.example.demo.enums.Stringenums;
+import com.example.demo.user.model.uservo;
+import com.example.demo.user.service.userService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,18 +28,24 @@ public class kakaoLoginService {
     
     @Autowired
     private requestTo requestTo;
+    @Autowired
+    private userService userService;
    
 
     public String showLoingPage(String apikey) {
         System.out.println("kakaoLoginService showLoginPage");
         return "https://kauth.kakao.com/oauth/authorize?response_type=code&client_id="+apikey+"&redirect_uri="+loginCallbackUrl+"";
     }
-    public void tryLogin(HttpServletRequest request,HttpServletResponse response,String apiKey) {
+    public uservo tryLogin(HttpServletRequest request,String apiKey) {
         System.out.println("tryLogin");
         JSONObject reseponseTokens=getKakaoToken(request.getParameter("code").toString(), apiKey);
         System.out.println(reseponseTokens);
         JSONObject responseUserInfor=getUserInfor(reseponseTokens.getAsString("access_token").toString());
         System.out.println(responseUserInfor);
+        LinkedHashMap<String,Object>userInfor=(LinkedHashMap<String, Object>) responseUserInfor.get("kakao_account");
+        uservo vo=mapToVo(userInfor);
+        userService.insertOauth(vo);
+        return vo;
     }
     private JSONObject getKakaoToken(String code,String apikey) {
         System.out.println("getKakaoToken");
@@ -53,5 +64,17 @@ public class kakaoLoginService {
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         headers.add("Authorization","Bearer "+accessToken);
         return requestTo.requestToApi("https://kapi.kakao.com/v2/user/me", headers);
+    }
+    private uservo mapToVo(LinkedHashMap<String,Object>userInfor) {
+        System.out.println("mapToVo");
+        uservo vo=uservo.builder()
+                        .address("테스트 주소 안줌")
+                        .email((String)userInfor.get("email"))
+                        .name((String)userInfor.get("nickname"))
+                        .phoneNum("테스트 번호 안줌")
+                        .provider("kakao")
+                        .role(Stringenums.role_user.getString())
+                        .build();
+                        return vo;
     }
 }

@@ -16,6 +16,7 @@ import com.example.demo.utill.utillService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +31,9 @@ public class userService {
     private securityConfig securityConfig;
     @Autowired
     private confrimService confrimService;
+    
+    @Value("${oauth.pwd}")
+    private String oauthPwd;
 
     public JSONObject checkLogin(HttpServletRequest request) {
         System.out.println("checkLogin");
@@ -117,7 +121,7 @@ public class userService {
         uservo dbVo=userDao.findByEmail(uservo.getEmail()).orElseGet(()-> new uservo());
         if(dbVo.getUid()==0){
             System.out.println(uservo.getProvider()+"로그인 회원가입시도");
-            uservo.setPwd(securityConfig.pwdEncoder().encode(uservo.getPwd()));
+            uservo.setPwd(securityConfig.pwdEncoder().encode(oauthPwd));
             userDao.save(uservo);
             dbVo=uservo;
         }

@@ -53,7 +53,6 @@ public class naverLoginService {
                         .phoneNum(getNaver.get("mobile").toString().replace("-", ""))
                         .address("테스트계정 주소 안줌")
                         .provider("naver")
-                        .pwd("oauthPwd")
                         .role(Stringenums.role_user.getString())
                         .build();
         System.out.println("통과");                

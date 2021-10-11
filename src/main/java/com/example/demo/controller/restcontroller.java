@@ -77,7 +77,7 @@ public class restcontroller {
     public void naverLoginCallback(HttpServletRequest request ,HttpServletResponse response) {
         System.out.println("naverLoginCallback restcontroller");
         naverService.tryNaverLogin(request,response);
-        doRedirect(response, "http://localhost:3030/doneLogin");
+        doRedirect(response, "http://localhost:3030/doneLogin?provider=naver");
     }
     @GetMapping("/kakao/showLoginPage")
     public JSONObject showKakaoLoginPage(HttpServletRequest request ,HttpServletResponse response) {
@@ -88,6 +88,7 @@ public class restcontroller {
     public void kakaoLoginCallback(HttpServletRequest request ,HttpServletResponse response) {
         System.out.println("showKakaoLoginPage restcontroller");
         kakaoService.tryKakaoLogin(request, response);
+        doRedirect(response, "http://localhost:3030/doneLogin?provider=kakao");
     }
     private void doRedirect(HttpServletResponse response,String url) {
         System.out.println("doRedirect");
