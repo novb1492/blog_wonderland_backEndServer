@@ -2,6 +2,8 @@ package com.example.demo.user.service;
 
 
 
+import java.util.Optional;
+
 import javax.servlet.http.HttpServletRequest;
 
 import com.example.demo.config.securityConfig;
@@ -39,7 +41,8 @@ public class userService {
         System.out.println("checkLogin");
         JSONObject response=utillService.makeJson(true,"로그인 사용자입니다" );
         uservo uservo=sendUserInfor();
-        if(request.getRequestURI().equals("/user/checkLogin&scope=all")){
+        System.out.println(request.getRequestURI());
+        if(Optional.ofNullable(request.getParameter("scope")).orElseGet(()->"emthy").equals("all")){
             response.put(data, uservo);
         }
         return response;

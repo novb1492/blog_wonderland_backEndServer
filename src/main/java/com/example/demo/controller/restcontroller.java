@@ -71,7 +71,7 @@ public class restcontroller {
         System.out.println("jwtex restcontroller");
         return jwtService.reGetAccessToken(request, response);
     }
-    @GetMapping("/naver/showLoginPage")
+    @GetMapping("/naver/showPage")
     public JSONObject showNaverLoginPage(HttpServletRequest request ,HttpServletResponse response) {
         System.out.println("showNaverLoginPage restcontroller");
         return naverService.getNaverLogin();
@@ -88,7 +88,7 @@ public class restcontroller {
         return kakaoService.showPage(request);
     }
     @GetMapping("/kakao/callback/**")
-    public void kakaoLoginCallback(HttpServletRequest request ,HttpServletResponse response) {
+    public void kakaoCallback(HttpServletRequest request ,HttpServletResponse response) {
         System.out.println("showKakaoLoginPage restcontroller");
         kakaoService.callback(request, response);
         doRedirect(response, frontDamain+"doneLogin?provider=kakao");
