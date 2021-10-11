@@ -16,6 +16,7 @@ import org.springframework.util.MultiValueMap;
 
 @Service
 public class kakaoLoginService {
+   
 
     @Value("${kakao.login.callback}")
     private String loginCallbackUrl;
@@ -30,17 +31,27 @@ public class kakaoLoginService {
     }
     public void tryLogin(HttpServletRequest request,HttpServletResponse response,String apiKey) {
         System.out.println("tryLogin");
-        System.out.println(getKakaoToken(request.getParameter("code").toString(), apiKey));
+        JSONObject reseponseTokens=getKakaoToken(request.getParameter("code").toString(), apiKey);
+        System.out.println(reseponseTokens);
+        JSONObject responseUserInfor=getUserInfor(reseponseTokens.getAsString("access_token").toString());
+        System.out.println(responseUserInfor);
     }
     private JSONObject getKakaoToken(String code,String apikey) {
         System.out.println("getKakaoToken");
-        HttpHeaders headers=new HttpHeaders();
-        MultiValueMap<String,Object> body=new LinkedMultiValueMap<>();
+        HttpHeaders headers=requestTo.getHeaders();
+        MultiValueMap<String,Object> body=requestTo.getMultiValueBody();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         body.add("grant_type", "authorization_code");
         body.add("client_id", apikey);
         body.add("redirect_uri", loginCallbackUrl);
         body.add("code", code);
-        return requestTo.requestToKakao(body, "https://kauth.kakao.com/oauth/token", headers);
+        return requestTo.requestToApi(body, "https://kauth.kakao.com/oauth/token", headers);
+    }
+    private JSONObject getUserInfor(String accessToken) {
+        System.out.println("getUserInfor");
+        HttpHeaders headers=requestTo.getHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.add("Authorization","Bearer "+accessToken);
+        return requestTo.requestToApi("https://kapi.kakao.com/v2/user/me", headers);
     }
 }

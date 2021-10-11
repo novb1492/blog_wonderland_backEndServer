@@ -39,9 +39,9 @@ public class naverLoginService {
     }
     public uservo tryNaverLogin(JSONObject tokens,HttpServletResponse response) {
         System.out.println("tryNaverLogin naverLoginService");
-        HttpHeaders headers=new HttpHeaders();
+        HttpHeaders headers=requestTo.getHeaders();
         headers.add("Authorization","Bearer " + tokens.get("access_token"));
-        JSONObject getNaver=requestTo.requestToKakao("https://openapi.naver.com/v1/nid/me", headers); //requestToNaver(tokens.get("access_token").toString(),"https://openapi.naver.com/v1/nid/me");
+        JSONObject getNaver=requestTo.requestToApi("https://openapi.naver.com/v1/nid/me", headers); 
         System.out.println(getNaver);
         return userService.insertOauth(makeVo((LinkedHashMap<String,Object>)getNaver.get("response")));
     }
