@@ -1,27 +1,27 @@
-package com.example.demo.confrim.model.phone;
+package com.example.demo.confrim.model;
 
 import java.sql.Timestamp;
 
-import com.example.demo.confrim.model.sendRandNumInter;
-
-public class sendPhoneInter implements sendRandNumInter {
+public class sendInter implements sendRandNumInter {
 
     private int count;
     private String addressOrNum;
     private Timestamp firstReuqest;
     private String randNum;
     private int doneOrNot;
+    private String Scope;
 
-    public sendPhoneInter(int count,String addressOrNum,Timestamp firstReuqest,String randNum,int doneOrNot){
+    public sendInter(int count,String addressOrNum,Timestamp firstReuqest,String randNum,int doneOrNot,String Scope){
         this.count=count;
         this.addressOrNum=addressOrNum;
         this.firstReuqest=firstReuqest;
         this.randNum=randNum;
         this.doneOrNot=doneOrNot;
+        this.Scope=Scope;
     }
     @Override
-    public String getUnit() {
-        return "phone";
+    public String getScope() {
+        return Scope;
     }
 
     @Override

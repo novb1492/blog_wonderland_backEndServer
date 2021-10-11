@@ -17,6 +17,6 @@ public interface phoneDao extends JpaRepository<phoneVo,Integer> {
   
     @Modifying
     @Transactional
-    @Query(value = "update requestphone set pcount=? where phone_num=?",nativeQuery = true)
-    void updatePhoneNative(int count,String phoneNum);
+    @Query(value = "update requestphone set pcount=?,prand_num=? where phone_num=?",nativeQuery = true)
+    void updatePhoneNative(int count,String randNum,String phoneNum);
 }

@@ -2,13 +2,17 @@ package com.example.demo.confrim.service;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
+import com.example.demo.confrim.model.sendInter;
 import com.example.demo.confrim.model.sendRandNumInter;
 import com.example.demo.confrim.model.email.emailDao;
 import com.example.demo.confrim.model.email.emailVo;
+import com.example.demo.confrim.model.email.getUserJoinInter;
 import com.example.demo.confrim.model.phone.phoneDao;
 import com.example.demo.confrim.model.phone.phoneVo;
-import com.example.demo.confrim.model.phone.sendPhoneInter;
 import com.example.demo.confrim.model.phone.tryConfrimRandNumDto;
 import com.example.demo.confrim.model.phone.trySendSmsDto;
 import com.example.demo.utill.utillService;
@@ -37,7 +41,7 @@ public class confrimService {
         System.out.println("sendNum");
         if(trySendSmsDto.getScope().equals("phone")){
             System.out.println("문자 인증번호 전송 요청");
-            sendPhone(trySendSmsDto);
+            sendPhone(trySendSmsDto); 
         }else if(trySendSmsDto.getScope().equals("email")){
             System.out.println("이메일 인증번호 전송 요청");
             sendEmail(trySendSmsDto);
@@ -48,9 +52,32 @@ public class confrimService {
     public void sendEmail(trySendSmsDto trySendSmsDto) {
         System.out.println("sendEmail");
         System.out.println(trySendSmsDto.getUnit());
-        emailVo emailVo=emailDao.findByEemail(trySendSmsDto.getUnit()).orElseGet(() -> new emailVo().builder().ecount(0).ecreated(Timestamp.valueOf(LocalDateTime.now())).eemail(trySendSmsDto.getUnit()).build());
+    
+        emailVo emailVo=new emailVo();
+        if(trySendSmsDto.getDetail().equals("confrim")){
+            System.out.println("회원가입시 이메일 요청");
+        }else{
+            System.out.println("이미 회원가입 되어있는 이메일 찾기");
+            getUserJoinInter getUserJoinInter=emailDao.findByEemailJoinUsers(trySendSmsDto.getUnit());
+            if(getUserJoinInter.getAlready()!=1){
+                System.out.println("회원가입 되어있지 않은 이메일");
+                throw new RuntimeException("회원가입 되어있지 않은 이메일입니다");
+            }else if(Optional.ofNullable(getUserJoinInter.getEemail()).orElseGet(()->"emthy").equals("emthy")){
+                System.out.println("첫요청");
+                emailVo.setDoneemail(0);
+                emailVo.setEcount(0);
+                emailVo.setEcreated(Timestamp.valueOf(LocalDateTime.now()));
+            }else{
+                System.out.println("요청 내역존재");
+                emailVo.setEid(getUserJoinInter.getEid());
+                emailVo.setDoneemail(getUserJoinInter.getDoneemail());
+                emailVo.setEcount(getUserJoinInter.getEcount());
+                emailVo.setEcreated(getUserJoinInter.getEcreated());
+            }
+            emailVo.setEemail(trySendSmsDto.getUnit());
+        }
         System.out.println("이메일 전송"+emailVo);
-        sendRandNumInter sendRandNumInter=new sendPhoneInter(emailVo.getEcount(),emailVo.getEemail(),emailVo.getEcreated(),utillService.getRandomNum(numLength),emailVo.getDoneemail());
+        sendRandNumInter sendRandNumInter=new sendInter(emailVo.getEcount(),emailVo.getEemail(),emailVo.getEcreated(), utillService.getRandomNum(numLength),emailVo.getDoneemail(),trySendSmsDto.getScope());
         sendRandNum(sendRandNumInter);
         //sendMessage.sendMessege("01091443409",sendRandNumInter.getRandNum()); 
     }
@@ -58,9 +85,15 @@ public class confrimService {
     public void sendPhone(trySendSmsDto sendSmsDto) {
         System.out.println("sendPhone");
         System.out.println(sendSmsDto.getUnit());
-        phoneVo phoneVo=phoneDao.findByPhoneNum(sendSmsDto.getUnit()).orElseGet(() -> new phoneVo().builder().pcount(0).pcreated(Timestamp.valueOf(LocalDateTime.now())).phoneNum(sendSmsDto.getUnit()).build());
+        phoneVo phoneVo=null;
+        if(sendSmsDto.getDetail().equals("confrim")){
+            System.out.println("회원가입시 핸드폰 번호 요청");
+            phoneVo=phoneDao.findByPhoneNum(sendSmsDto.getUnit()).orElseGet(() -> new phoneVo().builder().pcount(0).pcreated(Timestamp.valueOf(LocalDateTime.now())).phoneNum(sendSmsDto.getUnit()).build());
+        }else{
+            System.out.println("이미 회원가입 되어있는 휴대폰 번호 찾기");
+        }
         System.out.println("문자메세지 전송"+phoneVo);
-        sendRandNumInter sendRandNumInter=new sendPhoneInter(phoneVo.getPcount(),phoneVo.getPhoneNum(),phoneVo.getPcreated(),utillService.getRandomNum(numLength),phoneVo.getDonePhone());
+        sendRandNumInter sendRandNumInter=new sendInter(phoneVo.getPcount(),phoneVo.getPhoneNum(),phoneVo.getPcreated(),utillService.getRandomNum(numLength),phoneVo.getDonePhone(),sendSmsDto.getScope());
         sendRandNum(sendRandNumInter);
         //sendMessage.sendMessege("01091443409",sendRandNumInter.getRandNum()); 
     }
@@ -97,14 +130,17 @@ public class confrimService {
     }
     private void insert(sendRandNumInter sendRandNumInter){
         System.out.println("insert");
-        if(sendRandNumInter.getUnit().equals("phone")){
+        if(sendRandNumInter.getScope().equals("phone")){
             System.out.println("전화인증 db 저장");
-            phoneDao.save(interToPhoneVo(sendRandNumInter));
+            phoneDao.save((phoneVo)interToPhoneVo(sendRandNumInter).get("vo"));
+        }else if(sendRandNumInter.getScope().equals("email")){
+            System.out.println("이메일 인증 db저장");
+            emailDao.save((emailVo)interToPhoneVo(sendRandNumInter).get("vo"));
         }
     }
     private void delete(sendRandNumInter sendRandNumInter){
         System.out.println("delete");
-        if(sendRandNumInter.getUnit().equals("phone")){
+        if(sendRandNumInter.getScope().equals("phone")){
             System.out.println("핸드폰 인증 정보 삭제");
             phoneDao.deleteByPhoneNum(sendRandNumInter.getEmailOrPhone());
             return;
@@ -112,20 +148,38 @@ public class confrimService {
     }
     private void update(sendRandNumInter sendRandNumInter){
         System.out.println("update");
-        if(sendRandNumInter.getUnit().equals("phone")){
+        if(sendRandNumInter.getScope().equals("phone")){
             System.out.println("핸드폰 요청 횟수 증가");
-            phoneDao.updatePhoneNative(sendRandNumInter.getCount()+1,sendRandNumInter.getEmailOrPhone());
+            phoneDao.updatePhoneNative(sendRandNumInter.getCount()+1,sendRandNumInter.getRandNum(),sendRandNumInter.getEmailOrPhone());
+        }else if(sendRandNumInter.getScope().equals("email")){
+            System.out.println("이메일 요청 횟수 증가");
+            emailDao.updateEmailNative(sendRandNumInter.getCount()+1, sendRandNumInter.getRandNum(), sendRandNumInter.getEmailOrPhone());
         }
     }
-    private phoneVo interToPhoneVo(sendRandNumInter sendRandNumInter){
+    private Map<String,Object> interToPhoneVo(sendRandNumInter sendRandNumInter){
         System.out.println("interToVo");
-        phoneVo vo=phoneVo.builder()
-        .pcount(1)
-        .phoneNum(sendRandNumInter.getEmailOrPhone())
-        .randNum(sendRandNumInter.getRandNum())
-        .donePhone(noDoneNum)
-        .build();
-        return vo;
+        Map<String,Object>map=new HashMap<>();
+        if(sendRandNumInter.getScope().equals("phone")){
+            System.out.println("phonevo로 변환");
+            phoneVo vo=phoneVo.builder()
+            .pcount(1)
+            .phoneNum(sendRandNumInter.getEmailOrPhone())
+            .randNum(sendRandNumInter.getRandNum())
+            .donePhone(noDoneNum)
+            .build();
+            map.put("vo", vo);
+        }else if(sendRandNumInter.getScope().equals("email")){
+            System.out.println("emailco로 변환");
+            emailVo vo=emailVo.builder()
+            .ecount(1)
+            .eemail(sendRandNumInter.getEmailOrPhone())
+            .erandNum(sendRandNumInter.getRandNum())
+            .doneemail(noDoneNum)
+            .build();
+            map.put("vo", vo);
+        }
+  
+        return map;
     }
     @Transactional
     public JSONObject checkRandNum(tryConfrimRandNumDto tryConfrimRandNumDto) throws IllegalArgumentException {
