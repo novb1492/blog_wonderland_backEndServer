@@ -17,4 +17,7 @@ public interface emailDao extends JpaRepository<emailVo,Integer> {
     @Transactional
     @Query(value = "update requestemail set ecount=?,erand_num=? where eemail=?",nativeQuery = true)
     void updateEmailNative(int count,String randNum,String email);
+    
+    void deleteByEemail(String email);
+
 }

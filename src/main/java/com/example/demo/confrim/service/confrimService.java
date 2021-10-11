@@ -144,6 +144,9 @@ public class confrimService {
             System.out.println("핸드폰 인증 정보 삭제");
             phoneDao.deleteByPhoneNum(sendRandNumInter.getEmailOrPhone());
             return;
+        }else if(sendRandNumInter.getScope().equals("email")){
+            System.out.println("이메일 인증 정보 삭제");
+            emailDao.deleteByEemail(sendRandNumInter.getEmailOrPhone());
         }
     }
     private void update(sendRandNumInter sendRandNumInter){
