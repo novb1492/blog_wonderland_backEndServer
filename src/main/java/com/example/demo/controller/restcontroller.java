@@ -17,6 +17,7 @@ import com.example.demo.user.service.userService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,6 +27,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class restcontroller {
+    @Value("${front.domain}")
+    private String frontDamain;
     
     @Autowired
     private userService userService;
@@ -77,7 +80,7 @@ public class restcontroller {
     public void naverLoginCallback(HttpServletRequest request ,HttpServletResponse response) {
         System.out.println("naverLoginCallback restcontroller");
         naverService.tryNaverLogin(request,response);
-        doRedirect(response, "http://localhost:3030/doneLogin?provider=naver");
+        doRedirect(response, frontDamain+"doneLogin?provider=naver");
     }
     @RequestMapping(value = "/kakao/showPage",method = RequestMethod.GET)
     public JSONObject showKakaoPage(HttpServletRequest request ,HttpServletResponse response) {
@@ -88,7 +91,7 @@ public class restcontroller {
     public void kakaoLoginCallback(HttpServletRequest request ,HttpServletResponse response) {
         System.out.println("showKakaoLoginPage restcontroller");
         kakaoService.callback(request, response);
-        doRedirect(response, "http://localhost:3030/doneLogin?provider=kakao");
+        doRedirect(response, frontDamain+"doneLogin?provider=kakao");
     }
     private void doRedirect(HttpServletResponse response,String url) {
         System.out.println("doRedirect");

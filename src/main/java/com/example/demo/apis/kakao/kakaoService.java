@@ -26,6 +26,8 @@ public class kakaoService {
     private String apiKey;
     @Value("${kakao.more.callback}")
     private String morePageCallback;
+    @Value("${front.domain}")
+    private String frontDamain;
 
     
     @Autowired
@@ -54,6 +56,7 @@ public class kakaoService {
             tryKakaoLogin(request, response);
         }else if(scope.equals("more")){
             System.out.println("카카오 추가동의 콜백");
+            utillService.doRedirect(response,frontDamain+"popUpClose");
         }
     }
     private void tryKakaoLogin(HttpServletRequest request,HttpServletResponse response) {

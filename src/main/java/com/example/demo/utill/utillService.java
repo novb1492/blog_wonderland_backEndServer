@@ -1,6 +1,7 @@
 package com.example.demo.utill;
 
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.Random;
 
@@ -56,5 +57,15 @@ public class utillService {
             }
         }
         return null;
+    }
+    public static void doRedirect(HttpServletResponse response,String url) {
+        System.out.println("doRedirect");
+        System.out.println(url+"리다이렉트 요청 url");
+        try {
+            response.sendRedirect(url);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("doRedirect error"+e.getMessage());
+        }
     }
 }
