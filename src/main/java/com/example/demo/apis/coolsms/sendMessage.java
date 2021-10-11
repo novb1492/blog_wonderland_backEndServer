@@ -1,4 +1,4 @@
-package com.example.demo.sendPhoneAndEmail;
+package com.example.demo.apis.coolsms;
 
 import java.util.HashMap;
 

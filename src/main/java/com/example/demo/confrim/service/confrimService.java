@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import com.example.demo.apis.coolsms.sendMessage;
+import com.example.demo.apis.mailSender.sendMailService;
 import com.example.demo.confrim.model.sendInter;
 import com.example.demo.confrim.model.sendRandNumInter;
 import com.example.demo.confrim.model.email.emailDao;
@@ -36,6 +38,10 @@ public class confrimService {
     private phoneDao phoneDao;
     @Autowired
     private emailDao emailDao;
+    @Autowired
+    private sendMailService sendMailService;
+
+
     
     public JSONObject sendNum(trySendSmsDto trySendSmsDto) {
         System.out.println("sendNum");
@@ -79,7 +85,7 @@ public class confrimService {
         System.out.println("이메일 전송"+emailVo);
         sendRandNumInter sendRandNumInter=new sendInter(emailVo.getEcount(),emailVo.getEemail(),emailVo.getEcreated(), utillService.getRandomNum(numLength),emailVo.getDoneemail(),trySendSmsDto.getScope());
         sendRandNum(sendRandNumInter);
-        //sendMessage.sendMessege("01091443409",sendRandNumInter.getRandNum()); 
+        sendMailService.sendEmail(sendRandNumInter.getEmailOrPhone(),"안녕하세요 wonderland입니다","인증번호는 "+sendRandNumInter.getRandNum()+"입니다");
     }
     @Transactional(rollbackFor = Exception.class)
     public void sendPhone(trySendSmsDto sendSmsDto) {
