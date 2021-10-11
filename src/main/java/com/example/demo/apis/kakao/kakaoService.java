@@ -24,6 +24,8 @@ public class kakaoService {
     private String appKey;
     @Value("${kakao.rest.key}")
     private String apiKey;
+    @Value("${kakao.more.callback}")
+    private String morePageCallback;
 
     
     @Autowired
@@ -31,11 +33,30 @@ public class kakaoService {
     @Autowired
     private jwtService jwtService;
 
-    public JSONObject showLoginPage() {
+    public JSONObject showPage(HttpServletRequest request) {
         System.out.println("kakaoService showLoginPage");
-        return utillService.makeJson(true, kakaoLoginService.showLoingPage(apiKey));
+        String scope=request.getParameter("scope");
+        String url=null;
+        if(scope.equals("login")){
+            System.out.println("카카오 로그인 화면요청");
+            url=kakaoLoginService.showLoingPage(apiKey);
+        }else if(scope.equals("selfMessage")){
+            System.out.println("카카오 추가동의 화면요청");
+            url="https://kauth.kakao.com/oauth/authorize?client_id="+apiKey+"&redirect_uri="+morePageCallback+"&response_type=code&scope=talk_message";
+        }
+        return utillService.makeJson(true, url);
     }
-    public void tryKakaoLogin(HttpServletRequest request,HttpServletResponse response) {
+    public void callback(HttpServletRequest request,HttpServletResponse response) {
+        System.out.println("callback");
+        String scope=request.getParameter("scope");
+        if(scope.equals("login")){
+            System.out.println("카카오 로그인 콜백");
+            tryKakaoLogin(request, response);
+        }else if(scope.equals("more")){
+            System.out.println("카카오 추가동의 콜백");
+        }
+    }
+    private void tryKakaoLogin(HttpServletRequest request,HttpServletResponse response) {
         System.out.println("tryKakaoLogin");
         uservo uservo =kakaoLoginService.tryLogin(request,apiKey);
         Map<String,Object>makeCookies=new HashMap<>();

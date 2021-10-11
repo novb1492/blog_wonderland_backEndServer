@@ -79,15 +79,15 @@ public class restcontroller {
         naverService.tryNaverLogin(request,response);
         doRedirect(response, "http://localhost:3030/doneLogin?provider=naver");
     }
-    @GetMapping("/kakao/showLoginPage")
-    public JSONObject showKakaoLoginPage(HttpServletRequest request ,HttpServletResponse response) {
+    @RequestMapping(value = "/kakao/showPage",method = RequestMethod.GET)
+    public JSONObject showKakaoPage(HttpServletRequest request ,HttpServletResponse response) {
         System.out.println("showKakaoLoginPage restcontroller");
-        return kakaoService.showLoginPage();
+        return kakaoService.showPage(request);
     }
-    @GetMapping("/kakao/loginCallback")
+    @GetMapping("/kakao/callback/**")
     public void kakaoLoginCallback(HttpServletRequest request ,HttpServletResponse response) {
         System.out.println("showKakaoLoginPage restcontroller");
-        kakaoService.tryKakaoLogin(request, response);
+        kakaoService.callback(request, response);
         doRedirect(response, "http://localhost:3030/doneLogin?provider=kakao");
     }
     private void doRedirect(HttpServletResponse response,String url) {
