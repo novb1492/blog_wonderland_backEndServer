@@ -93,7 +93,7 @@ public class jwtService {
         return JWT.require(Algorithm.HMAC512(jwtSing)).build().verify(accessToken).getClaim("email").asString();
     }
     public Authentication makeAuthentication(principalDetail principalDetail) {
-        System.out.println("makeAuthentication 로그인한 회원"+ principalDetail.getUservo().getName());
+        System.out.println("makeAuthentication 로그인한 회원"+ principalDetail.getUservo().getEmail());
         return new UsernamePasswordAuthenticationToken(principalDetail, null, principalDetail.getAuthorities());
     }
     public JSONObject reGetAccessToken(HttpServletRequest request,HttpServletResponse response ){

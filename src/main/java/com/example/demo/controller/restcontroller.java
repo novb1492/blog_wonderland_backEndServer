@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import com.example.demo.apis.kakao.kakaoService;
 import com.example.demo.apis.naver.naverService;
 import com.example.demo.confrim.model.phone.tryConfrimRandNumDto;
 import com.example.demo.confrim.model.phone.trySendSmsDto;
@@ -34,18 +35,20 @@ public class restcontroller {
     private jwtService jwtService;
     @Autowired
     private naverService naverService;
+    @Autowired
+    private kakaoService kakaoService;
 
     @RequestMapping(value = "/user/crud/**",method = RequestMethod.GET)
     public JSONObject checkLogin(HttpServletRequest request,HttpServletResponse response) {
         System.out.println("checkLogin restcontroller");
         return userService.checkLogin(request);
     }
-    @RequestMapping(value = "/send/**",method = RequestMethod.POST)
+    @RequestMapping(value = "/confrim/**",method = RequestMethod.POST)
     public JSONObject sendSms(@Valid @RequestBody trySendSmsDto trySendSmsDto ,HttpServletResponse response) {
         System.out.println("sendSms restcontroller");
         return confrimService.sendPhone(trySendSmsDto);
     }
-    @PostMapping("/user/checkNum")
+    @RequestMapping(value = "/confrim/**",method = RequestMethod.PUT)
     public JSONObject checkRandNum(@Valid @RequestBody tryConfrimRandNumDto tryConfrimRandNumDto ,HttpServletResponse response) {
         System.out.println("checkRandNum restcontroller");
         return confrimService.checkRandNum(tryConfrimRandNumDto);
@@ -60,21 +63,26 @@ public class restcontroller {
         System.out.println("login restcontroller");
         return userService.checkSucLogin();
     }
-    @PostMapping("/auth/jwtex")
+    @RequestMapping("/user/jwtex")
     public JSONObject jwtex(HttpServletRequest request ,HttpServletResponse response) {
         System.out.println("jwtex restcontroller");
         return jwtService.reGetAccessToken(request, response);
     }
-    @GetMapping("/auth/showNaverLoginPage")
+    @GetMapping("/naver/showLoginPage")
     public JSONObject showNaverLoginPage(HttpServletRequest request ,HttpServletResponse response) {
         System.out.println("showNaverLoginPage restcontroller");
         return naverService.getNaverLogin();
     }
-    @RequestMapping("/auth/naverLoginCallback")
+    @GetMapping("/naver/loginCallback")
     public void naverLoginCallback(HttpServletRequest request ,HttpServletResponse response) {
         System.out.println("naverLoginCallback restcontroller");
         naverService.tryNaverLogin(request,response);
         doRedirect(response, "http://localhost:3030/doneLogin");
+    }
+    @GetMapping("/kakao/showLoginPage")
+    public JSONObject showKakaoLoginPage(HttpServletRequest request ,HttpServletResponse response) {
+        System.out.println("showKakaoLoginPage restcontroller");
+        return kakaoService.showLoginPage();
     }
     private void doRedirect(HttpServletResponse response,String url) {
         System.out.println("doRedirect");

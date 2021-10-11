@@ -54,13 +54,13 @@ public class authorizationFilter extends BasicAuthenticationFilter  {
                 chain.doFilter(request, response);
             } catch (TokenExpiredException e) {
                 System.out.println("토큰기간만료");
-                goToError("/auth/jwtex", request, response);
+                goToError("/user/jwtex", request, response);
             }catch(JWTDecodeException e){
                 System.out.println("토큰변환실패");
-                goToError("/auth/failOpenToken", request, response);
+                goToError("/user/failOpenToken", request, response);
             }catch(IllegalArgumentException e){
                 System.out.println("존재하지 않는 회원");
-                goToError("/auth/failFindUser", request, response);
+                goToError("/user/failFindUser", request, response);
             }
            
         }
