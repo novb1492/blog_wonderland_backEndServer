@@ -4,12 +4,13 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 import com.example.demo.confrim.model.sendRandNumInter;
+import com.example.demo.confrim.model.email.emailDao;
+import com.example.demo.confrim.model.email.emailVo;
 import com.example.demo.confrim.model.phone.phoneDao;
 import com.example.demo.confrim.model.phone.phoneVo;
 import com.example.demo.confrim.model.phone.sendPhoneInter;
 import com.example.demo.confrim.model.phone.tryConfrimRandNumDto;
 import com.example.demo.confrim.model.phone.trySendSmsDto;
-import com.example.demo.sendPhoneAndEmail.sendMessage;
 import com.example.demo.utill.utillService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
@@ -29,17 +30,39 @@ public class confrimService {
 
     @Autowired
     private phoneDao phoneDao;
+    @Autowired
+    private emailDao emailDao;
     
+    public JSONObject sendNum(trySendSmsDto trySendSmsDto) {
+        System.out.println("sendNum");
+        if(trySendSmsDto.getScope().equals("phone")){
+            System.out.println("문자 인증번호 전송 요청");
+            sendPhone(trySendSmsDto);
+        }else if(trySendSmsDto.getScope().equals("email")){
+            System.out.println("이메일 인증번호 전송 요청");
+            sendEmail(trySendSmsDto);
+        }
+        return utillService.makeJson(true, "인증번호 전송이 완료 되었습니다");
+    }
     @Transactional(rollbackFor = Exception.class)
-    public JSONObject sendPhone(trySendSmsDto sendSmsDto) {
+    public void sendEmail(trySendSmsDto trySendSmsDto) {
+        System.out.println("sendEmail");
+        System.out.println(trySendSmsDto.getUnit());
+        emailVo emailVo=emailDao.findByEemail(trySendSmsDto.getUnit()).orElseGet(() -> new emailVo().builder().ecount(0).ecreated(Timestamp.valueOf(LocalDateTime.now())).eemail(trySendSmsDto.getUnit()).build());
+        System.out.println("이메일 전송"+emailVo);
+        sendRandNumInter sendRandNumInter=new sendPhoneInter(emailVo.getEcount(),emailVo.getEemail(),emailVo.getEcreated(),utillService.getRandomNum(numLength),emailVo.getDoneemail());
+        sendRandNum(sendRandNumInter);
+        //sendMessage.sendMessege("01091443409",sendRandNumInter.getRandNum()); 
+    }
+    @Transactional(rollbackFor = Exception.class)
+    public void sendPhone(trySendSmsDto sendSmsDto) {
         System.out.println("sendPhone");
-        System.out.println(sendSmsDto.getPhone());
-        phoneVo phoneVo=phoneDao.findByPhoneNum(sendSmsDto.getPhone()).orElseGet(() -> new phoneVo().builder().pcount(0).pcreated(Timestamp.valueOf(LocalDateTime.now())).phoneNum(sendSmsDto.getPhone()).build());
+        System.out.println(sendSmsDto.getUnit());
+        phoneVo phoneVo=phoneDao.findByPhoneNum(sendSmsDto.getUnit()).orElseGet(() -> new phoneVo().builder().pcount(0).pcreated(Timestamp.valueOf(LocalDateTime.now())).phoneNum(sendSmsDto.getUnit()).build());
         System.out.println("문자메세지 전송"+phoneVo);
         sendRandNumInter sendRandNumInter=new sendPhoneInter(phoneVo.getPcount(),phoneVo.getPhoneNum(),phoneVo.getPcreated(),utillService.getRandomNum(numLength),phoneVo.getDonePhone());
         sendRandNum(sendRandNumInter);
-        //sendMessage.sendMessege("01091443409",sendRandNumInter.getRandNum());
-        return utillService.makeJson(true, "인증번호 전송");
+        //sendMessage.sendMessege("01091443409",sendRandNumInter.getRandNum()); 
     }
     private void sendRandNum(sendRandNumInter sendRandNumInter){
         System.out.println("sendRandNum");
@@ -57,7 +80,7 @@ public class confrimService {
                     System.out.println("요청 db 수정완료");
                 }else{
                     System.out.println("첫 요청 후 하루가 지나지않고 최대 회수 초과한 상태");
-                    utillService.throwRuntimeEX(new RuntimeException(),"하루 최대 요청 횟수는 "+maxReuqest+"입니다","sendRandNum");
+                    utillService.throwRuntimeEX(new RuntimeException(),"하루 최대 요청 횟수는 "+maxReuqest+"입니다 24시간뒤에 시도해주세요","sendRandNum");
                 }
                 return; 
             }else{
@@ -76,7 +99,7 @@ public class confrimService {
         System.out.println("insert");
         if(sendRandNumInter.getUnit().equals("phone")){
             System.out.println("전화인증 db 저장");
-            phoneDao.save(interToVo(sendRandNumInter));
+            phoneDao.save(interToPhoneVo(sendRandNumInter));
         }
     }
     private void delete(sendRandNumInter sendRandNumInter){
@@ -94,7 +117,7 @@ public class confrimService {
             phoneDao.updatePhoneNative(sendRandNumInter.getCount()+1,sendRandNumInter.getEmailOrPhone());
         }
     }
-    private phoneVo interToVo(sendRandNumInter sendRandNumInter){
+    private phoneVo interToPhoneVo(sendRandNumInter sendRandNumInter){
         System.out.println("interToVo");
         phoneVo vo=phoneVo.builder()
         .pcount(1)

@@ -9,9 +9,9 @@ import lombok.NoArgsConstructor;
 @Data
 public class trySendSmsDto {
 
-   private String phone; 
-   private String email;
-
+   @NotBlank
+   private String unit; 
+  
    @NotBlank
    private String scope;
 }

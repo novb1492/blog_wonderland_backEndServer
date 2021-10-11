@@ -49,7 +49,7 @@ public class restcontroller {
     @RequestMapping(value = "/confrim/**",method = RequestMethod.POST)
     public JSONObject sendSms(@Valid @RequestBody trySendSmsDto trySendSmsDto ,HttpServletResponse response) {
         System.out.println("sendSms restcontroller");
-        return confrimService.sendPhone(trySendSmsDto);
+        return confrimService.sendNum(trySendSmsDto);
     }
     @RequestMapping(value = "/confrim/**",method = RequestMethod.PUT)
     public JSONObject checkRandNum(@Valid @RequestBody tryConfrimRandNumDto tryConfrimRandNumDto ,HttpServletResponse response) {
