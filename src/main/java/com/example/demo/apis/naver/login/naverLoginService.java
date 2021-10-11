@@ -6,7 +6,7 @@ import java.util.LinkedHashMap;
 
 import javax.servlet.http.HttpServletResponse;
 
-import com.example.demo.apis.naver.naverService;
+import com.example.demo.apis.requestTo;
 import com.example.demo.enums.Stringenums;
 import com.example.demo.user.model.uservo;
 import com.example.demo.user.service.userService;
@@ -15,6 +15,7 @@ import com.nimbusds.jose.shaded.json.JSONObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -23,9 +24,9 @@ public class naverLoginService {
     @Value("${naver.loginCallback}")
     private String loginCallback;
     @Autowired
-    private naverService naverService;
-    @Autowired
     private userService userService;
+    @Autowired
+    private requestTo requestTo;
     
     public JSONObject getNaverLogin(String naverId) {
         String state="";
@@ -38,7 +39,9 @@ public class naverLoginService {
     }
     public uservo tryNaverLogin(JSONObject tokens,HttpServletResponse response) {
         System.out.println("tryNaverLogin naverLoginService");
-        JSONObject getNaver=naverService.requestToNaver(tokens.get("access_token").toString(),"https://openapi.naver.com/v1/nid/me");
+        HttpHeaders headers=new HttpHeaders();
+        headers.add("Authorization","Bearer " + tokens.get("access_token"));
+        JSONObject getNaver=requestTo.requestToKakao("https://openapi.naver.com/v1/nid/me", headers); //requestToNaver(tokens.get("access_token").toString(),"https://openapi.naver.com/v1/nid/me");
         System.out.println(getNaver);
         return userService.insertOauth(makeVo((LinkedHashMap<String,Object>)getNaver.get("response")));
     }

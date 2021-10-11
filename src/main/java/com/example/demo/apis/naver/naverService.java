@@ -14,17 +14,13 @@ import com.example.demo.utill.utillService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 @Service
 public class naverService {
     
     private RestTemplate restTemplate=new RestTemplate();
-    private HttpHeaders headers=new HttpHeaders();
     private final String get="authorization_code";
     private final String update="refresh_token";
     private final String delete="delete";
@@ -57,19 +53,4 @@ public class naverService {
         System.out.println("getToken");
         return restTemplate.getForObject("https://nid.naver.com/oauth2.0/token?grant_type="+get+"&client_id="+naverId+"&client_secret="+pwd+"&code="+code+"&state="+state+"", JSONObject.class);
     }
-    public JSONObject requestToNaver(String accessToken,String requestUrl) {
-        System.out.println("requestToNaver"+accessToken);
-        try {
-            headers.add("Authorization","Bearer " + accessToken);
-            HttpEntity<JSONObject>entity=new HttpEntity<JSONObject>(headers);
-            return restTemplate.postForObject(requestUrl, entity, JSONObject.class);
-        } catch (HttpClientErrorException e) {
-            e.printStackTrace();
-            return utillService.makeJson(false, "네이버 통신에 실패했습니다");
-        }finally{
-            headers.clear();
-        }
-    }
-    
-
 }

@@ -84,6 +84,11 @@ public class restcontroller {
         System.out.println("showKakaoLoginPage restcontroller");
         return kakaoService.showLoginPage();
     }
+    @GetMapping("/kakao/loginCallback")
+    public void kakaoLoginCallback(HttpServletRequest request ,HttpServletResponse response) {
+        System.out.println("showKakaoLoginPage restcontroller");
+        kakaoService.tryKakaoLogin(request, response);
+    }
     private void doRedirect(HttpServletResponse response,String url) {
         System.out.println("doRedirect");
         System.out.println(url+"리다이렉트 요청 url");
