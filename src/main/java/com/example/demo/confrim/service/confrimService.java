@@ -13,6 +13,7 @@ import com.example.demo.confrim.model.sendRandNumInter;
 import com.example.demo.confrim.model.email.emailDao;
 import com.example.demo.confrim.model.email.emailVo;
 import com.example.demo.confrim.model.email.getUserJoinInter;
+import com.example.demo.confrim.model.phone.getRequestAndusersInter;
 import com.example.demo.confrim.model.phone.phoneDao;
 import com.example.demo.confrim.model.phone.phoneVo;
 import com.example.demo.confrim.model.phone.tryConfrimRandNumDto;
@@ -54,6 +55,8 @@ public class confrimService {
         }else if(trySendSmsDto.getScope().equals("email")){
             System.out.println("이메일 인증번호 전송 요청");
             sendEmail(trySendSmsDto);
+        }else{
+            return utillService.makeJson(false, "수단이 유효하지 않습니다");
         }
         return utillService.makeJson(true, "인증번호 전송이 완료 되었습니다");
     }
@@ -65,17 +68,14 @@ public class confrimService {
         emailVo emailVo=new emailVo();
         if(trySendSmsDto.getDetail().equals("confrim")){
             System.out.println("회원가입시 이메일 요청");
-        }else{
+        }else if(trySendSmsDto.getDetail().equals("find")){
             System.out.println("이미 회원가입 되어있는 이메일 찾기");
             getUserJoinInter getUserJoinInter=emailDao.findByEemailJoinUsers(trySendSmsDto.getUnit());
-            if(getUserJoinInter.getAlready()!=1){
-                System.out.println("회원가입 되어있지 않은 이메일");
-                throw new RuntimeException("회원가입 되어있지 않은 이메일입니다");
-            }else if(Optional.ofNullable(getUserJoinInter.getEemail()).orElseGet(()->"emthy").equals("emthy")){
+            confrimAlready(getUserJoinInter.getAlready());
+            if(Optional.ofNullable(getUserJoinInter.getEemail()).orElseGet(()->"emthy").equals("emthy")){
                 System.out.println("첫요청");
                 emailVo.setDoneemail(0);
                 emailVo.setEcount(0);
-                emailVo.setEcreated(Timestamp.valueOf(LocalDateTime.now()));
             }else{
                 System.out.println("요청 내역존재");
                 emailVo.setEid(getUserJoinInter.getEid());
@@ -84,22 +84,49 @@ public class confrimService {
                 emailVo.setEcreated(getUserJoinInter.getEcreated());
             }
             emailVo.setEemail(trySendSmsDto.getUnit());
+        }else{
+            throw new RuntimeException("detail이 유요하지 않습니다");
         }
         System.out.println("이메일 전송"+emailVo);
         sendRandNumInter sendRandNumInter=new sendInter(emailVo.getEcount(),emailVo.getEemail(),emailVo.getEcreated(), utillService.getRandomNum(numLength),emailVo.getDoneemail(),trySendSmsDto.getScope());
         sendRandNum(sendRandNumInter);
         //sendMailService.sendEmail(sendRandNumInter.getEmailOrPhone(),"안녕하세요 wonderland입니다","인증번호는 "+sendRandNumInter.getRandNum()+"입니다");
     }
+    private void confrimAlready(int count) {
+        System.out.println("회원가입되어있나 검사");
+        if(count!=1){
+            System.out.println("회원가입 되어있지 않은 이메일");
+            throw new RuntimeException("회원가입 되어있지 않은 이메일입니다");
+        }
+        System.out.println("회원가입 유효성 통과");
+    }
     @Transactional(rollbackFor = Exception.class)
     public void sendPhone(trySendSmsDto sendSmsDto) {
         System.out.println("sendPhone");
         System.out.println(sendSmsDto.getUnit());
-        phoneVo phoneVo=null;
+        phoneVo phoneVo=new phoneVo();
         if(sendSmsDto.getDetail().equals("confrim")){
             System.out.println("회원가입시 핸드폰 번호 요청");
             phoneVo=phoneDao.findByPhoneNum(sendSmsDto.getUnit()).orElseGet(() -> new phoneVo().builder().pcount(0).pcreated(Timestamp.valueOf(LocalDateTime.now())).phoneNum(sendSmsDto.getUnit()).build());
-        }else{
+        }else if(sendSmsDto.getDetail().equals("find")){
             System.out.println("이미 회원가입 되어있는 휴대폰 번호 찾기");
+            getRequestAndusersInter getRequestAndusersInter=phoneDao.findPhoneJoinUsers(sendSmsDto.getUnit());
+            confrimAlready(getRequestAndusersInter.getAlready());
+            if(Optional.ofNullable(getRequestAndusersInter.getPhone_num()).orElseGet(()->"emthy").equals("emthy")){
+                System.out.println("첫요청");
+                phoneVo.setDonePhone(noDoneNum);
+                phoneVo.setPcount(0);
+                phoneVo.setPcreated(Timestamp.valueOf(LocalDateTime.now()));
+            }else{
+                System.out.println("요청 내역존재");
+                phoneVo.setPid(getRequestAndusersInter.getPid());
+                phoneVo.setDonePhone(getRequestAndusersInter.getDone_phone());
+                phoneVo.setPcount(getRequestAndusersInter.getPcount());
+                phoneVo.setPcreated(getRequestAndusersInter.getPcreated());
+            }
+            phoneVo.setPhoneNum(sendSmsDto.getUnit());
+        }else{
+            throw new RuntimeException("detail이 유요하지 않습니다");
         }
         System.out.println("문자메세지 전송"+phoneVo);
         sendRandNumInter sendRandNumInter=new sendInter(phoneVo.getPcount(),phoneVo.getPhoneNum(),phoneVo.getPcreated(),utillService.getRandomNum(numLength),phoneVo.getDonePhone(),sendSmsDto.getScope());

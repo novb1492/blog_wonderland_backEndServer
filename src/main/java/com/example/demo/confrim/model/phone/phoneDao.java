@@ -14,6 +14,8 @@ public interface phoneDao extends JpaRepository<phoneVo,Integer> {
 
     void deleteByPhoneNum(String phone);
 
+    @Query(value = "select a.*,count(b.id)already from users b left join requestphone a on b.phone_num=a.phone_num where b.phone_num=?",nativeQuery=true)
+    getRequestAndusersInter findPhoneJoinUsers(String phone);
   
     @Modifying
     @Transactional
