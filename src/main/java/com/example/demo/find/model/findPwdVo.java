@@ -35,10 +35,9 @@ public class findPwdVo {
     private String ptokenName;
 
     @Column(name = "pexpire" ,nullable = false)
-    @CreationTimestamp
     private Timestamp pexpire;
 
-    @Column(name = "ucreated")
+    @Column(name = "pcreated")
     @CreationTimestamp
     private Timestamp pcreated;
 }
