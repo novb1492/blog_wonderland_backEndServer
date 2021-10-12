@@ -9,8 +9,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class tryConfrimRandNumDto {
-    @Size(min = 11,max = 11,message = "핸드폰번호를 확인해주세요")
-    private String phone; 
+    
+    @NotBlank
+    private String phoneOrEmail; 
 
     @NotBlank
     private String randNum;

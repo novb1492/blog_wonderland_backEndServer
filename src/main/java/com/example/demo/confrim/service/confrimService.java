@@ -108,10 +108,11 @@ public class confrimService {
         int reuqestCount=sendRandNumInter.getCount();
         LocalDateTime firstRequest=sendRandNumInter.getCreated().toLocalDateTime();
         System.out.println(reuqestCount+1+"번째 요청시도");
+        System.out.println(firstRequest+" "+firstRequest.plusDays(limitDay));
         try {
             if(reuqestCount==0){
                 System.out.println("첫 인증번호 요청");
-            }else if(firstRequest.isBefore(firstRequest.plusDays(limitDay))){
+            }else if(LocalDateTime.now().isBefore(firstRequest.plusDays(limitDay))){
                 System.out.println("첫 요청후 하루가 지나지않음");
                 if(reuqestCount<=maxReuqest){
                     System.out.println(maxReuqest+"회 이하입니다");
@@ -148,11 +149,11 @@ public class confrimService {
         System.out.println("delete");
         if(sendRandNumInter.getScope().equals("phone")){
             System.out.println("핸드폰 인증 정보 삭제");
-            phoneDao.deleteByPhoneNum(sendRandNumInter.getEmailOrPhone());
+            phoneDao.deletePhoneNative(sendRandNumInter.getEmailOrPhone());
             return;
         }else if(sendRandNumInter.getScope().equals("email")){
             System.out.println("이메일 인증 정보 삭제");
-            emailDao.deleteByEemail(sendRandNumInter.getEmailOrPhone());
+            emailDao.deleteEmailNative(sendRandNumInter.getEmailOrPhone());
         }
     }
     private void update(sendRandNumInter sendRandNumInter){
@@ -195,9 +196,13 @@ public class confrimService {
         System.out.println("checkRandNum");
         try {
             if(tryConfrimRandNumDto.getUnit().equals("phone")){
-                phoneVo phoneVo=phoneDao.findByPhoneNum(tryConfrimRandNumDto.getPhone()).orElseThrow(()->new IllegalArgumentException("인증 요청 내역이 존재 하지 않습니다"));
+                phoneVo phoneVo=phoneDao.findByPhoneNum(tryConfrimRandNumDto.getPhoneOrEmail()).orElseThrow(()->new IllegalArgumentException("인증 요청 내역이 존재 하지 않습니다"));
                 confrimNum(tryConfrimRandNumDto.getRandNum(), phoneVo.getRandNum());
                 phoneVo.setDonePhone(doneNum);
+            }else if(tryConfrimRandNumDto.getUnit().equals("email")){
+                emailVo emailVo=emailDao.findByEemail(tryConfrimRandNumDto.getPhoneOrEmail()).orElseThrow(()->new IllegalArgumentException("인증요청 내역이 존재하지 않습니다"));
+                confrimNum(tryConfrimRandNumDto.getRandNum(), emailVo.getErandNum());
+                emailVo.setDoneemail(doneNum);
             }
             return utillService.makeJson(true, "인증이 완료되었습니다");
         }catch (RuntimeException e) {

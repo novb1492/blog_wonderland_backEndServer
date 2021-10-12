@@ -20,4 +20,10 @@ public interface emailDao extends JpaRepository<emailVo,Integer> {
     
     void deleteByEemail(String email);
 
+    @Modifying
+    @Transactional
+    @Query(value = "delete from requestemail where eemail=?",nativeQuery = true)
+    void deleteEmailNative(String email);
+
+
 }
