@@ -9,6 +9,7 @@ import com.example.demo.find.model.findPwdVo;
 import com.example.demo.find.model.getJoinUsers;
 import com.example.demo.jwt.service.jwtService;
 import com.example.demo.utill.utillService;
+import com.nimbusds.jose.shaded.json.JSONObject;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -47,7 +48,7 @@ public class findService {
                 findPwdVo.setPtokenName(token);
                 findPwdDao.save(findPwdVo);
             }
-            sendMailService.sendEmail(email,"안녕하세요 wonderland입니다","비밀번호 변경링크입니다 "+frontDamain+"/findPwdPage?object="+token);
+            sendMailService.sendEmail(email,"안녕하세요 wonderland입니다","비밀번호 변경링크입니다 "+frontDamain+"changePwdPage?scope=pwd&object="+token);
         }catch (RuntimeException e) {
             utillService.throwRuntimeEX(e, e.getMessage() ,"findPwd");
         }catch (Exception e) {
@@ -62,5 +63,19 @@ public class findService {
             throw new RuntimeException("회원가입된 사용자가 아닙니다");
         }
         System.out.println("비밀번호 변경/아이디찾기 요청 유효성 통과");
+    }
+    public JSONObject findRequest(String token,String scope) {
+        System.out.println("findRequest");
+        int count=0;
+        if(scope.equals("pwd")){
+            System.out.println("비밀번호 찾기 내역 확인");
+            count=findPwdDao.countByPtokenNameNative(token);
+        }else{
+            System.out.println("이메일 찾기 내역 확인");
+        }
+        if(count==0){
+           return utillService.makeJson(false, "변경요청 내역 없음");
+        }
+        return utillService.makeJson(true, "변경요청 내역 존재");
     }
 }

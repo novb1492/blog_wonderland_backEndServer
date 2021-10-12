@@ -1,7 +1,6 @@
 package com.example.demo.find.model;
 
 import java.sql.Timestamp;
-import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -18,4 +17,7 @@ public interface findPwdDao extends JpaRepository<findPwdVo,Integer> {
     @Transactional
     @Query(value = "update requestpwd set pcreated=?,pexpire=?,ptoken_name=? where pemail=?",nativeQuery = true)
     void updateTokenNative(Timestamp created,Timestamp expire,String token,String email);
+
+    @Query(value = "select count(*) from requestpwd where ptoken_name=?",nativeQuery=true)
+    int countByPtokenNameNative(String token);
 }

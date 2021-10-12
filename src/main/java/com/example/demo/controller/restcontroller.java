@@ -11,6 +11,7 @@ import com.example.demo.apis.naver.naverService;
 import com.example.demo.confrim.model.phone.tryConfrimRandNumDto;
 import com.example.demo.confrim.model.phone.trySendSmsDto;
 import com.example.demo.confrim.service.confrimService;
+import com.example.demo.find.service.findService;
 import com.example.demo.jwt.service.jwtService;
 import com.example.demo.user.model.tryJoinDto;
 import com.example.demo.user.service.userService;
@@ -40,6 +41,8 @@ public class restcontroller {
     private naverService naverService;
     @Autowired
     private kakaoService kakaoService;
+    @Autowired
+    private findService findService;
 
     @RequestMapping(value = "/user/crud/**",method = RequestMethod.GET)
     public JSONObject checkLogin(HttpServletRequest request,HttpServletResponse response) {
@@ -92,6 +95,11 @@ public class restcontroller {
         System.out.println("showKakaoLoginPage restcontroller");
         kakaoService.callback(request, response);
         doRedirect(response, frontDamain+"doneLogin?provider=kakao");
+    }
+    @RequestMapping(value = "/find/**",method = RequestMethod.GET)
+    public JSONObject findSomthing(HttpServletRequest request,HttpServletResponse response) {
+        System.out.println("findSomthing");
+        return findService.findRequest(request.getParameter("token"), request.getParameter("scope"));
     }
     private void doRedirect(HttpServletResponse response,String url) {
         System.out.println("doRedirect");

@@ -220,7 +220,7 @@ public class confrimService {
             return utillService.makeJson(false, "인증번호 검증 오류");
         }
     }
-    private void confrimNum(String submitNum,String dbNum) {
+    public void confrimNum(String submitNum,String dbNum) {
         System.out.println("confrimNuM");
         if(submitNum.equals(dbNum.trim())){
             System.out.println("인증번호 일치");
