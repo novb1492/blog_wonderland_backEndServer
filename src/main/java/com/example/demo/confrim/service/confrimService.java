@@ -17,6 +17,7 @@ import com.example.demo.confrim.model.phone.phoneDao;
 import com.example.demo.confrim.model.phone.phoneVo;
 import com.example.demo.confrim.model.phone.tryConfrimRandNumDto;
 import com.example.demo.confrim.model.phone.trySendSmsDto;
+import com.example.demo.find.service.findService;
 import com.example.demo.utill.utillService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
@@ -40,6 +41,8 @@ public class confrimService {
     private emailDao emailDao;
     @Autowired
     private sendMailService sendMailService;
+    @Autowired
+    private findService findService;
 
 
     
@@ -57,7 +60,7 @@ public class confrimService {
     @Transactional(rollbackFor = Exception.class)
     public void sendEmail(trySendSmsDto trySendSmsDto) {
         System.out.println("sendEmail");
-        System.out.println(trySendSmsDto.getUnit());
+        System.out.println(trySendSmsDto.getDetail());
     
         emailVo emailVo=new emailVo();
         if(trySendSmsDto.getDetail().equals("confrim")){
@@ -85,7 +88,7 @@ public class confrimService {
         System.out.println("이메일 전송"+emailVo);
         sendRandNumInter sendRandNumInter=new sendInter(emailVo.getEcount(),emailVo.getEemail(),emailVo.getEcreated(), utillService.getRandomNum(numLength),emailVo.getDoneemail(),trySendSmsDto.getScope());
         sendRandNum(sendRandNumInter);
-        sendMailService.sendEmail(sendRandNumInter.getEmailOrPhone(),"안녕하세요 wonderland입니다","인증번호는 "+sendRandNumInter.getRandNum()+"입니다");
+        //sendMailService.sendEmail(sendRandNumInter.getEmailOrPhone(),"안녕하세요 wonderland입니다","인증번호는 "+sendRandNumInter.getRandNum()+"입니다");
     }
     @Transactional(rollbackFor = Exception.class)
     public void sendPhone(trySendSmsDto sendSmsDto) {
@@ -195,6 +198,7 @@ public class confrimService {
     public JSONObject checkRandNum(tryConfrimRandNumDto tryConfrimRandNumDto) throws IllegalArgumentException {
         System.out.println("checkRandNum");
         try {
+            String message="인증이 완료되었습니다";
             if(tryConfrimRandNumDto.getUnit().equals("phone")){
                 phoneVo phoneVo=phoneDao.findByPhoneNum(tryConfrimRandNumDto.getPhoneOrEmail()).orElseThrow(()->new IllegalArgumentException("인증 요청 내역이 존재 하지 않습니다"));
                 confrimNum(tryConfrimRandNumDto.getRandNum(), phoneVo.getRandNum());
@@ -203,8 +207,13 @@ public class confrimService {
                 emailVo emailVo=emailDao.findByEemail(tryConfrimRandNumDto.getPhoneOrEmail()).orElseThrow(()->new IllegalArgumentException("인증요청 내역이 존재하지 않습니다"));
                 confrimNum(tryConfrimRandNumDto.getRandNum(), emailVo.getErandNum());
                 emailVo.setDoneemail(doneNum);
+                if(tryConfrimRandNumDto.getScope().equals("find")){
+                    System.out.println("비밀번호 찾기 요청");
+                    findService.findPwd(tryConfrimRandNumDto.getPhoneOrEmail());
+                    message="이메일로 링크가 전송되었습니다";
+                }
             }
-            return utillService.makeJson(true, "인증이 완료되었습니다");
+            return utillService.makeJson(true, message);
         }catch (RuntimeException e) {
             return utillService.makeJson(false,  e.getMessage());
         }catch (Exception e) {

@@ -10,4 +10,5 @@ public interface userDao extends JpaRepository<uservo,Integer> {
 
     @Query(value = "select (select count(*) from users where phone_num=?)pcount,(select count(*) from users where email=?)ucount,(select done_phone from requestphone where phone_num=?)done",nativeQuery = true)
     inserConfrimInter findByEmailJoinConfrim(String phone,String email,String phone2);
+
 }
