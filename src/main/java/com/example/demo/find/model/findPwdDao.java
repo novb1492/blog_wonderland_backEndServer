@@ -31,4 +31,10 @@ public interface findPwdDao extends JpaRepository<findPwdVo,Integer> {
 
     @Query(value = "select email from users where phone_num=?",nativeQuery = true)
     Optional<String> findEmailNative(String phone);
+
+    @Modifying
+    @Transactional
+    @Query(value = "delete  from requestphone where phone_num=?",nativeQuery = true)
+    void deleteRequest(String phone);
+
 }
