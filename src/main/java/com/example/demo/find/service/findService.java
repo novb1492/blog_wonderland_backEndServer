@@ -73,6 +73,7 @@ public class findService {
         }else{
             System.out.println("이메일 찾기 내역 확인");
         }
+        System.out.println(count+"카운트");
         if(count==0){
            return utillService.makeJson(false, "변경요청 내역 없음");
         }

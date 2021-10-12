@@ -12,6 +12,8 @@ public interface findPwdDao extends JpaRepository<findPwdVo,Integer> {
     @Query(value = "select (select count(*) from requestpwd where pemail=?)pcount,(select count(*) from users where email=?)ucount",nativeQuery = true)
     getJoinUsers findJoinUsers(String email,String email2);
 
+    @Query(value = "select u.email,e.doneemail,r.pexpire  from requestpwd r inner join users u on r.pemail=u.email inner join requestemail e on e.eemail=r.pemail where r.ptoken_name=?",nativeQuery = true)
+    getJoinRequest findTokenNameJoinRequest(String email);
       
     @Modifying
     @Transactional
@@ -20,4 +22,9 @@ public interface findPwdDao extends JpaRepository<findPwdVo,Integer> {
 
     @Query(value = "select count(*) from requestpwd where ptoken_name=?",nativeQuery=true)
     int countByPtokenNameNative(String token);
+
+    @Modifying
+    @Transactional
+    @Query(value = "delete a.*,b.* from requestpwd a inner join requestemail b on a.pemail=b.eemail where a.ptoken_name=?",nativeQuery = true)
+    void deleteJoinRequest(String token);
 }

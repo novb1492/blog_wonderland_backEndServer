@@ -14,6 +14,7 @@ import com.example.demo.confrim.service.confrimService;
 import com.example.demo.find.service.findService;
 import com.example.demo.jwt.service.jwtService;
 import com.example.demo.user.model.tryJoinDto;
+import com.example.demo.user.model.tryUpadateDto;
 import com.example.demo.user.service.userService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
@@ -48,6 +49,11 @@ public class restcontroller {
     public JSONObject checkLogin(HttpServletRequest request,HttpServletResponse response) {
         System.out.println("checkLogin restcontroller");
         return userService.checkLogin(request);
+    }
+    @RequestMapping(value = "/user/change/**",method = RequestMethod.PUT)
+    public JSONObject userChange(@Valid @RequestBody tryUpadateDto tryUpadateDto ,HttpServletResponse response) {
+        System.out.println("userChange restcontroller");
+        return userService.update(tryUpadateDto);
     }
     @RequestMapping(value = "/confrim/**",method = RequestMethod.POST)
     public JSONObject sendSms(@Valid @RequestBody trySendSmsDto trySendSmsDto ,HttpServletResponse response) {
@@ -111,5 +117,6 @@ public class restcontroller {
             System.out.println("doRedirect error"+e.getMessage());
         }
     }
+
 
 }

@@ -2,16 +2,25 @@ package com.example.demo.user.service;
 
 
 
+
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 
 import com.example.demo.config.securityConfig;
+
 import com.example.demo.confrim.service.confrimService;
 import com.example.demo.enums.Stringenums;
+import com.example.demo.find.model.findPwdDao;
+
+import com.example.demo.find.model.getJoinRequest;
+
+
 import com.example.demo.user.model.inserConfrimInter;
 import com.example.demo.user.model.principalDetail;
 import com.example.demo.user.model.tryJoinDto;
+import com.example.demo.user.model.tryUpadateDto;
 import com.example.demo.user.model.userDao;
 import com.example.demo.user.model.uservo;
 import com.example.demo.utill.utillService;
@@ -23,6 +32,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+
 @Service
 public class userService {
     private final String data=Stringenums.data.getString();
@@ -33,6 +43,10 @@ public class userService {
     private securityConfig securityConfig;
     @Autowired
     private confrimService confrimService;
+    @Autowired
+    private findPwdDao findPwdDao;
+
+
     
     @Value("${oauth.pwd}")
     private String oauthPwd;
@@ -129,5 +143,67 @@ public class userService {
             dbVo=uservo;
         }
         return dbVo;
+    }
+    public JSONObject update(tryUpadateDto tryUpadateDto) {
+        System.out.println("update");
+        if(tryUpadateDto.getScope().equals("pwd")&&tryUpadateDto.getDetail().equals("find")){
+            System.out.println("비밀번호 변경 요청");
+            updatePwd(tryUpadateDto);
+            findPwdDao.deleteJoinRequest(tryUpadateDto.getToken());
+        }else if(tryUpadateDto.getScope().equals("address")){
+
+        }else if(tryUpadateDto.getScope().equals("phone")){
+
+        }else{
+            return utillService.makeJson(false, "변경사항이 유효하지 않습니다");
+        }
+        return utillService.makeJson(true, "변경에 성공했습니다");
+    }
+    private void updatePwd(tryUpadateDto tryUpadateDto) {
+        System.out.println("updatePwd");
+        confrimPwd(tryUpadateDto.getPwd(),tryUpadateDto.getPwd2());
+        try {
+            getJoinRequest getJoinRequest=findPwdDao.findTokenNameJoinRequest(tryUpadateDto.getToken());
+            confrim(getJoinRequest);
+            userDao.updatePwd(securityConfig.pwdEncoder().encode(tryUpadateDto.getPwd()),getJoinRequest.getEmail());
+        }catch (RuntimeException e) {
+            utillService.throwRuntimeEX(e, e.getMessage(), "updatePwd");
+        }catch (Exception e) {
+            utillService.throwRuntimeEX(e, "알수 없는 오류가 발생했습니다", "updatePwd");
+        }
+    }
+    private void confrim(getJoinRequest getJoinRequest) {
+        System.out.println("confrimDate");
+        String message=null;
+        if(getJoinRequest.getEmail()==null){
+            message="존재하지 않는 회원입니다";
+        }else if(LocalDateTime.now().isAfter(getJoinRequest.getPexpire().toLocalDateTime())){
+            message="만료되었습니다 다시 요청바랍니다";
+        }else if(!getJoinRequest.getDoneEmail().equals("1")){
+            message="인증이 완료되지 않았습니다";
+        }else{
+            System.out.println("유효성검사 통과");
+            return;
+        }
+        throw new RuntimeException(message);
+    }
+    private void confrimPwd(String pwd,String pwd2) {
+        System.out.println("confrimPwd");
+        String message=null;
+        int pwdLength=pwd.length();
+        int pwd2Length=pwd2.length();
+        if(!pwd.equals(pwd2)){
+            message="비밀번호가 일치 하지 않습니다";
+        }else if(pwd==null||pwd2==null||pwd==""||pwd2==""||pwd==" "||pwd2==" "){
+            message="비밀번호가 빈칸입니다";
+        }else if(pwdLength<4||pwdLength>10||pwd2Length<4||pwd2Length>10){
+            message="비밀번호는 최소 4자리이상 10자리 이하입니다";
+        }else{
+            System.out.println("비밀번호 유효성 통과");
+            return;
+        }
+        throw new RuntimeException(message);
+      
+
     }
 }
