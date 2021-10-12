@@ -1,6 +1,7 @@
 package com.example.demo.find.model;
 
 import java.sql.Timestamp;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -27,4 +28,7 @@ public interface findPwdDao extends JpaRepository<findPwdVo,Integer> {
     @Transactional
     @Query(value = "delete a.*,b.* from requestpwd a inner join requestemail b on a.pemail=b.eemail where a.ptoken_name=?",nativeQuery = true)
     void deleteJoinRequest(String token);
+
+    @Query(value = "select email from users where phone_num=?",nativeQuery = true)
+    Optional<String> findEmailNative(String phone);
 }

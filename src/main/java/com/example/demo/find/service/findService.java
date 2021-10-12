@@ -3,6 +3,7 @@ package com.example.demo.find.service;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
+import com.example.demo.apis.coolsms.sendMessage;
 import com.example.demo.apis.mailSender.sendMailService;
 import com.example.demo.find.model.findPwdDao;
 import com.example.demo.find.model.findPwdVo;
@@ -78,5 +79,10 @@ public class findService {
            return utillService.makeJson(false, "변경요청 내역 없음");
         }
         return utillService.makeJson(true, "변경요청 내역 존재");
+    }
+    public void findEmail(String phone) {
+        System.out.println("findEmail");
+        String email=findPwdDao.findEmailNative(phone).orElseThrow(()->new IllegalArgumentException("회원가입된 핸드폰이 아닙니다"));
+        sendMessage.sendMessege(phone, "안녕하세요 wonderland입니다 이메일은 "+email+"입니다");
     }
 }

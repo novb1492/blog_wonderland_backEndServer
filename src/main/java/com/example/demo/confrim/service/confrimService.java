@@ -230,6 +230,12 @@ public class confrimService {
                 phoneVo phoneVo=phoneDao.findByPhoneNum(tryConfrimRandNumDto.getPhoneOrEmail()).orElseThrow(()->new IllegalArgumentException("인증 요청 내역이 존재 하지 않습니다"));
                 confrimNum(tryConfrimRandNumDto.getRandNum(), phoneVo.getRandNum());
                 phoneVo.setDonePhone(doneNum);
+                if(tryConfrimRandNumDto.getScope().equals("find")){
+                    System.out.println("이메일 찾기 요청");
+                    findService.findEmail(tryConfrimRandNumDto.getPhoneOrEmail());
+                }else{
+                    return utillService.makeJson(false,"유효하지 않는 스코프입니다");
+                }
             }else if(tryConfrimRandNumDto.getUnit().equals("email")){
                 emailVo emailVo=emailDao.findByEemail(tryConfrimRandNumDto.getPhoneOrEmail()).orElseThrow(()->new IllegalArgumentException("인증요청 내역이 존재하지 않습니다"));
                 confrimNum(tryConfrimRandNumDto.getRandNum(), emailVo.getErandNum());
@@ -238,6 +244,8 @@ public class confrimService {
                     System.out.println("비밀번호 찾기 요청");
                     findService.findPwd(tryConfrimRandNumDto.getPhoneOrEmail());
                     message="이메일로 링크가 전송되었습니다";
+                }else{
+                    return utillService.makeJson(false,"유효하지 않는 스코프입니다");
                 }
             }
             return utillService.makeJson(true, message);
