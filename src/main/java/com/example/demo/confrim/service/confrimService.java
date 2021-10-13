@@ -217,6 +217,8 @@ public class confrimService {
             .doneemail(noDoneNum)
             .build();
             map.put("vo", vo);
+        }else {
+            throw new RuntimeException("유효하지 않는 인증수단입니다");
         }
   
         return map;
@@ -225,35 +227,39 @@ public class confrimService {
     public JSONObject checkRandNum(tryConfrimRandNumDto tryConfrimRandNumDto) throws IllegalArgumentException {
         System.out.println("checkRandNum");
         try {
-            String message="인증이 완료되었습니다";
-            if(tryConfrimRandNumDto.getUnit().equals("phone")){
-                phoneVo phoneVo=phoneDao.findByPhoneNum(tryConfrimRandNumDto.getPhoneOrEmail()).orElseThrow(()->new IllegalArgumentException("인증 요청 내역이 존재 하지 않습니다"));
+            String unit=tryConfrimRandNumDto.getUnit();
+            String phoneOrEmail=tryConfrimRandNumDto.getPhoneOrEmail();
+            if(unit.equals("phone")){
+                phoneVo phoneVo=phoneDao.findByPhoneNum(phoneOrEmail).orElseThrow(()->new IllegalArgumentException("인증 요청 내역이 존재 하지 않습니다"));
                 confrimNum(tryConfrimRandNumDto.getRandNum(), phoneVo.getRandNum());
                 phoneVo.setDonePhone(doneNum);
-                if(tryConfrimRandNumDto.getScope().equals("find")){
-                    System.out.println("이메일 찾기 요청");
-                    findService.findEmail(tryConfrimRandNumDto.getPhoneOrEmail());
-                }else{
-                    return utillService.makeJson(false,"유효하지 않는 스코프입니다");
-                }
-            }else if(tryConfrimRandNumDto.getUnit().equals("email")){
-                emailVo emailVo=emailDao.findByEemail(tryConfrimRandNumDto.getPhoneOrEmail()).orElseThrow(()->new IllegalArgumentException("인증요청 내역이 존재하지 않습니다"));
+            }else if(unit.equals("email")){
+                emailVo emailVo=emailDao.findByEemail(phoneOrEmail).orElseThrow(()->new IllegalArgumentException("인증요청 내역이 존재하지 않습니다"));
                 confrimNum(tryConfrimRandNumDto.getRandNum(), emailVo.getErandNum());
                 emailVo.setDoneemail(doneNum);
-                if(tryConfrimRandNumDto.getScope().equals("find")){
-                    System.out.println("비밀번호 찾기 요청");
-                    findService.findPwd(tryConfrimRandNumDto.getPhoneOrEmail());
-                    message="이메일로 링크가 전송되었습니다";
-                }else{
-                    return utillService.makeJson(false,"유효하지 않는 스코프입니다");
-                }
             }
-            return utillService.makeJson(true, message);
+            return ifFind(tryConfrimRandNumDto.getScope(), phoneOrEmail, unit);
         }catch (RuntimeException e) {
             return utillService.makeJson(false,  e.getMessage());
         }catch (Exception e) {
             return utillService.makeJson(false, "인증번호 검증 오류");
         }
+    }
+    private JSONObject ifFind(String scope,String phoneOrEmail,String unit) {
+        System.out.println("ifFind");
+        String message="인증이 완료되었습니다";
+        if(scope.equals("find")&&unit.equals("email")){
+            System.out.println("비밀번호 찾기 요청");
+            findService.findPwd(phoneOrEmail);
+            message="이메일로 링크가 전송되었습니다";
+        }else if(scope.equals("find")&&unit.equals("phone")){
+            System.out.println("이메일 찾기 요청");
+            findService.findEmail(phoneOrEmail);
+            message="핸드폰으로 이메일을 전송했습니다";
+        }else{
+            return utillService.makeJson(false,"유효하지 않는 스코프 혹은 유닛입니다");
+        }
+        return utillService.makeJson(true, message);
     }
     public void confrimNum(String submitNum,String dbNum) {
         System.out.println("confrimNuM");
