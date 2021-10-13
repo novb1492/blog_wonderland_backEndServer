@@ -70,6 +70,7 @@ public class confrimService {
             System.out.println("회원가입시 이메일 요청");
         }else if(trySendSmsDto.getDetail().equals("find")){
             System.out.println("이미 회원가입 되어있는 이메일 찾기");
+            System.out.println(trySendSmsDto.getUnit());
             getUserJoinInter getUserJoinInter=emailDao.findByEemailJoinUsers(trySendSmsDto.getUnit());
             confrimAlready(getUserJoinInter.getAlready());
             if(Optional.ofNullable(getUserJoinInter.getEemail()).orElseGet(()->"emthy").equals("emthy")){
@@ -95,9 +96,10 @@ public class confrimService {
     }
     private void confrimAlready(int count) {
         System.out.println("회원가입되어있나 검사");
+        System.out.println(count);
         if(count!=1){
             System.out.println("회원가입 되어있지 않은 이메일");
-            throw new RuntimeException("회원가입 되어있지 않은 이메일입니다");
+            throw new RuntimeException("회원가입 정보가 없습니다");
         }
         System.out.println("회원가입 유효성 통과");
     }

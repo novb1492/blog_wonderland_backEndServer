@@ -68,4 +68,28 @@ public class utillService {
             System.out.println("doRedirect error"+e.getMessage());
         }
     }
+    public static boolean checkBlankOrNull(String object) {
+        System.out.println("checkBlankOrNull");
+        if(object.isBlank()||object==null){
+            return true;
+        }
+        return false;
+    }
+    public static String checkLength(int min,int max,String object) {
+        System.out.println("checkLength");
+        int length=object.length();
+        if(length<min){
+            return Stringenums.tooSmall.getString();
+        }else if(length>max){
+            return Stringenums.tooBig.getString();
+        }
+        return Stringenums.collect.getString();
+    }
+    public static boolean checkEquals(String object,String object2) {
+        System.out.println("checkEquals");
+        if(object.equals(object2)){
+            return true;
+        }
+        return false;
+    }
 }

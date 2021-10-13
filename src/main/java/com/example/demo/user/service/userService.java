@@ -4,6 +4,8 @@ package com.example.demo.user.service;
 
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
@@ -182,8 +184,8 @@ public class userService {
     }
     private void updatePwd(tryUpadateDto tryUpadateDto) {
         System.out.println("updatePwd");
-        confrimPwd(tryUpadateDto.getPwd(),tryUpadateDto.getPwd2());
         try {
+            confrimPwd(tryUpadateDto);
             String email=null;
             if(tryUpadateDto.getDetail().equals("find")){
                 getJoinRequest getJoinRequest=findPwdDao.findTokenNameJoinRequest(tryUpadateDto.getToken());
@@ -217,23 +219,23 @@ public class userService {
         }
         throw new RuntimeException(message);
     }
-    private void confrimPwd(String pwd,String pwd2) {
+    private void confrimPwd(tryUpadateDto tryUpadateDto) {
         System.out.println("confrimPwd");
-        String message=null;
-        int pwdLength=pwd.length();
-        int pwd2Length=pwd2.length();
-        if(!pwd.equals(pwd2)){
-            message="비밀번호가 일치 하지 않습니다";
-        }else if(pwd.isBlank()||pwd2.isBlank()){
-            message="비밀번호가 빈칸입니다";
-        }else if(pwdLength<4||pwdLength>10||pwd2Length<4||pwd2Length>10){
-            message="비밀번호는 최소 4자리이상 10자리 이하입니다";
-        }else{
-            System.out.println("비밀번호 유효성 통과");
-            return;
-        }
-        throw new RuntimeException(message);
-      
+        String pwd=tryUpadateDto.getPwd();
+        String pwd2=tryUpadateDto.getPwd2();
+        int pwdminLength=intEnums.pwdMin.getInt(); 
+        int pwdmaxLength=intEnums.pwdMin.getInt();
 
+        if(utillService.checkBlankOrNull(pwd)||utillService.checkBlankOrNull(pwd2)){
+            System.out.println("비밀번호 빈칸 발견");
+            throw new RuntimeException("비밀번호 빈칸 발견");
+        }else if(!utillService.checkEquals(pwd, pwd2)){
+            System.out.println("비밀번호 불일치");
+            throw new RuntimeException("비밀번호 불일치");
+        }
+        String lengthResult=utillService.checkLength(pwdminLength, pwdmaxLength, pwd);
+        if(lengthResult.equals(Stringenums.tooSmall.getString())||lengthResult.equals(Stringenums.tooBig.getString())){
+            throw new RuntimeException("비밀번호는 최소 4자리 최대10자리입니다");
+        }   
     }
 }
