@@ -29,6 +29,11 @@ public class utillService {
         System.out.println(methodName+"error "+exception.getMessage());
         throw new RuntimeException(message);
     }
+    public static RuntimeException makeRuntimeEX(Exception exception,String message,String methodName) {
+        System.out.println("throwRuntimeEX");
+        System.out.println(methodName+"error "+exception.getMessage());
+        throw new RuntimeException(message);
+    }
     public static String getRandomNum(int end) {
         String num="";
         Random random=new Random();
@@ -88,6 +93,13 @@ public class utillService {
     public static boolean checkEquals(String object,String object2) {
         System.out.println("checkEquals");
         if(object.equals(object2)){
+            return true;
+        }
+        return false;
+    }
+    public static boolean checkEquals(int num,int num2) {
+        System.out.println("checkEquals");
+        if(num==num2){
             return true;
         }
         return false;

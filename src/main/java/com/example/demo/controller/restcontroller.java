@@ -13,6 +13,7 @@ import com.example.demo.confrim.model.phone.trySendSmsDto;
 import com.example.demo.confrim.service.confrimService;
 import com.example.demo.find.service.findService;
 import com.example.demo.jwt.service.jwtService;
+import com.example.demo.send.snsService;
 import com.example.demo.user.model.tryJoinDto;
 import com.example.demo.user.model.tryUpadateDto;
 import com.example.demo.user.service.userService;
@@ -37,6 +38,8 @@ public class restcontroller {
     @Autowired
     private confrimService confrimService;
     @Autowired
+    private snsService snsService;
+    @Autowired
     private jwtService jwtService;
     @Autowired
     private naverService naverService;
@@ -58,12 +61,12 @@ public class restcontroller {
     @RequestMapping(value = "/confrim/**",method = RequestMethod.POST)
     public JSONObject sendSms(@Valid @RequestBody trySendSmsDto trySendSmsDto ,HttpServletResponse response) {
         System.out.println("sendSms restcontroller");
-        return confrimService.sendNum(trySendSmsDto);
+        return snsService.sendNum(trySendSmsDto);
     }
     @RequestMapping(value = "/confrim/**",method = RequestMethod.PUT)
     public JSONObject checkRandNum(@Valid @RequestBody tryConfrimRandNumDto tryConfrimRandNumDto ,HttpServletResponse response) {
         System.out.println("checkRandNum restcontroller");
-        return confrimService.checkRandNum(tryConfrimRandNumDto);
+        return snsService.checkRandNum(tryConfrimRandNumDto);
     }
     @RequestMapping(value = "/user/crud/**",method = RequestMethod.POST)
     public JSONObject tryJoin(@Valid @RequestBody tryJoinDto tryJoinDto ,HttpServletResponse response) {

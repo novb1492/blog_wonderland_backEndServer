@@ -1,5 +1,6 @@
 package com.example.demo.confrim.model.phone;
 
+import java.sql.Timestamp;
 import java.util.Optional;
 
 import javax.transaction.Transactional;
@@ -19,8 +20,8 @@ public interface phoneDao extends JpaRepository<phoneVo,Integer> {
   
     @Modifying
     @Transactional
-    @Query(value = "update requestphone set pcount=?,prand_num=? where phone_num=?",nativeQuery = true)
-    void updatePhoneNative(int count,String randNum,String phoneNum);
+    @Query(value = "update requestphone set pcount=?,prand_num=?,pcreated=? where phone_num=?",nativeQuery = true)
+    void updatePhoneNative(int count,String randNum,Timestamp now,String phoneNum);
 
     @Modifying
     @Transactional

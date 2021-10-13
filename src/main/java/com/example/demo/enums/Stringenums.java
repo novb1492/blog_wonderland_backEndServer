@@ -1,6 +1,13 @@
 package com.example.demo.enums;
 
 public enum Stringenums {
+    insert("insert"),
+    update("update"),
+    delete("delete"),
+    first("first"),
+    noFirst("noFirst"),
+    reset("reset"),
+    tooMany("tooMany"),
     role_user("role_user"),
     flag("flag"),
     message("message"),

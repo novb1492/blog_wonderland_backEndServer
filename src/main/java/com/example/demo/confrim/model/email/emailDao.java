@@ -1,5 +1,6 @@
 package com.example.demo.confrim.model.email;
 
+import java.sql.Timestamp;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,8 +16,8 @@ public interface emailDao extends JpaRepository<emailVo,Integer> {
 
     @Modifying
     @Transactional
-    @Query(value = "update requestemail set ecount=?,erand_num=? where eemail=?",nativeQuery = true)
-    void updateEmailNative(int count,String randNum,String email);
+    @Query(value = "update requestemail set ecount=?,erand_num=?,ecreated=? where eemail=?",nativeQuery = true)
+    void updateEmailNative(int count,String randNum,Timestamp now,String email);
     
     void deleteByEemail(String email);
 
