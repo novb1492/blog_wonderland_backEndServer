@@ -17,4 +17,11 @@ public interface userDao extends JpaRepository<uservo,Integer> {
     @Transactional
     @Query(value = "update users set pwd=? where email=?",nativeQuery = true)
     void updatePwd(String pwd,String email);
+
+    @Modifying
+    @Transactional
+    @Query(value = "update users set address=? where email=?",nativeQuery = true)
+    void updateAddress(String fullAddress,String email);
+
+
 }

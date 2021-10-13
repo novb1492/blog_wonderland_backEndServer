@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import com.example.demo.apis.coolsms.sendMessage;
+
 import com.example.demo.apis.mailSender.sendMailService;
 import com.example.demo.confrim.model.sendInter;
 import com.example.demo.confrim.model.sendRandNumInter;
@@ -76,6 +76,7 @@ public class confrimService {
                 System.out.println("첫요청");
                 emailVo.setDoneemail(0);
                 emailVo.setEcount(0);
+                emailVo.setEcreated(Timestamp.valueOf(LocalDateTime.now()));
             }else{
                 System.out.println("요청 내역존재");
                 emailVo.setEid(getUserJoinInter.getEid());

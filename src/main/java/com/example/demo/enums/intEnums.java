@@ -2,7 +2,9 @@ package com.example.demo.enums;
 
 public enum intEnums {
     pwdMin(4),
-    pwdMax(10);
+    pwdMax(10),
+    doneNum(1),
+    noDoneNum(0);
 
 
 
@@ -12,7 +14,7 @@ public enum intEnums {
         this.num=num;
     
     }
-    public int getString() {
+    public int getInt() {
         return num;
     }    
 }

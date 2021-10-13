@@ -12,6 +12,7 @@ import com.example.demo.config.securityConfig;
 
 import com.example.demo.confrim.service.confrimService;
 import com.example.demo.enums.Stringenums;
+import com.example.demo.enums.intEnums;
 import com.example.demo.find.model.findPwdDao;
 
 import com.example.demo.find.model.getJoinRequest;
@@ -26,6 +27,7 @@ import com.example.demo.user.model.uservo;
 import com.example.demo.utill.utillService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
+import org.dom4j.IllegalAddException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -36,6 +38,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class userService {
     private final String data=Stringenums.data.getString();
+    private final int doneNum=intEnums.doneNum.getInt();
 
     @Autowired
     private userDao userDao;
@@ -151,7 +154,8 @@ public class userService {
             updatePwd(tryUpadateDto);
             findPwdDao.deleteJoinRequest(tryUpadateDto.getToken());
         }else if(tryUpadateDto.getScope().equals("address")){
-
+            System.out.println("주소변경 요청");
+            updateAddress(tryUpadateDto);
         }else if(tryUpadateDto.getScope().equals("phone")){
 
         }else{
@@ -159,13 +163,39 @@ public class userService {
         }
         return utillService.makeJson(true, "변경에 성공했습니다");
     }
+    private void updateAddress(tryUpadateDto tryUpadateDto) {
+        System.out.println("updateAddress");
+        String postcode=Optional.ofNullable(tryUpadateDto.getPostcode()).orElseThrow(()->new IllegalAddException("우편번호가 빈칸입니다"));
+        String address=Optional.ofNullable(tryUpadateDto.getAddress()).orElseThrow(()->new IllegalAddException("주소가 빈칸입니다"));
+        String detailAddress=Optional.ofNullable(tryUpadateDto.getDetailAddress()).orElseThrow(()->new IllegalAddException("상세주소가 빈칸입니다"));
+        confrim(postcode, address, detailAddress);
+        String email=sendUserInfor().getEmail();
+        String fullAddress=postcode+","+address+","+detailAddress;
+        userDao.updateAddress(fullAddress, email);
+    }
+    private void confrim(String postcode,String address,String detailAddress) {
+        System.out.println("confrim");
+        if(postcode.isBlank()||address.isBlank()||detailAddress.isBlank()){
+            throw new RuntimeException("주소에 빈칸이 존재합니다");
+        }
+        System.out.println("주소유효성 통과");
+    }
     private void updatePwd(tryUpadateDto tryUpadateDto) {
         System.out.println("updatePwd");
         confrimPwd(tryUpadateDto.getPwd(),tryUpadateDto.getPwd2());
         try {
-            getJoinRequest getJoinRequest=findPwdDao.findTokenNameJoinRequest(tryUpadateDto.getToken());
-            confrim(getJoinRequest);
-            userDao.updatePwd(securityConfig.pwdEncoder().encode(tryUpadateDto.getPwd()),getJoinRequest.getEmail());
+            String email=null;
+            if(tryUpadateDto.getDetail().equals("find")){
+                getJoinRequest getJoinRequest=findPwdDao.findTokenNameJoinRequest(tryUpadateDto.getToken());
+                confrim(getJoinRequest);
+                email=getJoinRequest.getEmail();
+            }else if(tryUpadateDto.getDetail().equals("update")){
+                email=sendUserInfor().getEmail();
+            }else{
+                throw new RuntimeException("디테일값이 유효하지 않습니다");
+            }
+            
+            userDao.updatePwd(securityConfig.pwdEncoder().encode(tryUpadateDto.getPwd()),email);
         }catch (RuntimeException e) {
             utillService.throwRuntimeEX(e, e.getMessage(), "updatePwd");
         }catch (Exception e) {
@@ -179,7 +209,7 @@ public class userService {
             message="존재하지 않는 회원입니다";
         }else if(LocalDateTime.now().isAfter(getJoinRequest.getPexpire().toLocalDateTime())){
             message="만료되었습니다 다시 요청바랍니다";
-        }else if(!getJoinRequest.getDoneEmail().equals("1")){
+        }else if(!getJoinRequest.getDoneEmail().equals(Integer.toString(doneNum))){
             message="인증이 완료되지 않았습니다";
         }else{
             System.out.println("유효성검사 통과");
@@ -194,7 +224,7 @@ public class userService {
         int pwd2Length=pwd2.length();
         if(!pwd.equals(pwd2)){
             message="비밀번호가 일치 하지 않습니다";
-        }else if(pwd==null||pwd2==null||pwd==""||pwd2==""||pwd==" "||pwd2==" "){
+        }else if(pwd.isBlank()||pwd2.isBlank()){
             message="비밀번호가 빈칸입니다";
         }else if(pwdLength<4||pwdLength>10||pwd2Length<4||pwd2Length>10){
             message="비밀번호는 최소 4자리이상 10자리 이하입니다";
