@@ -266,7 +266,7 @@ public class confrimService {
     }
     public void confrimNum(String submitNum,String dbNum) {
         System.out.println("confrimNuM");
-        if(submitNum.equals(dbNum.trim())){
+        if(utillService.checkEquals(submitNum, dbNum)){
             System.out.println("인증번호 일치");
             return;
         }

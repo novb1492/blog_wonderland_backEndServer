@@ -177,7 +177,7 @@ public class userService {
     }
     private void confrim(String postcode,String address,String detailAddress) {
         System.out.println("confrim");
-        if(postcode.isBlank()||address.isBlank()||detailAddress.isBlank()){
+        if(utillService.checkBlankOrNull(postcode)||utillService.checkBlankOrNull(address)||utillService.checkBlankOrNull(detailAddress)){
             throw new RuntimeException("주소에 빈칸이 존재합니다");
         }
         System.out.println("주소유효성 통과");
@@ -207,11 +207,11 @@ public class userService {
     private void confrim(getJoinRequest getJoinRequest) {
         System.out.println("confrimDate");
         String message=null;
-        if(getJoinRequest.getEmail()==null){
+        if(utillService.checkBlankOrNull(getJoinRequest.getEmail())){
             message="존재하지 않는 회원입니다";
         }else if(LocalDateTime.now().isAfter(getJoinRequest.getPexpire().toLocalDateTime())){
             message="만료되었습니다 다시 요청바랍니다";
-        }else if(!getJoinRequest.getDoneEmail().equals(Integer.toString(doneNum))){
+        }else if(!utillService.checkEquals(Integer.toString(doneNum), getJoinRequest.getDoneEmail())){
             message="인증이 완료되지 않았습니다";
         }else{
             System.out.println("유효성검사 통과");
