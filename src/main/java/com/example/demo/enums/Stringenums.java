@@ -1,6 +1,7 @@
 package com.example.demo.enums;
 
 public enum Stringenums {
+    defalutErrorMessage("알 수없는 에러발생"),
     insert("insert"),
     update("update"),
     delete("delete"),

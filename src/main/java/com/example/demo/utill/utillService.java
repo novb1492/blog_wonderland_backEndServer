@@ -29,9 +29,9 @@ public class utillService {
         System.out.println(methodName+"error "+exception.getMessage());
         throw new RuntimeException(message);
     }
-    public static RuntimeException makeRuntimeEX(Exception exception,String message,String methodName) {
+    public static RuntimeException makeRuntimeEX(String message,String methodName) {
         System.out.println("throwRuntimeEX");
-        System.out.println(methodName+"error "+exception.getMessage());
+        System.out.println(methodName+"error "+message);
         throw new RuntimeException(message);
     }
     public static String getRandomNum(int end) {

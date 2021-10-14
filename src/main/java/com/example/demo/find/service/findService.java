@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 
 import com.example.demo.apis.coolsms.sendMessage;
 import com.example.demo.apis.mailSender.sendMailService;
+import com.example.demo.enums.Stringenums;
 import com.example.demo.find.model.findPwdDao;
 import com.example.demo.find.model.findPwdVo;
 import com.example.demo.find.model.getJoinUsers;
@@ -33,6 +34,7 @@ public class findService {
 
     public void findPwd(String email) {
         System.out.println("findPwd");
+        String errorMessage=Stringenums.defalutErrorMessage.getString();
         try {
             getJoinUsers getJoinUsers=findPwdDao.findJoinUsers(email,email);
             confrim(getJoinUsers.getUcount());
@@ -51,11 +53,9 @@ public class findService {
             }
             sendMailService.sendEmail(email,"안녕하세요 wonderland입니다","비밀번호 변경링크입니다 "+frontDamain+"changePwdPage?scope=pwd&object="+token);
         }catch (RuntimeException e) {
-            utillService.throwRuntimeEX(e, e.getMessage() ,"findPwd");
-        }catch (Exception e) {
-            utillService.throwRuntimeEX(e,"알수 없는 오류 발생", "findPwd");
+            errorMessage=e.getMessage();
         }
-      
+      throw  utillService.makeRuntimeEX(errorMessage, "findPwd");
     }
     private void confrim(int ucount) {
         System.out.println("confrim");

@@ -4,23 +4,14 @@ package com.example.demo.user.service;
 
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
-
 import javax.servlet.http.HttpServletRequest;
-
 import com.example.demo.config.securityConfig;
-import com.example.demo.confrim.model.phone.phoneDao;
-import com.example.demo.confrim.model.phone.phoneVo;
 import com.example.demo.confrim.service.confrimService;
 import com.example.demo.enums.Stringenums;
 import com.example.demo.enums.intEnums;
 import com.example.demo.find.model.findPwdDao;
-
 import com.example.demo.find.model.getJoinRequest;
-
-
 import com.example.demo.user.model.inserConfrimInter;
 import com.example.demo.user.model.principalDetail;
 import com.example.demo.user.model.tryJoinDto;
@@ -73,18 +64,18 @@ public class userService {
     public uservo sendUserInfor() {
         String methodName="sendUserInfor";
         System.out.println(methodName);
+        String errorMessag=Stringenums.defalutErrorMessage.getString();
         try {
             principalDetail principalDetail=(principalDetail)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             uservo uservo=principalDetail.getUservo();
             uservo.setPwd(null);
             return uservo;
         } catch (ClassCastException e) {
-            utillService.throwRuntimeEX(e,"비로그인 사용자입니다", methodName);
-          
+            errorMessag="비로그인 사용자입니다";
         }catch (Exception e){
-            utillService.throwRuntimeEX(e,"로그인 정보 조회에 실패했습니다", methodName);
+            errorMessag="로그인 정보 조회에 실패했습니다";
         }
-        return null;
+        throw utillService.makeRuntimeEX(errorMessag, methodName);
     }
     @Transactional(rollbackFor = Exception.class)
     public JSONObject insert(tryJoinDto tryJoinDto) {
@@ -216,7 +207,7 @@ public class userService {
         }catch (RuntimeException e) {
             errorMessage=e.getMessage();
         }
-        throw utillService.makeRuntimeEX(new RuntimeException(), errorMessage, "updatePwd");
+        throw utillService.makeRuntimeEX(errorMessage, "updatePwd");
     }
     private void confrim(getJoinRequest getJoinRequest) {
         System.out.println("confrimDate");

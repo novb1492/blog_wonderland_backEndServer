@@ -169,7 +169,7 @@ public class confrimService {
         }catch (RuntimeException e) {
             errorMessage=e.getMessage();
         }
-        throw utillService.makeRuntimeEX(new RuntimeException(),errorMessage, "sendRandNum");
+        throw utillService.makeRuntimeEX(errorMessage, "sendRandNum");
 
     }
     public void confrimAlready(int count) {
