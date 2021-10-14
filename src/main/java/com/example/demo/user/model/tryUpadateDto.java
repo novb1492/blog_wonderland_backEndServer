@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 public class tryUpadateDto {
     
     private String phone;
+    private String originPwd;
     private String pwd;
     private String pwd2;
     private String postcode;

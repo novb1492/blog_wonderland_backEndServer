@@ -152,7 +152,7 @@ public class userService {
     }
     public JSONObject update(tryUpadateDto tryUpadateDto) {
         System.out.println("update");
-        if(tryUpadateDto.getScope().equals("pwd")&&tryUpadateDto.getDetail().equals(Stringenums.find.getString())){
+        if(tryUpadateDto.getScope().equals("pwd")){
             System.out.println("비밀번호 변경 요청");
             updatePwd(tryUpadateDto);
             findPwdDao.deleteJoinRequest(tryUpadateDto.getToken());
@@ -191,25 +191,30 @@ public class userService {
     }
     private void updatePwd(tryUpadateDto tryUpadateDto) {
         System.out.println("updatePwd");
+        String errorMessage="알수 없는 오류 발생";
         try {
             confrimPwd(tryUpadateDto);
             String email=null;
-            if(tryUpadateDto.getDetail().equals("find")){
+            if(tryUpadateDto.getDetail().equals(Stringenums.find.getString())){
                 getJoinRequest getJoinRequest=findPwdDao.findTokenNameJoinRequest(tryUpadateDto.getToken());
                 confrim(getJoinRequest);
                 email=getJoinRequest.getEmail();
             }else if(tryUpadateDto.getDetail().equals("update")){
                 email=sendUserInfor().getEmail();
+                uservo uservo=userDao.findByEmail(email).orElseThrow(()->new IllegalArgumentException("존재하지 않는 사용자입니다"));
+                System.out.println(tryUpadateDto.getOriginPwd()+"기존");
+                if(!securityConfig.pwdEncoder().matches(tryUpadateDto.getOriginPwd(),uservo.getPwd())){
+                    throw new RuntimeException("기존비밀번호가 불일치 합니다");
+                }
             }else{
                 throw new RuntimeException("디테일값이 유효하지 않습니다");
             }
-            
             userDao.updatePwd(securityConfig.pwdEncoder().encode(tryUpadateDto.getPwd()),email);
+            return;
         }catch (RuntimeException e) {
-            utillService.throwRuntimeEX(e, e.getMessage(), "updatePwd");
-        }catch (Exception e) {
-            utillService.throwRuntimeEX(e, "알수 없는 오류가 발생했습니다", "updatePwd");
+            errorMessage=e.getMessage();
         }
+        throw utillService.makeRuntimeEX(new RuntimeException(), errorMessage, "updatePwd");
     }
     private void confrim(getJoinRequest getJoinRequest) {
         System.out.println("confrimDate");
@@ -244,5 +249,15 @@ public class userService {
         if(lengthResult.equals(Stringenums.tooSmall.getString())||lengthResult.equals(Stringenums.tooBig.getString())){
             throw new RuntimeException("비밀번호는 최소 4자리 최대10자리입니다");
         }   
+        if(tryUpadateDto.getDetail().equals(Stringenums.update.getString())){
+            System.out.println("마이페이지 비밀번호 변경시도");
+            String originPwd=tryUpadateDto.getOriginPwd();
+            if(utillService.checkBlankOrNull(originPwd)){
+                throw new RuntimeException("기존 비밀번호를 입력해주세요");
+            }else if(!utillService.checkLength(4, 10, originPwd).equals(Stringenums.collect.getString())){
+                throw new RuntimeException("비밀번호는 최소 4자리 최대10자리입니다");
+            }
+        }
+        System.out.println(" 비밀번효 유효성 통과");
     }
 }
