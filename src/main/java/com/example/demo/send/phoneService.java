@@ -16,6 +16,9 @@ import com.example.demo.confrim.service.confrimService;
 import com.example.demo.enums.Stringenums;
 import com.example.demo.enums.intEnums;
 import com.example.demo.find.service.findService;
+import com.example.demo.user.model.tryUpadateDto;
+import com.example.demo.user.model.uservo;
+import com.example.demo.user.service.userService;
 import com.example.demo.utill.utillService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
@@ -35,10 +38,13 @@ public class phoneService {
     private confrimService confrimService;
     @Autowired
     private findService findService;
+    @Autowired
+    private userService userService;
     
     @Transactional(rollbackFor = Exception.class)
     public void sendPhone(trySendSmsDto sendSmsDto) {
         System.out.println("sendPhone");
+        confrim(sendSmsDto.getUnit());
         System.out.println(sendSmsDto.getUnit());
         phoneVo phoneVo=new phoneVo();
         if(sendSmsDto.getDetail().equals("confrim")){
@@ -81,6 +87,13 @@ public class phoneService {
         }
         sendMessage.sendMessege("01091443409",sendRandNumInter.getRandNum()); 
     }
+    private void confrim(String phone) {
+        System.out.println("confrim");
+        String reult=utillService.checkLength(11, 11, phone);
+        if(!reult.equals(Stringenums.collect.getString())){
+            throw new RuntimeException("핸드폰 번호를 확인해주세요");
+        }
+    }
     private void insert(sendRandNumInter sendRandNumInter){
         System.out.println("insert");
         phoneVo vo=phoneVo.builder()
@@ -108,18 +121,29 @@ public class phoneService {
         phoneVo.setDonePhone(doneNum);
         return ifFind(tryConfrimRandNumDto.getScope(), phone);
     }
-    private JSONObject ifFind(String scope,String phoneOrEmail) {
+    private JSONObject ifFind(String scope,String phone) {
         System.out.println("ifFind");
         String message="인증이 완료되었습니다";
-         if(scope.equals("find")){
+        if(scope.equals(Stringenums.find.getString())){
             System.out.println("이메일 찾기 요청");
-            findService.findEmail(phoneOrEmail);
+            findService.findEmail(phone);
             message="핸드폰으로 이메일을 전송했습니다";
+        }else if(scope.equals(Stringenums.update.getString())){
+            System.out.println("핸드폰 번호 변경요청");
+            phoneVo phoneVo=phoneDao.findByPhoneNum(phone).orElseThrow(()->new IllegalArgumentException("요청 내역이 존재 하지 않습니다"));
+            confrimService.confrimDone(phoneVo.getDonePhone());
+            tryUpadateDto tryUpadateDto=new tryUpadateDto();
+            tryUpadateDto.setPhone(phone);
+            tryUpadateDto.setScope("phone");
+            userService.update(tryUpadateDto);
+            delete(phone);
+            message="휴대폰 번호가 변경되었습니다";
         }else{
             return utillService.makeJson(false,"유효하지 않는 스코프 혹은 유닛입니다");
         }
         return utillService.makeJson(true, message);
     }
+    
 
    
 }

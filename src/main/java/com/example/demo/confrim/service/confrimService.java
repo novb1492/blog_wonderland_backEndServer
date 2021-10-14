@@ -292,6 +292,13 @@ public class confrimService {
         }
         throw new RuntimeException(errorMessage);
     }
+    public void confrimDone(int dbDone) {
+        System.out.println("confrimDone");
+        if(dbDone!=doneNum){
+            throw new RuntimeException("인증이 완료 되지 않았습니다");
+        }
+        System.out.println("인증완료확인");
+    }
     public void delete(String phone) {
         System.out.println("delete"+phone);
         phoneDao.deleteByPhoneNum(phone);

@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Data
 public class tryUpadateDto {
     
-    
+    private String phone;
     private String pwd;
     private String pwd2;
     private String postcode;

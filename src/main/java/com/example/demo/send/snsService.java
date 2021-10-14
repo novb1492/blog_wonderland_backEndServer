@@ -42,8 +42,9 @@ public class snsService {
                 return utillService.makeJson(false, "지원하지 않는 sns종류입니다");
             }
             
-        }catch (Exception e) {
-            return utillService.makeJson(false, "인증번호 검증 오류");
+        }catch (RuntimeException e) {
+            errorMessage=e.getMessage();
         }
+        return utillService.makeJson(false, errorMessage);
     }
 }

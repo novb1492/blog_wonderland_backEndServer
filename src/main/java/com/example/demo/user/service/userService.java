@@ -11,7 +11,8 @@ import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 
 import com.example.demo.config.securityConfig;
-
+import com.example.demo.confrim.model.phone.phoneDao;
+import com.example.demo.confrim.model.phone.phoneVo;
 import com.example.demo.confrim.service.confrimService;
 import com.example.demo.enums.Stringenums;
 import com.example.demo.enums.intEnums;
@@ -151,7 +152,7 @@ public class userService {
     }
     public JSONObject update(tryUpadateDto tryUpadateDto) {
         System.out.println("update");
-        if(tryUpadateDto.getScope().equals("pwd")&&tryUpadateDto.getDetail().equals("find")){
+        if(tryUpadateDto.getScope().equals("pwd")&&tryUpadateDto.getDetail().equals(Stringenums.find.getString())){
             System.out.println("비밀번호 변경 요청");
             updatePwd(tryUpadateDto);
             findPwdDao.deleteJoinRequest(tryUpadateDto.getToken());
@@ -159,11 +160,17 @@ public class userService {
             System.out.println("주소변경 요청");
             updateAddress(tryUpadateDto);
         }else if(tryUpadateDto.getScope().equals("phone")){
-
+            System.out.println("휴대폰 번호 변경");
+            updatePhone(tryUpadateDto.getPhone());
         }else{
             return utillService.makeJson(false, "변경사항이 유효하지 않습니다");
         }
         return utillService.makeJson(true, "변경에 성공했습니다");
+    }
+    private void updatePhone(String phone) {
+        System.out.println("updatePhone");
+        uservo uservo=sendUserInfor();
+        userDao.updatePhone(phone, uservo.getEmail());
     }
     private void updateAddress(tryUpadateDto tryUpadateDto) {
         System.out.println("updateAddress");
