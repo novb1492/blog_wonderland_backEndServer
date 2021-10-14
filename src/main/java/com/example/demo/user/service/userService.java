@@ -64,6 +64,8 @@ public class userService {
         System.out.println(request.getRequestURI());
         if(Optional.ofNullable(request.getParameter("scope")).orElseGet(()->"emthy").equals("all")){
             response.put(data, uservo);
+        }else{
+            response.put("email", uservo.getEmail());
         }
         return response;
         
