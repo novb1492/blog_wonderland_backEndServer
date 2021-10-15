@@ -10,7 +10,6 @@ import com.example.demo.apis.kakao.kakaoService;
 import com.example.demo.apis.naver.naverService;
 import com.example.demo.confrim.model.phone.tryConfrimRandNumDto;
 import com.example.demo.confrim.model.phone.trySendSmsDto;
-import com.example.demo.confrim.service.confrimService;
 import com.example.demo.find.service.findService;
 import com.example.demo.jwt.service.jwtService;
 import com.example.demo.send.snsService;
@@ -35,8 +34,6 @@ public class restcontroller {
     
     @Autowired
     private userService userService;
-    @Autowired
-    private confrimService confrimService;
     @Autowired
     private snsService snsService;
     @Autowired

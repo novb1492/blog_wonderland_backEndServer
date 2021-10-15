@@ -18,8 +18,12 @@ public class errorController {
     @ExceptionHandler(RuntimeException.class)
     public JSONObject runtimeException(RuntimeException exception) {
         System.out.println("runtimeException");
+        String message=exception.getMessage();
         exception.printStackTrace();
-        return utillService.makeJson(false, exception.getMessage());
+        if(message==null){
+            message="알수 없는 오류발생";
+        }
+        return utillService.makeJson(false, message);
     }
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public JSONObject processValidationError(MethodArgumentNotValidException exception) {

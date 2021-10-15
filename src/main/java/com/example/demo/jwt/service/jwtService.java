@@ -63,7 +63,7 @@ public class jwtService {
     public String getAccessToken(String email) {
         System.out.println("getAccessToken");
         System.out.println("토큰 email: "+email);
-        return JWT.create().withSubject(accessTokenName).withExpiresAt(new Date(System.currentTimeMillis()+secondOfDay*accessTokenExpire)).withClaim("email",email).sign(Algorithm.HMAC512(jwtSing));
+        return JWT.create().withSubject(accessTokenName).withExpiresAt(new Date(System.currentTimeMillis()+1000*accessTokenExpire)).withClaim("email",email).sign(Algorithm.HMAC512(jwtSing));
     }
     public String getRefreshToken() {
         System.out.println("getRefreshToken");
@@ -107,6 +107,7 @@ public class jwtService {
     private Optional<String> findRefreshTokenAndGetEmail(String refreshToken) {
         System.out.println("findRefreshToken");
         try {
+            System.out.println(refreshToken+" 리프레시토큰");
             jwtVo jwtVo=jwtDao.findByTokenName(refreshToken).orElseThrow(()->new IllegalArgumentException("리프레쉬 토큰 존재하지 않음"));
             jwtDao.updateTokenExpire(Timestamp.valueOf(LocalDateTime.now().plusDays(refreshTokenExpire)),Timestamp.valueOf(LocalDateTime.now()), refreshToken);
             return Optional.ofNullable(jwtVo.getTemail());
