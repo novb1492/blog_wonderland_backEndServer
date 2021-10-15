@@ -7,11 +7,11 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 import com.example.demo.config.securityConfig;
-import com.example.demo.confrim.service.confrimService;
 import com.example.demo.enums.Stringenums;
 import com.example.demo.enums.intEnums;
 import com.example.demo.find.model.findPwdDao;
 import com.example.demo.find.model.getJoinRequest;
+import com.example.demo.send.phoneService;
 import com.example.demo.user.model.inserConfrimInter;
 import com.example.demo.user.model.principalDetail;
 import com.example.demo.user.model.tryJoinDto;
@@ -39,7 +39,7 @@ public class userService {
     @Autowired
     private securityConfig securityConfig;
     @Autowired
-    private confrimService confrimService;
+    phoneService phoneService;
     @Autowired
     private findPwdDao findPwdDao;
 
@@ -91,7 +91,7 @@ public class userService {
                             .role(Stringenums.role_user.getString())
                             .build();
                             userDao.save(vo);
-                            confrimService.delete(tryJoinDto.getPhone());
+                            phoneService.delete(tryJoinDto.getPhone());
                             return utillService.makeJson(true, "회원가입을 축하드립니다");
         }catch (RuntimeException e) {
             return utillService.makeJson(false, e.getMessage());

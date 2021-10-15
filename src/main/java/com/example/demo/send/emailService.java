@@ -76,6 +76,7 @@ public class emailService {
             update(sendRandNumInter);
         }else if(result.equals(Stringenums.reset.getString())){
             delete(emailVo.getEemail());
+            insert(sendRandNumInter);
         }else if(result.equals(Stringenums.tooMany.getString())){
             throw new RuntimeException("하루 "+maxReuqest+"회 제한입니다");
         }else{

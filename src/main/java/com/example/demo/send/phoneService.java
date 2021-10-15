@@ -80,12 +80,13 @@ public class phoneService {
             update(sendRandNumInter);
         }else if(result.equals(Stringenums.reset.getString())){
             delete(phoneVo.getPhoneNum());
+            insert(sendRandNumInter);
         }else if(result.equals(Stringenums.tooMany.getString())){
             throw new RuntimeException("하루 "+intEnums.maxRequest.getInt()+"회 제한입니다");
         }else{
             throw new RuntimeException("알 수없는 오류발생");
         }
-        sendMessage.sendMessege("01091443409",sendRandNumInter.getRandNum()); 
+        sendMessage.sendMessege(sendRandNumInter.getEmailOrPhone(),sendRandNumInter.getRandNum()); 
     }
     private void confrim(String phone) {
         System.out.println("confrim");
@@ -108,11 +109,11 @@ public class phoneService {
         System.out.println("update");
         phoneDao.updatePhoneNative(sendRandNumInter.getCount()+1,sendRandNumInter.getRandNum(),Timestamp.valueOf(LocalDateTime.now()),sendRandNumInter.getEmailOrPhone());
     }
-    private void delete(String phone) {
+    public void delete(String phone) {
         System.out.println("delete"+phone);
         phoneDao.deleteByPhoneNum(phone);
     }
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public JSONObject checkNum(tryConfrimRandNumDto tryConfrimRandNumDto) {
         System.out.println("checkNum");
         String phone=tryConfrimRandNumDto.getPhoneOrEmail();

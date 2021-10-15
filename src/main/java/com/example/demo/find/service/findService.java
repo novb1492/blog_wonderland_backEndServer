@@ -52,6 +52,7 @@ public class findService {
                 findPwdDao.save(findPwdVo);
             }
             sendMailService.sendEmail(email,"안녕하세요 wonderland입니다","비밀번호 변경링크입니다 "+frontDamain+"changePwdPage?scope=pwd&object="+token);
+            return;
         }catch (RuntimeException e) {
             errorMessage=e.getMessage();
         }

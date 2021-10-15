@@ -38,14 +38,14 @@ public class confrimService {
     //private final int noDoneNum=0;
     private final int doneNum=1;
 
-    @Autowired
+    /*@Autowired
     private phoneDao phoneDao;
     @Autowired
     private emailDao emailDao;
     @Autowired
     private sendMailService sendMailService;
     @Autowired
-    private findService findService;
+    private findService findService;*/
    
 
 
@@ -299,9 +299,9 @@ public class confrimService {
         }
         System.out.println("인증완료확인");
     }
-    public void delete(String phone) {
+    /*public void delete(String phone) {
         System.out.println("delete"+phone);
         phoneDao.deleteByPhoneNum(phone);
-    }
+    }*/
     
 }
