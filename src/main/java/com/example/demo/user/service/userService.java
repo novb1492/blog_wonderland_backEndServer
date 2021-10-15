@@ -4,13 +4,18 @@ package com.example.demo.user.service;
 
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import com.example.demo.config.securityConfig;
 import com.example.demo.enums.Stringenums;
 import com.example.demo.enums.intEnums;
 import com.example.demo.find.model.findPwdDao;
 import com.example.demo.find.model.getJoinRequest;
+import com.example.demo.jwt.service.jwtService;
 import com.example.demo.send.phoneService;
 import com.example.demo.user.model.inserConfrimInter;
 import com.example.demo.user.model.principalDetail;
@@ -42,9 +47,14 @@ public class userService {
     phoneService phoneService;
     @Autowired
     private findPwdDao findPwdDao;
+    @Autowired
+    private jwtService jwtService;
 
 
-    
+    @Value("${jwt.access.name}")
+    private String accessTokenName;
+    @Value("${jwt.refresh.name}")
+    private String refreshTokenName;
     @Value("${oauth.pwd}")
     private String oauthPwd;
 
@@ -252,5 +262,16 @@ public class userService {
             }
         }
         System.out.println(" 비밀번효 유효성 통과");
+    }
+    public JSONObject logOut(HttpServletRequest request,HttpServletResponse response) {
+        System.out.println("logOut");
+        List<String>tokens=new ArrayList<>();
+        tokens.add(accessTokenName);
+        tokens.add(refreshTokenName);
+        for(String s:tokens){
+            utillService.deleteCookie(s, request, response);
+        }
+        jwtService.delete(refreshTokenName);
+        return utillService.makeJson(true, "로그아웃");
     }
 }

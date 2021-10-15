@@ -104,4 +104,14 @@ public class utillService {
         }
         return false;
     }
+    public static void deleteCookie(String cookieName,HttpServletRequest request,HttpServletResponse response) {
+        System.out.println("deleteCookie");
+        ResponseCookie cookie = ResponseCookie.from(cookieName, null) 
+        .sameSite("None") 
+        .secure(true) 
+        .path("/") 
+        .maxAge(0)
+        .build(); 
+        response.addHeader("Set-Cookie", cookie.toString()+";HttpOnly");
+    }
 }

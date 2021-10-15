@@ -31,6 +31,10 @@ public class naverService {
     private String pwd;
     @Value("${naver.loginCallback}")
     private String loginCallbackUrl;
+    @Value("${jwt.access.name}")
+    private String accessTokenName;
+    @Value("${jwt.refresh.name}")
+    private String refreshTokenName;
 
     @Autowired
     private naverLoginService naverLoginService;
@@ -45,8 +49,8 @@ public class naverService {
         System.out.println("tryNaverLogin naverService");
         uservo uservo=naverLoginService.tryNaverLogin(getToken(request.getParameter("code"), request.getParameter("state")), response);
         Map<String,Object>makeCookies=new HashMap<>();
-        makeCookies.put("accessToken",jwtService.getAccessToken(uservo.getEmail()));
-        makeCookies.put("refreshToken", jwtService.getRefreshToken());
+        makeCookies.put(accessTokenName,jwtService.getAccessToken(uservo.getEmail()));
+        makeCookies.put(refreshTokenName, jwtService.getRefreshToken());
         utillService.makeCookie(makeCookies, response);
     }
     private JSONObject getToken(String code,String state) {

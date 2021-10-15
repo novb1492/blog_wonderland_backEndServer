@@ -28,6 +28,10 @@ public class kakaoService {
     private String morePageCallback;
     @Value("${front.domain}")
     private String frontDamain;
+    @Value("${jwt.access.name}")
+    private String accessTokenName;
+    @Value("${jwt.refresh.name}")
+    private String refreshTokenName;
 
     
     @Autowired
@@ -57,14 +61,18 @@ public class kakaoService {
         }else if(scope.equals("more")){
             System.out.println("카카오 추가동의 콜백");
             utillService.doRedirect(response,frontDamain+"popUpClose");
+        }else if(scope.equals("pay")){
+            System.out.println("카카오페이 롤백");
+        }else{
+            throw new RuntimeException("카카오 콜백 잘못된 스코프입니다");
         }
     }
     private void tryKakaoLogin(HttpServletRequest request,HttpServletResponse response) {
         System.out.println("tryKakaoLogin");
         uservo uservo =kakaoLoginService.tryLogin(request,apiKey);
         Map<String,Object>makeCookies=new HashMap<>();
-        makeCookies.put("accessToken",jwtService.getAccessToken(uservo.getEmail()));
-        makeCookies.put("refreshToken", jwtService.getRefreshToken());
+        makeCookies.put(accessTokenName,jwtService.getAccessToken(uservo.getEmail()));
+        makeCookies.put(refreshTokenName, jwtService.getRefreshToken());
         utillService.makeCookie(makeCookies, response);
     }
     

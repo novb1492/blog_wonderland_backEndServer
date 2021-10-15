@@ -23,7 +23,7 @@ public class kakaoLoginService {
 
     @Value("${kakao.login.callback}")
     private String loginCallbackUrl;
-    
+
     @Autowired
     private requestTo requestTo;
     @Autowired

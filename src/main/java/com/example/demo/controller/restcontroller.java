@@ -75,6 +75,12 @@ public class restcontroller {
         System.out.println("login restcontroller");
         return userService.checkSucLogin();
     }
+    
+    @RequestMapping(value = "/user/logout",method = RequestMethod.GET)
+    public JSONObject logOut(HttpServletRequest request,HttpServletResponse response) {
+        System.out.println("logOut restcontroller");
+        return userService.logOut(request, response);
+    }
     @RequestMapping("/user/jwtex")
     public JSONObject jwtex(HttpServletRequest request ,HttpServletResponse response) {
         System.out.println("jwtex restcontroller");

@@ -17,4 +17,6 @@ public interface jwtDao extends JpaRepository<jwtVo,Integer>{
    @Transactional
    @Query(value = "update tokens set texpired=?,tcreated=? where token_name=?",nativeQuery = true)
    void updateTokenExpire(Timestamp newExpireDate,Timestamp now,String TokenName);
+
+   void deleteByTokenName(String token);
 }

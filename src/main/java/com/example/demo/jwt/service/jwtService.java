@@ -115,4 +115,8 @@ public class jwtService {
             return null;
         }
     }
+    public void delete(String refreshToken) {
+        System.out.println("delete");
+        jwtDao.deleteByTokenName(refreshToken);
+    }
 }
