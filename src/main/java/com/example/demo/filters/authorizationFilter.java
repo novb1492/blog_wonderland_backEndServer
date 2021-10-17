@@ -5,7 +5,6 @@ import java.io.IOException;
 import javax.servlet.FilterChain;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -15,6 +14,7 @@ import com.example.demo.jwt.service.jwtService;
 import com.example.demo.user.model.principalDetail;
 import com.example.demo.user.model.userDao;
 import com.example.demo.user.model.uservo;
+import com.example.demo.utill.utillService;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
@@ -34,12 +34,7 @@ public class authorizationFilter extends BasicAuthenticationFilter  {
         System.out.println("doFilterInternal 페이지요청 발생 "+request.getRequestURI());
         String accessToken=null;
         try {
-            Cookie[] cookies=request.getCookies();
-            for(Cookie c:cookies){
-                if(c.getName().equals("accessToken")){
-                    accessToken=c.getValue();
-                }
-            }
+            accessToken=utillService.getCookieValue(request, "accessToken");
         } catch (Exception e) {
             System.out.println("토큰없음");
         }
