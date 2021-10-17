@@ -17,7 +17,6 @@ import com.example.demo.enums.Stringenums;
 import com.example.demo.enums.intEnums;
 import com.example.demo.find.service.findService;
 import com.example.demo.user.model.tryUpadateDto;
-import com.example.demo.user.model.uservo;
 import com.example.demo.user.service.userService;
 import com.example.demo.utill.utillService;
 import com.nimbusds.jose.shaded.json.JSONObject;
@@ -46,14 +45,21 @@ public class phoneService {
         System.out.println("sendPhone");
         confrim(sendSmsDto.getUnit());
         System.out.println(sendSmsDto.getUnit());
+        String detail=sendSmsDto.getDetail();
         phoneVo phoneVo=new phoneVo();
-        if(sendSmsDto.getDetail().equals("confrim")){
+        if(detail.equals("confrim")){
             System.out.println("회원가입시 핸드폰 번호 요청");
             phoneVo=phoneDao.findByPhoneNum(sendSmsDto.getUnit()).orElseGet(() -> new phoneVo().builder().pcount(0).pcreated(Timestamp.valueOf(LocalDateTime.now())).phoneNum(sendSmsDto.getUnit()).build());
-        }else if(sendSmsDto.getDetail().equals("find")){
+        }else if(detail.equals(Stringenums.find.getString())||detail.equals("change")){
             System.out.println("이미 회원가입 되어있는 휴대폰 번호 찾기");
             getRequestAndusersInter getRequestAndusersInter=phoneDao.findPhoneJoinUsers(sendSmsDto.getUnit());
-            confrimService.confrimAlready(getRequestAndusersInter.getAlready());
+            int already=getRequestAndusersInter.getAlready();
+            if(detail.equals("change")){
+                if(utillService.checkEquals(already, 1)){
+                    throw new RuntimeException("이미존재 하는 핸드폰입니다");
+                }
+            }
+            confrimService.confrimAlready(already);
             if(Optional.ofNullable(getRequestAndusersInter.getPhone_num()).orElseGet(()->"emthy").equals("emthy")){
                 System.out.println("첫요청");
                 phoneVo.setDonePhone(noDoneNum);
@@ -85,7 +91,7 @@ public class phoneService {
         }else{
             throw new RuntimeException("알 수없는 오류발생");
         }
-        sendMessage.sendMessege(sendRandNumInter.getEmailOrPhone(),sendRandNumInter.getRandNum()); 
+        //sendMessage.sendMessege(sendRandNumInter.getEmailOrPhone(),sendRandNumInter.getRandNum()); 
     }
     private void confrim(String phone) {
         System.out.println("confrim");
