@@ -72,7 +72,9 @@ public class kakaoService {
         uservo uservo =kakaoLoginService.tryLogin(request,apiKey);
         Map<String,Object>makeCookies=new HashMap<>();
         makeCookies.put(accessTokenName,jwtService.getAccessToken(uservo.getEmail()));
-        makeCookies.put(refreshTokenName, jwtService.getRefreshToken());
+        String refreshToken=jwtService.getRefreshToken();
+        makeCookies.put(refreshTokenName, refreshToken);
+        jwtService.insert(uservo, refreshToken);
         utillService.makeCookie(makeCookies, response);
     }
     

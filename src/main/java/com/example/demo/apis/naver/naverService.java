@@ -50,7 +50,9 @@ public class naverService {
         uservo uservo=naverLoginService.tryNaverLogin(getToken(request.getParameter("code"), request.getParameter("state")), response);
         Map<String,Object>makeCookies=new HashMap<>();
         makeCookies.put(accessTokenName,jwtService.getAccessToken(uservo.getEmail()));
-        makeCookies.put(refreshTokenName, jwtService.getRefreshToken());
+        String refreshToken=jwtService.getRefreshToken();
+        makeCookies.put(refreshTokenName, refreshToken);
+        jwtService.insert(uservo, refreshToken);
         utillService.makeCookie(makeCookies, response);
     }
     private JSONObject getToken(String code,String state) {
