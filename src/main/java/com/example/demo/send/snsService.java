@@ -29,7 +29,7 @@ public class snsService {
         }
         return utillService.makeJson(true, "인증번호 전송이 완료 되었습니다");
     }
-    public JSONObject checkRandNum(tryConfrimRandNumDto tryConfrimRandNumDto) throws IllegalArgumentException {
+    public JSONObject checkRandNum(tryConfrimRandNumDto tryConfrimRandNumDto){
         System.out.println("checkRandNum");
         String errorMessage="인증번호 검증 오류";
         try {

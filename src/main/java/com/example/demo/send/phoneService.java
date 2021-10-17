@@ -72,7 +72,6 @@ public class phoneService {
         }
         System.out.println("문자메세지 전송"+phoneVo);
         sendRandNumInter sendRandNumInter=new sendInter(phoneVo.getPcount(),phoneVo.getPhoneNum(),phoneVo.getPcreated(),utillService.getRandomNum(intEnums.randNumLength.getInt()),phoneVo.getDonePhone(),sendSmsDto.getScope());
-        confrimService.sendRandNum(sendRandNumInter);
         String result=confrimService.sendRandNum(sendRandNumInter);
         if(result.equals(Stringenums.first.getString())){
             insert(sendRandNumInter);
@@ -125,7 +124,9 @@ public class phoneService {
     private JSONObject ifFind(String scope,String phone) {
         System.out.println("ifFind");
         String message="인증이 완료되었습니다";
-        if(scope.equals(Stringenums.find.getString())){
+        if(scope.equals(Stringenums.confrim.getString())){
+            System.out.println("인증서비스 요청");
+        }else if(scope.equals(Stringenums.find.getString())){
             System.out.println("이메일 찾기 요청");
             findService.findEmail(phone);
             message="핸드폰으로 이메일을 전송했습니다";
@@ -140,7 +141,7 @@ public class phoneService {
             delete(phone);
             message="휴대폰 번호가 변경되었습니다";
         }else{
-            return utillService.makeJson(false,"유효하지 않는 스코프 혹은 유닛입니다");
+            return utillService.makeJson(true, message);
         }
         return utillService.makeJson(true, message);
     }

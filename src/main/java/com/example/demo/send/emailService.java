@@ -115,7 +115,9 @@ public class emailService {
     private JSONObject ifFind(String scope,String phoneOrEmail) {
         System.out.println("ifFind");
         String message="인증이 완료되었습니다";
-        if(scope.equals("find")){
+        if(scope.equals(Stringenums.confrim.getString())){
+            System.out.println("인증서비스 요청");
+        }else if(scope.equals("find")){
             System.out.println("비밀번호 찾기 요청");
             findService.findPwd(phoneOrEmail);
             message="이메일로 링크가 전송되었습니다";
