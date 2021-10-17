@@ -146,7 +146,7 @@ public class userService {
         System.out.println("insertOauth");
         uservo dbVo=userDao.findByEmail(uservo.getEmail()).orElseGet(()-> new uservo());
         if(dbVo.getUid()==0){
-            System.out.println(uservo.getProvider()+"로그인 회원가입시도");
+            System.out.println(uservo+"로그인 회원가입시도");
             uservo.setPwd(securityConfig.pwdEncoder().encode(oauthPwd));
             userDao.save(uservo);
             dbVo=uservo;

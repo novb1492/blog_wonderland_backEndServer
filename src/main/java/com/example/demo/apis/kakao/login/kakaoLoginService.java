@@ -65,10 +65,11 @@ public class kakaoLoginService {
     }
     private uservo mapToVo(LinkedHashMap<String,Object>userInfor) {
         System.out.println("mapToVo");
+        LinkedHashMap<String,Object>profile=(LinkedHashMap<String, Object>) userInfor.get("profile");
         uservo vo=uservo.builder()
                         .address("테스트 주소 안줌")
                         .email((String)userInfor.get("email"))
-                        .name((String)userInfor.get("nickname"))
+                        .name((String)profile.get("nickname"))
                         .phoneNum("테스트 번호 안줌")
                         .provider("kakao")
                         .role(Stringenums.role_user.getString())
