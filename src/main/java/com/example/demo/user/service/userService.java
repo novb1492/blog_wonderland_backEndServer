@@ -38,6 +38,7 @@ public class userService {
     private final String data=Stringenums.data.getString();
     private final int doneNum=intEnums.doneNum.getInt();
     private final String confrim=Stringenums.confrim.getString();
+    private final String find=Stringenums.find.getString();
 
     @Autowired
     private userDao userDao;
@@ -200,8 +201,8 @@ public class userService {
         try {
             confrimPwd(tryUpadateDto);
             String email=null;
-            if(tryUpadateDto.getDetail().equals(Stringenums.find.getString())){
-                getJoinRequest getJoinRequest=findPwdDao.findTokenNameJoinRequest(tryUpadateDto.getToken());
+            if(tryUpadateDto.getDetail().equals(find)){
+                getJoinRequest getJoinRequest=findPwdDao.findTokenNameJoinRequest(find,tryUpadateDto.getToken());
                 confrim(getJoinRequest);
                 email=getJoinRequest.getEmail();
             }else if(tryUpadateDto.getDetail().equals("update")){

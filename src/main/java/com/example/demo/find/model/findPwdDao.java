@@ -13,8 +13,8 @@ public interface findPwdDao extends JpaRepository<findPwdVo,Integer> {
     @Query(value = "select (select count(*) from requestpwd where pemail=?)pcount,(select count(*) from users where email=?)ucount",nativeQuery = true)
     getJoinUsers findJoinUsers(String email,String email2);
 
-    @Query(value = "select u.email,e.doneemail,r.pexpire  from requestpwd r inner join users u on r.pemail=u.email inner join requestemail e on e.eemail=r.pemail where r.ptoken_name=?",nativeQuery = true)
-    getJoinRequest findTokenNameJoinRequest(String email);
+    @Query(value = "select u.email,e.doneemail,r.pexpire  from requestpwd r inner join users u on r.pemail=u.email inner join requestemail e on e.eemail=r.pemail and e.detail=? where r.ptoken_name=?",nativeQuery = true)
+    getJoinRequest findTokenNameJoinRequest(String detail,String email);
       
     @Modifying
     @Transactional
