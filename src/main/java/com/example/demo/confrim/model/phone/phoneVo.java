@@ -32,8 +32,8 @@ public class phoneVo {
     @Column(name = "pcount",nullable = false)
     private int pcount;
 
-    @Column(name = "phoneNum",nullable = false,length = 20)
-    private String phoneNum;
+    @Column(name = "pphoneNum",nullable = false,length = 20)
+    private String pphoneNum;
 
     @Column(name = "prandNum",nullable = false,length = 20)
     private String randNum;

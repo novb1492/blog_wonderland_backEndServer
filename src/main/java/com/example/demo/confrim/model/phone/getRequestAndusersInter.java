@@ -7,6 +7,6 @@ public interface getRequestAndusersInter {
     int getDone_phone();
     int getPcount();
     Timestamp getPcreated();
-    String getPhone_num();
+    String getPphone_num();
     int getAlready();
 }
