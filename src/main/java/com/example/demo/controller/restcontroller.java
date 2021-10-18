@@ -12,6 +12,7 @@ import com.example.demo.confrim.model.phone.tryConfrimRandNumDto;
 import com.example.demo.confrim.model.phone.trySendSmsDto;
 import com.example.demo.find.service.findService;
 import com.example.demo.jwt.service.jwtService;
+import com.example.demo.product.service.productService;
 import com.example.demo.send.snsService;
 import com.example.demo.user.model.tryJoinDto;
 import com.example.demo.user.model.tryUpadateDto;
@@ -44,6 +45,8 @@ public class restcontroller {
     private kakaoService kakaoService;
     @Autowired
     private findService findService;
+    @Autowired
+    private productService productService;
 
     @RequestMapping(value = "/user/crud/**",method = RequestMethod.GET)
     public JSONObject checkLogin(HttpServletRequest request,HttpServletResponse response) {
@@ -112,6 +115,11 @@ public class restcontroller {
     public JSONObject findSomthing(HttpServletRequest request,HttpServletResponse response) {
         System.out.println("findSomthing");
         return findService.findRequest(request.getParameter("token"), request.getParameter("scope"));
+    }
+    @RequestMapping(value = "/product/select",method = RequestMethod.GET)
+    public JSONObject getProducts(HttpServletRequest request,HttpServletResponse response) {
+        System.out.println("getProducts restcontroller");
+        return productService.getProducts(request);
     }
     private void doRedirect(HttpServletResponse response,String url) {
         System.out.println("doRedirect");
