@@ -67,7 +67,7 @@ public class phoneService {
         }else if(result.equals(Stringenums.noFirst.getString())){
             update(sendRandNumInter);
         }else if(result.equals(Stringenums.reset.getString())){
-            delete(phoneVo.getPphoneNum());
+            delete(phoneVo.getPphoneNum(),detail);
             insert(sendRandNumInter);
         }else if(result.equals(Stringenums.tooMany.getString())){
             throw new RuntimeException("하루 "+intEnums.maxRequest.getInt()+"회 제한입니다");
@@ -128,9 +128,9 @@ public class phoneService {
         System.out.println("update");
         phoneDao.updatePhoneNative(sendRandNumInter.getCount()+1,sendRandNumInter.getRandNum(),Timestamp.valueOf(LocalDateTime.now()),sendRandNumInter.getEmailOrPhone(),sendRandNumInter.getDetail());
     }
-    public void delete(String phone) {
+    public void delete(String phone,String detail) {
         System.out.println("delete"+phone);
-        phoneDao.deleteByPphoneNum(phone);
+        phoneDao.deletePhoneNative(phone,detail);
     }
     @Transactional(rollbackFor = Exception.class)
     public JSONObject checkNum(tryConfrimRandNumDto tryConfrimRandNumDto) {
@@ -157,7 +157,7 @@ public class phoneService {
             tryUpadateDto.setPhone(phone);
             tryUpadateDto.setScope("phone");
             userService.update(tryUpadateDto);
-            delete(phone);
+            delete(phone,scope);
             message="휴대폰 번호가 변경되었습니다";
         }else{
             return utillService.makeJson(true, message);
