@@ -41,6 +41,10 @@ public class emailVo {
     @Column(name = "doneemail",nullable = false)
     private int doneemail;
 
+    
+    @Column(name = "detail",nullable = false,length = 50)
+    private String detail;
+
     @Column(name = "ecreated")
     @CreationTimestamp
     private Timestamp ecreated;

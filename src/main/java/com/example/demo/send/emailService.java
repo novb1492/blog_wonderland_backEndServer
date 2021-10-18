@@ -68,7 +68,7 @@ public class emailService {
             throw new RuntimeException("detail이 유요하지 않습니다");
         }
         System.out.println("이메일 전송"+emailVo);
-        sendRandNumInter sendRandNumInter=new sendInter(emailVo.getEcount(),emailVo.getEemail(),emailVo.getEcreated(), utillService.getRandomNum(intEnums.randNumLength.getInt()),emailVo.getDoneemail(),trySendSmsDto.getScope());
+        sendRandNumInter sendRandNumInter=new sendInter(emailVo.getEcount(),emailVo.getEemail(),emailVo.getEcreated(), utillService.getRandomNum(intEnums.randNumLength.getInt()),emailVo.getDoneemail(),trySendSmsDto.getScope(),trySendSmsDto.getDetail());
         String result=confrimService.sendRandNum(sendRandNumInter);
         if(result.equals(Stringenums.first.getString())){
             insert(sendRandNumInter);
@@ -91,6 +91,7 @@ public class emailService {
                             .eemail(sendRandNumInter.getEmailOrPhone())
                             .erandNum(sendRandNumInter.getRandNum())
                             .doneemail(noDoneNum)
+                            .detail(sendRandNumInter.getDetail())
                             .build();
                             emailDao.save(vo);
     }
