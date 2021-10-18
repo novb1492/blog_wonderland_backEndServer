@@ -52,30 +52,7 @@ public class phoneService {
             phoneVo=phoneDao.findByPphoneNum(phone).orElseGet(() -> new phoneVo().builder().pcount(0).pcreated(Timestamp.valueOf(LocalDateTime.now())).pphoneNum(phone).build());
         }else if(detail.equals(Stringenums.find.getString())||detail.equals("change")){
             System.out.println("이미 회원가입 되어있는 휴대폰 번호 찾기");
-            getRequestAndusersInter getRequestAndusersInter=null;
-            if(detail.equals("change")){
-                System.out.println("change입니다");
-                getRequestAndusersInter=phoneDao.findPhoneJoinUsers2(phone,phone,phone,phone,phone);
-                if(utillService.checkEquals(getRequestAndusersInter.getAlready(), 1)){
-                    throw new RuntimeException("이미존재 하는 핸드폰입니다");
-                }
-            }else{
-                getRequestAndusersInter=phoneDao.findPhoneJoinUsers(sendSmsDto.getUnit());
-                confrimService.confrimAlready(getRequestAndusersInter.getAlready());
-            }
-            System.out.println(getRequestAndusersInter.getPphone_num()+"젆하번호");
-            if(Optional.ofNullable(getRequestAndusersInter.getPphone_num()).orElseGet(()->"emthy").equals("emthy")){
-                System.out.println("첫요청");
-                phoneVo.setDonePhone(noDoneNum);
-                phoneVo.setPcount(0);
-                phoneVo.setPcreated(Timestamp.valueOf(LocalDateTime.now()));
-            }else{
-                System.out.println("요청 내역존재");
-                phoneVo.setDonePhone(getRequestAndusersInter.getDone_phone());
-                phoneVo.setPcount(getRequestAndusersInter.getPcount());
-                phoneVo.setPcreated(getRequestAndusersInter.getPcreated());
-            }
-            phoneVo.setPphoneNum(sendSmsDto.getUnit());
+            phoneVo=getPhoneVo(sendSmsDto);
         }else{
             throw new RuntimeException("detail이 유요하지 않습니다");
         }
@@ -95,6 +72,35 @@ public class phoneService {
             throw new RuntimeException("알 수없는 오류발생");
         }
         //sendMessage.sendMessege(sendRandNumInter.getEmailOrPhone(),sendRandNumInter.getRandNum()); 
+    }
+    private phoneVo getPhoneVo(trySendSmsDto sendSmsDto) {
+        System.out.println("getGetRequestAndusersInter");
+        phoneVo phoneVo=new phoneVo();
+        getRequestAndusersInter getRequestAndusersInter=null;
+        String phone=sendSmsDto.getUnit();
+        if(sendSmsDto.getDetail().equals("change")){
+            System.out.println("change입니다");
+            getRequestAndusersInter=phoneDao.findPhoneJoinUsers2(phone,phone,phone,phone,phone);
+            if(utillService.checkEquals(getRequestAndusersInter.getAlready(), 1)){
+                throw new RuntimeException("이미존재 하는 핸드폰입니다");
+            }
+        }else{
+            getRequestAndusersInter=phoneDao.findPhoneJoinUsers(sendSmsDto.getUnit());
+            confrimService.confrimAlready(getRequestAndusersInter.getAlready());
+        }
+        if(Optional.ofNullable(getRequestAndusersInter.getPphone_num()).orElseGet(()->"emthy").equals("emthy")){
+            System.out.println("첫요청");
+            phoneVo.setDonePhone(noDoneNum);
+            phoneVo.setPcount(0);
+            phoneVo.setPcreated(Timestamp.valueOf(LocalDateTime.now()));
+        }else{
+            System.out.println("요청 내역존재");
+            phoneVo.setDonePhone(getRequestAndusersInter.getDone_phone());
+            phoneVo.setPcount(getRequestAndusersInter.getPcount());
+            phoneVo.setPcreated(getRequestAndusersInter.getPcreated());
+        }
+        phoneVo.setPphoneNum(sendSmsDto.getUnit());
+        return phoneVo;
     }
     private void confrim(String phone) {
         System.out.println("confrim");
