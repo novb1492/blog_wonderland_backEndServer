@@ -16,7 +16,6 @@ import com.example.demo.enums.intEnums;
 import com.example.demo.find.model.findPwdDao;
 import com.example.demo.find.model.getJoinRequest;
 import com.example.demo.jwt.service.jwtService;
-import com.example.demo.send.phoneService;
 import com.example.demo.user.model.inserConfrimInter;
 import com.example.demo.user.model.principalDetail;
 import com.example.demo.user.model.tryJoinDto;
@@ -44,8 +43,6 @@ public class userService {
     private userDao userDao;
     @Autowired
     private securityConfig securityConfig;
-    @Autowired
-    phoneService phoneService;
     @Autowired
     private findPwdDao findPwdDao;
     @Autowired
@@ -103,7 +100,7 @@ public class userService {
                             .role(Stringenums.role_user.getString())
                             .build();
                             userDao.save(vo);
-                            phoneService.delete(tryJoinDto.getPhone());
+                            userDao.deletePhone(tryJoinDto.getPhone(), confrim);
                             return utillService.makeJson(true, "회원가입을 축하드립니다");
         }catch (RuntimeException e) {
             return utillService.makeJson(false, e.getMessage());
@@ -113,12 +110,14 @@ public class userService {
     }
     private void confrim(tryJoinDto tryJoinDto) {
         System.out.println("checkPhoneConfrim");
-            inserConfrimInter inserConfrimInter=userDao.findByEmailJoinConfrim(tryJoinDto.getPhone(),tryJoinDto.getEmail(), tryJoinDto.getPhone(),confrim);
+            String phone=tryJoinDto.getPhone();
+            inserConfrimInter inserConfrimInter=userDao.findByEmailJoinConfrim(phone,tryJoinDto.getEmail(), phone,confrim);
             int done=inserConfrimInter.getDone().orElseThrow(()->new IllegalArgumentException("요청내역이 존재하지 않습니다"));
             String message=null;
             if(done==0){
                 System.out.println("인증되지 않은 핸든폰입니다");
                 message="인증되지 않은 핸든폰입니다";
+                userDao.deletePhone(phone, confrim);
             }else if(inserConfrimInter.getUcount()!=0){
                 System.out.println("이미 존재하는 이메일 입니다");
                 message="이미 존재하는 이메일 입니다";
@@ -128,6 +127,7 @@ public class userService {
             }else if(inserConfrimInter.getPcount()>0){
                 System.out.println("이미 존재하는 핸드폰번호 입니다");
                 message="이미 존재하는 핸드폰번호 입니다";
+                userDao.deletePhone(phone, confrim);
             }else{
                 System.out.println("회원가입 유효성 통과");
                 return;

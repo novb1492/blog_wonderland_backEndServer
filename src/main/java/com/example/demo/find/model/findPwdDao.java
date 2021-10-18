@@ -34,7 +34,7 @@ public interface findPwdDao extends JpaRepository<findPwdVo,Integer> {
 
     @Modifying
     @Transactional
-    @Query(value = "delete  from requestphone where phone_num=?",nativeQuery = true)
+    @Query(value = "delete  from requestphone where pphone_num=?",nativeQuery = true)
     void deleteRequest(String phone);
 
 }

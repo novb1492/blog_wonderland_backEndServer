@@ -33,7 +33,7 @@ public class phoneService {
     private final String find=Stringenums.find.getString();
     private final String change=Stringenums.change.getString();
     private final String update=Stringenums.update.getString();
-
+    
     @Autowired
     private phoneDao phoneDao;
     @Autowired
@@ -90,7 +90,7 @@ public class phoneService {
                 throw new RuntimeException("이미존재 하는 핸드폰입니다");
             }
         }else{
-            getRequestAndusersInter=phoneDao.findPhoneJoinUsers(sendSmsDto.getUnit(),detail);
+            getRequestAndusersInter=phoneDao.findPhoneJoinUsers(detail,sendSmsDto.getUnit());
             confrimService.confrimAlready(getRequestAndusersInter.getAlready());
         }
         if(Optional.ofNullable(getRequestAndusersInter.getPphone_num()).orElseGet(()->"emthy").equals("emthy")){
@@ -146,9 +146,9 @@ public class phoneService {
        
         confrimService.confrimNum(tryConfrimRandNumDto.getRandNum(), phoneVo.getRandNum(),phoneVo.getPcreated());
         phoneVo.setDonePhone(doneNum);
-        return ifFind(tryConfrimRandNumDto.getScope(), phone);
+        return ifFind(tryConfrimRandNumDto.getScope(), phone,phoneVo);
     }
-    private JSONObject ifFind(String scope,String phone) {
+    private JSONObject ifFind(String scope,String phone,phoneVo phoneVo) {
         System.out.println("ifFind");
         String message="인증이 완료되었습니다";
         if(scope.equals(confrim)){
@@ -159,7 +159,6 @@ public class phoneService {
             message="핸드폰으로 이메일을 전송했습니다";
         }else if(scope.equals(update)){
             System.out.println("핸드폰 번호 변경요청");
-            phoneVo phoneVo=phoneDao.findByPphoneNative(phone,change).orElseThrow(()->new IllegalArgumentException("요청 내역이 존재 하지 않습니다"));
             confrimService.confrimDone(phoneVo.getDonePhone());
             tryUpadateDto tryUpadateDto=new tryUpadateDto();
             tryUpadateDto.setPhone(phone);

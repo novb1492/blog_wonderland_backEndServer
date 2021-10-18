@@ -84,7 +84,7 @@ public class findService {
     public void findEmail(String phone) {
         System.out.println("findEmail");
         String email=findPwdDao.findEmailNative(phone).orElseThrow(()->new IllegalArgumentException("회원가입된 핸드폰이 아닙니다"));
-        sendMessage.sendMessege(phone, "안녕하세요 wonderland입니다 이메일은 "+email+"입니다");
+        //sendMessage.sendMessege(phone, "안녕하세요 wonderland입니다 이메일은 "+email+"입니다");
         findPwdDao.deleteRequest(phone);
     }
 }

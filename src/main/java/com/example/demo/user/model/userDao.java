@@ -28,5 +28,10 @@ public interface userDao extends JpaRepository<uservo,Integer> {
     @Query(value = "update users set phone_num=? where email=?",nativeQuery = true)
     void updatePhone(String phone,String email);
 
+    @Modifying
+    @Transactional
+    @Query(value = "delete from requestphone where pphone_num=? and detail=?",nativeQuery = true)
+    void deletePhone(String phone,String detail);
+
 
 }
