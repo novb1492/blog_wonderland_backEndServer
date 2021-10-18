@@ -26,13 +26,13 @@ public interface phoneDao extends JpaRepository<phoneVo,Integer> {
   
     @Modifying
     @Transactional
-    @Query(value = "update requestphone set pcount=?,prand_num=?,pcreated=? where pphone_num=?",nativeQuery = true)
-    void updatePhoneNative(int count,String randNum,Timestamp now,String phoneNum);
+    @Query(value = "update requestphone set pcount=?,prand_num=?,pcreated=? where pphone_num=? and detail=?",nativeQuery = true)
+    void updatePhoneNative(int count,String randNum,Timestamp now,String phoneNum,String detail);
 
     @Modifying
     @Transactional
-    @Query(value = "delete from requestphone where pphone_num=?",nativeQuery = true)
-    void deletePhoneNative(String phoneNum);
+    @Query(value = "delete from requestphone where pphone_num=? and detail=?",nativeQuery = true)
+    void deletePhoneNative(String phoneNum,String detail);
 
 
 }

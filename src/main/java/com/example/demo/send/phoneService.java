@@ -126,7 +126,7 @@ public class phoneService {
     }
     private void update(sendRandNumInter sendRandNumInter) {
         System.out.println("update");
-        phoneDao.updatePhoneNative(sendRandNumInter.getCount()+1,sendRandNumInter.getRandNum(),Timestamp.valueOf(LocalDateTime.now()),sendRandNumInter.getEmailOrPhone());
+        phoneDao.updatePhoneNative(sendRandNumInter.getCount()+1,sendRandNumInter.getRandNum(),Timestamp.valueOf(LocalDateTime.now()),sendRandNumInter.getEmailOrPhone(),sendRandNumInter.getDetail());
     }
     public void delete(String phone) {
         System.out.println("delete"+phone);
