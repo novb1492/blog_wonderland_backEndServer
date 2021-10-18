@@ -31,7 +31,6 @@ public class phoneService {
     private final int doneNum=intEnums.doneNum.getInt();
     private final String confrim=Stringenums.confrim.getString();
     private final String find=Stringenums.find.getString();
-    private final String change=Stringenums.change.getString();
     private final String update=Stringenums.update.getString();
 
     @Autowired
@@ -53,7 +52,7 @@ public class phoneService {
         phoneVo phoneVo=new phoneVo();
         if(detail.equals(confrim)){
             System.out.println("회원가입시 핸드폰 번호 요청");
-            phoneVo=phoneDao.findByPphoneNum(phone).orElseGet(() -> new phoneVo().builder().pcount(0).pcreated(Timestamp.valueOf(LocalDateTime.now())).pphoneNum(phone).build());
+            phoneVo=phoneDao.findByPphoneNative(phone,detail).orElseGet(() -> new phoneVo().builder().pcount(0).pcreated(Timestamp.valueOf(LocalDateTime.now())).pphoneNum(phone).build());
         }else if(detail.equals(find)||detail.equals(update)){
             System.out.println("이미 회원가입 되어있는 휴대폰 번호 찾기");
             phoneVo=getPhoneVo(sendSmsDto);
