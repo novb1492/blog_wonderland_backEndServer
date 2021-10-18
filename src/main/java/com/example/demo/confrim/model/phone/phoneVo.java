@@ -41,6 +41,10 @@ public class phoneVo {
     @Column(name = "donePhone",nullable = false)
     private int donePhone;
 
+    
+    @Column(name = "detail",nullable = false,length = 20)
+    private String detail;
+
     @Column(name = "pcreated")
     @CreationTimestamp
     private Timestamp pcreated;

@@ -38,6 +38,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class userService {
     private final String data=Stringenums.data.getString();
     private final int doneNum=intEnums.doneNum.getInt();
+    private final String confrim=Stringenums.confrim.getString();
 
     @Autowired
     private userDao userDao;
@@ -57,6 +58,7 @@ public class userService {
     private String refreshTokenName;
     @Value("${oauth.pwd}")
     private String oauthPwd;
+    
 
     public JSONObject checkLogin(HttpServletRequest request) {
         System.out.println("checkLogin");
@@ -111,7 +113,7 @@ public class userService {
     }
     private void confrim(tryJoinDto tryJoinDto) {
         System.out.println("checkPhoneConfrim");
-            inserConfrimInter inserConfrimInter=userDao.findByEmailJoinConfrim(tryJoinDto.getPhone(),tryJoinDto.getEmail(), tryJoinDto.getPhone());
+            inserConfrimInter inserConfrimInter=userDao.findByEmailJoinConfrim(tryJoinDto.getPhone(),tryJoinDto.getEmail(), tryJoinDto.getPhone(),confrim);
             int done=inserConfrimInter.getDone().orElseThrow(()->new IllegalArgumentException("요청내역이 존재하지 않습니다"));
             String message=null;
             if(done==0){

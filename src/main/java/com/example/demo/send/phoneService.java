@@ -29,6 +29,10 @@ public class phoneService {
 
     private final int noDoneNum=intEnums.noDoneNum.getInt();
     private final int doneNum=intEnums.doneNum.getInt();
+    private final String confrim=Stringenums.confrim.getString();
+    private final String find=Stringenums.find.getString();
+    private final String change=Stringenums.change.getString();
+    private final String update=Stringenums.update.getString();
 
     @Autowired
     private phoneDao phoneDao;
@@ -47,17 +51,17 @@ public class phoneService {
         System.out.println(phone);
         String detail=sendSmsDto.getDetail();
         phoneVo phoneVo=new phoneVo();
-        if(detail.equals("confrim")){
+        if(detail.equals(confrim)){
             System.out.println("회원가입시 핸드폰 번호 요청");
             phoneVo=phoneDao.findByPphoneNum(phone).orElseGet(() -> new phoneVo().builder().pcount(0).pcreated(Timestamp.valueOf(LocalDateTime.now())).pphoneNum(phone).build());
-        }else if(detail.equals(Stringenums.find.getString())||detail.equals("change")){
+        }else if(detail.equals(find)||detail.equals(change)){
             System.out.println("이미 회원가입 되어있는 휴대폰 번호 찾기");
             phoneVo=getPhoneVo(sendSmsDto);
         }else{
             throw new RuntimeException("detail이 유요하지 않습니다");
         }
         System.out.println("문자메세지 전송"+phoneVo);
-        sendRandNumInter sendRandNumInter=new sendInter(phoneVo.getPcount(),phoneVo.getPphoneNum(),phoneVo.getPcreated(),utillService.getRandomNum(intEnums.randNumLength.getInt()),phoneVo.getDonePhone(),sendSmsDto.getScope());
+        sendRandNumInter sendRandNumInter=new sendInter(phoneVo.getPcount(),phoneVo.getPphoneNum(),phoneVo.getPcreated(),utillService.getRandomNum(intEnums.randNumLength.getInt()),phoneVo.getDonePhone(),sendSmsDto.getScope(),detail);
         String result=confrimService.sendRandNum(sendRandNumInter);
         if(result.equals(Stringenums.first.getString())){
             insert(sendRandNumInter);
@@ -78,14 +82,15 @@ public class phoneService {
         phoneVo phoneVo=new phoneVo();
         getRequestAndusersInter getRequestAndusersInter=null;
         String phone=sendSmsDto.getUnit();
-        if(sendSmsDto.getDetail().equals("change")){
+        String detail=sendSmsDto.getDetail();
+        if(detail.equals(change)){
             System.out.println("change입니다");
-            getRequestAndusersInter=phoneDao.findPhoneJoinUsers2(phone,phone,phone,phone,phone);
+            getRequestAndusersInter=phoneDao.findPhoneJoinUsers2(phone,detail,phone,detail,phone,detail,phone,detail,phone,detail);
             if(utillService.checkEquals(getRequestAndusersInter.getAlready(), 1)){
                 throw new RuntimeException("이미존재 하는 핸드폰입니다");
             }
         }else{
-            getRequestAndusersInter=phoneDao.findPhoneJoinUsers(sendSmsDto.getUnit());
+            getRequestAndusersInter=phoneDao.findPhoneJoinUsers(sendSmsDto.getUnit(),detail);
             confrimService.confrimAlready(getRequestAndusersInter.getAlready());
         }
         if(Optional.ofNullable(getRequestAndusersInter.getPphone_num()).orElseGet(()->"emthy").equals("emthy")){
@@ -115,6 +120,7 @@ public class phoneService {
         .pcount(1)
         .pphoneNum(sendRandNumInter.getEmailOrPhone())
         .randNum(sendRandNumInter.getRandNum())
+        .detail(sendRandNumInter.getDetail())
         .donePhone(noDoneNum)
         .build();
         phoneDao.save(vo);
@@ -131,7 +137,13 @@ public class phoneService {
     public JSONObject checkNum(tryConfrimRandNumDto tryConfrimRandNumDto) {
         System.out.println("checkNum");
         String phone=tryConfrimRandNumDto.getPhoneOrEmail();
-        phoneVo phoneVo=phoneDao.findByPphoneNum(phone).orElseThrow(()->new IllegalArgumentException("인증 요청 내역이 존재 하지 않습니다"));
+        phoneVo phoneVo=new phoneVo();
+        if(tryConfrimRandNumDto.getScope().equals(update)){
+            phoneVo=phoneDao.findByPphoneNative(phone,change).orElseThrow(()->new IllegalArgumentException("인증 요청 내역이 존재 하지 않습니다"));
+        }else{
+            phoneVo=phoneDao.findByPphoneNum(phone).orElseThrow(()->new IllegalArgumentException("인증 요청 내역이 존재 하지 않습니다"));
+        }
+       
         confrimService.confrimNum(tryConfrimRandNumDto.getRandNum(), phoneVo.getRandNum(),phoneVo.getPcreated());
         phoneVo.setDonePhone(doneNum);
         return ifFind(tryConfrimRandNumDto.getScope(), phone);
@@ -139,15 +151,15 @@ public class phoneService {
     private JSONObject ifFind(String scope,String phone) {
         System.out.println("ifFind");
         String message="인증이 완료되었습니다";
-        if(scope.equals(Stringenums.confrim.getString())){
+        if(scope.equals(confrim)){
             System.out.println("인증서비스 요청");
-        }else if(scope.equals(Stringenums.find.getString())){
+        }else if(scope.equals(find)){
             System.out.println("이메일 찾기 요청");
             findService.findEmail(phone);
             message="핸드폰으로 이메일을 전송했습니다";
-        }else if(scope.equals(Stringenums.update.getString())){
+        }else if(scope.equals(update)){
             System.out.println("핸드폰 번호 변경요청");
-            phoneVo phoneVo=phoneDao.findByPphoneNum(phone).orElseThrow(()->new IllegalArgumentException("요청 내역이 존재 하지 않습니다"));
+            phoneVo phoneVo=phoneDao.findByPphoneNative(phone,change).orElseThrow(()->new IllegalArgumentException("요청 내역이 존재 하지 않습니다"));
             confrimService.confrimDone(phoneVo.getDonePhone());
             tryUpadateDto tryUpadateDto=new tryUpadateDto();
             tryUpadateDto.setPhone(phone);

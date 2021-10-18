@@ -10,14 +10,16 @@ public class sendInter implements sendRandNumInter {
     private String randNum;
     private int doneOrNot;
     private String Scope;
+    private String detail;
 
-    public sendInter(int count,String addressOrNum,Timestamp firstReuqest,String randNum,int doneOrNot,String Scope){
+    public sendInter(int count,String addressOrNum,Timestamp firstReuqest,String randNum,int doneOrNot,String Scope,String detail){
         this.count=count;
         this.addressOrNum=addressOrNum;
         this.firstReuqest=firstReuqest;
         this.randNum=randNum;
         this.doneOrNot=doneOrNot;
         this.Scope=Scope;
+        this.detail=detail;
     }
     @Override
     public String getScope() {
@@ -45,6 +47,10 @@ public class sendInter implements sendRandNumInter {
     @Override
     public int doneOrNot() {
         return doneOrNot;
+    }
+    @Override
+    public String getDetail() {
+        return detail;
     }
     
 }
