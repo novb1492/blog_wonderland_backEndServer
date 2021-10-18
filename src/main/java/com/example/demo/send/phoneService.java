@@ -33,7 +33,7 @@ public class phoneService {
     private final String find=Stringenums.find.getString();
     private final String change=Stringenums.change.getString();
     private final String update=Stringenums.update.getString();
-    
+
     @Autowired
     private phoneDao phoneDao;
     @Autowired
@@ -54,7 +54,7 @@ public class phoneService {
         if(detail.equals(confrim)){
             System.out.println("회원가입시 핸드폰 번호 요청");
             phoneVo=phoneDao.findByPphoneNum(phone).orElseGet(() -> new phoneVo().builder().pcount(0).pcreated(Timestamp.valueOf(LocalDateTime.now())).pphoneNum(phone).build());
-        }else if(detail.equals(find)||detail.equals(change)){
+        }else if(detail.equals(find)||detail.equals(update)){
             System.out.println("이미 회원가입 되어있는 휴대폰 번호 찾기");
             phoneVo=getPhoneVo(sendSmsDto);
         }else{
@@ -83,7 +83,7 @@ public class phoneService {
         getRequestAndusersInter getRequestAndusersInter=null;
         String phone=sendSmsDto.getUnit();
         String detail=sendSmsDto.getDetail();
-        if(detail.equals(change)){
+        if(detail.equals(update)){
             System.out.println("change입니다");
             getRequestAndusersInter=phoneDao.findPhoneJoinUsers2(phone,detail,phone,detail,phone,detail,phone,detail,phone,detail);
             if(utillService.checkEquals(getRequestAndusersInter.getAlready(), 1)){
@@ -137,13 +137,7 @@ public class phoneService {
     public JSONObject checkNum(tryConfrimRandNumDto tryConfrimRandNumDto) {
         System.out.println("checkNum");
         String phone=tryConfrimRandNumDto.getPhoneOrEmail();
-        phoneVo phoneVo=new phoneVo();
-        if(tryConfrimRandNumDto.getScope().equals(update)){
-            phoneVo=phoneDao.findByPphoneNative(phone,change).orElseThrow(()->new IllegalArgumentException("인증 요청 내역이 존재 하지 않습니다"));
-        }else{
-            phoneVo=phoneDao.findByPphoneNum(phone).orElseThrow(()->new IllegalArgumentException("인증 요청 내역이 존재 하지 않습니다"));
-        }
-       
+        phoneVo phoneVo=phoneDao.findByPphoneNative(phone,tryConfrimRandNumDto.getScope()).orElseThrow(()->new IllegalArgumentException("인증 요청 내역이 존재 하지 않습니다"));
         confrimService.confrimNum(tryConfrimRandNumDto.getRandNum(), phoneVo.getRandNum(),phoneVo.getPcreated());
         phoneVo.setDonePhone(doneNum);
         return ifFind(tryConfrimRandNumDto.getScope(), phone,phoneVo);
