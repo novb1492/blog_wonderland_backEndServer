@@ -23,8 +23,11 @@ public class productService {
         System.out.println("getProducts");
         String kind=request.getParameter("kind");
         System.out.println("조회 품목:"+kind);
-        int start=utillService.getStart(Integer.parseInt(request.getParameter("page")), pageSize);
+        int nowPage=Integer.parseInt(request.getParameter("page"));
+        int start=utillService.getStart(nowPage, pageSize);
         List<getProductInter>productVos=productDao.findByKind(kind,kind,start-1,pageSize).orElseThrow(()->new IllegalArgumentException("존재하지 않는 품목입니다"));
+        int totalPage=utillService.getTotalPage(productVos.get(0).getTotalcount(), pageSize);
+        utillService.comparePage(nowPage, totalPage);
         JSONObject response=new JSONObject();
         List<JSONObject>products=new ArrayList<>();
         for(getProductInter p: productVos){
@@ -36,8 +39,9 @@ public class productService {
             product.put("imgPath", p.getProduct_img());
             products.add(product);
         }
-        response.put("totalPage", utillService.getTotalPage(productVos.get(0).getTotalcount(), pageSize));
+        response.put("totalPage", totalPage);
         response.put("products", products);
         return response;
     }
+  
 }

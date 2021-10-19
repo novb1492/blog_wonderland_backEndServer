@@ -130,4 +130,10 @@ public class utillService {
         System.out.println("요청페이지 :"+page);
         return (page-1)*pageSize+1;
     }
+    public static void comparePage(int nowPage,int totalPage) {
+        System.out.println("comparePage");
+        if(nowPage>totalPage){
+            throw new RuntimeException("마지막 페이지입니다");
+        }
+    }
 }
