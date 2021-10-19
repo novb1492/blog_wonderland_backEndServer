@@ -22,10 +22,11 @@ public class productService {
     public JSONObject getProducts(HttpServletRequest request) {
         System.out.println("getProducts");
         String kind=request.getParameter("kind");
-        System.out.println("조회 품목:"+kind);
+        String keyword=request.getParameter("keyword");
+        System.out.println("조회 품목:"+kind+"키워드 :"+keyword);
         int nowPage=Integer.parseInt(request.getParameter("page"));
         int start=utillService.getStart(nowPage, pageSize);
-        List<getProductInter>productVos=productDao.findByKind(kind,kind,start-1,pageSize).orElseThrow(()->new IllegalArgumentException("존재하지 않는 품목입니다"));
+        List<getProductInter>productVos=getProductVos(kind, start, keyword);
         int totalPage=utillService.getTotalPage(productVos.get(0).getTotalcount(), pageSize);
         utillService.comparePage(nowPage, totalPage);
         JSONObject response=new JSONObject();
@@ -42,6 +43,15 @@ public class productService {
         response.put("totalPage", totalPage);
         response.put("products", products);
         return response;
+    }
+    private List<getProductInter> getProductVos(String kind,int start,String keyword) {
+        System.out.println("getProductVos");
+        if(utillService.checkBlankOrNull(keyword)){
+            System.out.println("검색어 키워드 없음");
+            return productDao.findByKind(kind,kind,start-1,pageSize).orElseThrow(()->new IllegalArgumentException("존재하지 않는 품목입니다"));
+        }
+        System.out.println("검색 키워드 존재");
+        return null;
     }
   
 }
