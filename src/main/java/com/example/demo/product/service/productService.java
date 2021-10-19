@@ -1,5 +1,6 @@
 package com.example.demo.product.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -23,14 +24,16 @@ public class productService {
         System.out.println("조회 품목:"+kind);
         List<productVo>productVos=productDao.findByKind(kind).orElseThrow(()->new IllegalArgumentException("존재하지 않는 품목입니다"));
         JSONObject response=new JSONObject();
+        List<JSONObject>products=new ArrayList<>();
         for(productVo p: productVos){
-            JSONObject jsonObject=new JSONObject();
-            jsonObject.put("name", p.getProductName());
-            jsonObject.put("price", p.getPrice());
-            jsonObject.put("count", p.getCount());
-            jsonObject.put("imgPath", p.getProductImg());
-            response.put("products", jsonObject);
+            JSONObject product=new JSONObject();
+            product.put("name", p.getProductName());
+            product.put("price", p.getPrice());
+            product.put("count", p.getCount());
+            product.put("imgPath", p.getProductImg());
+            products.add(product);
         }
+        response.put("products", products);
         return response;
     }
 }
