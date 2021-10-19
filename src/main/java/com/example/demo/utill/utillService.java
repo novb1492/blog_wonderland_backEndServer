@@ -114,4 +114,20 @@ public class utillService {
         .build(); 
         response.addHeader("Set-Cookie", cookie.toString()+";HttpOnly");
     }
+    public static int getTotalPage(int totalCount,int pageSize) {
+        System.out.println("getTotalPage");
+        int totalPage=totalCount/pageSize;
+        int remainder=totalCount%pageSize;
+        if(totalPage==0){
+            return 1;
+        }else if(remainder>0){
+            totalPage+=1;
+        }
+        return totalPage;
+    }
+    public static int getStart(int page,int pageSize) {
+        System.out.println("getStart");
+        System.out.println("요청페이지 :"+page);
+        return (page-1)*pageSize+1;
+    }
 }
