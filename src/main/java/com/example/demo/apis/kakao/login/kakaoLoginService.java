@@ -10,6 +10,8 @@ import com.example.demo.user.model.uservo;
 import com.example.demo.user.service.userService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -20,7 +22,7 @@ import org.springframework.util.MultiValueMap;
 @Service
 public class kakaoLoginService {
    
-
+    private final static Logger LOGGER=LoggerFactory.getLogger(kakaoLoginService.class);
     @Value("${kakao.login.callback}")
     private String loginCallbackUrl;
 
@@ -31,22 +33,22 @@ public class kakaoLoginService {
    
 
     public String showLoingPage(String apikey) {
-        System.out.println("kakaoLoginService showLoginPage");
+        LOGGER.info("kakaoLoginService showLoginPage");
         return "https://kauth.kakao.com/oauth/authorize?response_type=code&client_id="+apikey+"&redirect_uri="+loginCallbackUrl+"";
     }
     public uservo tryLogin(HttpServletRequest request,String apiKey) {
-        System.out.println("tryLogin");
+        LOGGER.info("tryLogin");
         JSONObject reseponseTokens=getKakaoToken(request.getParameter("code").toString(), apiKey);
-        System.out.println(reseponseTokens);
+        LOGGER.info(reseponseTokens.toString());
         JSONObject responseUserInfor=getUserInfor(reseponseTokens.getAsString("access_token").toString());
-        System.out.println(responseUserInfor);
+        LOGGER.info(responseUserInfor.toString());
         LinkedHashMap<String,Object>userInfor=(LinkedHashMap<String, Object>) responseUserInfor.get("kakao_account");
         uservo vo=mapToVo(userInfor);
         userService.insertOauth(vo);
         return vo;
     }
     private JSONObject getKakaoToken(String code,String apikey) {
-        System.out.println("getKakaoToken");
+        LOGGER.info("getKakaoToken");
         HttpHeaders headers=requestTo.getHeaders();
         MultiValueMap<String,Object> body=requestTo.getMultiValueBody();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -57,14 +59,14 @@ public class kakaoLoginService {
         return requestTo.requestToApi(body, "https://kauth.kakao.com/oauth/token", headers);
     }
     private JSONObject getUserInfor(String accessToken) {
-        System.out.println("getUserInfor");
+        LOGGER.info("getUserInfor");
         HttpHeaders headers=requestTo.getHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         headers.add("Authorization","Bearer "+accessToken);
         return requestTo.requestToApi("https://kapi.kakao.com/v2/user/me", headers);
     }
     private uservo mapToVo(LinkedHashMap<String,Object>userInfor) {
-        System.out.println("mapToVo");
+        LOGGER.info("mapToVo");
         LinkedHashMap<String,Object>profile=(LinkedHashMap<String, Object>) userInfor.get("profile");
         uservo vo=uservo.builder()
                         .address("테스트 주소 안줌")

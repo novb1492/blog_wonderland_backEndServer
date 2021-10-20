@@ -12,6 +12,8 @@ import com.example.demo.user.model.uservo;
 import com.example.demo.utill.utillService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -19,7 +21,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class kakaoService {
 
-    
+    private final static Logger LOGGER=LoggerFactory.getLogger(kakaoService.class);
     @Value("${kakao.app.key}")
     private String appKey;
     @Value("${kakao.rest.key}")
@@ -40,35 +42,35 @@ public class kakaoService {
     private jwtService jwtService;
 
     public JSONObject showPage(HttpServletRequest request) {
-        System.out.println("kakaoService showLoginPage");
+        LOGGER.info("kakaoService showLoginPage");
         String scope=request.getParameter("scope");
         String url=null;
         if(scope.equals("login")){
-            System.out.println("카카오 로그인 화면요청");
+            LOGGER.info("카카오 로그인 화면요청");
             url=kakaoLoginService.showLoingPage(apiKey);
         }else if(scope.equals("selfMessage")){
-            System.out.println("카카오 추가동의 화면요청");
+            LOGGER.info("카카오 추가동의 화면요청");
             url="https://kauth.kakao.com/oauth/authorize?client_id="+apiKey+"&redirect_uri="+morePageCallback+"&response_type=code&scope=talk_message";
         }
         return utillService.makeJson(true, url);
     }
     public void callback(HttpServletRequest request,HttpServletResponse response) {
-        System.out.println("callback");
+        LOGGER.info("callback");
         String scope=request.getParameter("scope");
         if(scope.equals("login")){
-            System.out.println("카카오 로그인 콜백");
+            LOGGER.info("카카오 로그인 콜백");
             tryKakaoLogin(request, response);
         }else if(scope.equals("more")){
-            System.out.println("카카오 추가동의 콜백");
+            LOGGER.info("카카오 추가동의 콜백");
             utillService.doRedirect(response,frontDamain+"popUpClose");
         }else if(scope.equals("pay")){
-            System.out.println("카카오페이 롤백");
+            LOGGER.info("카카오페이 롤백");
         }else{
             throw new RuntimeException("카카오 콜백 잘못된 스코프입니다");
         }
     }
     private void tryKakaoLogin(HttpServletRequest request,HttpServletResponse response) {
-        System.out.println("tryKakaoLogin");
+        LOGGER.info("tryKakaoLogin");
         uservo uservo =kakaoLoginService.tryLogin(request,apiKey);
         Map<String,Object>makeCookies=new HashMap<>();
         makeCookies.put(accessTokenName,jwtService.getAccessToken(uservo.getEmail()));

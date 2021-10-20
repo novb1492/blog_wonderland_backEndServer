@@ -12,6 +12,9 @@ import com.example.demo.jwt.service.jwtService;
 import com.example.demo.user.model.uservo;
 import com.example.demo.utill.utillService;
 import com.nimbusds.jose.shaded.json.JSONObject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -19,7 +22,7 @@ import org.springframework.web.client.RestTemplate;
 
 @Service
 public class naverService {
-    
+    private final static Logger LOGGER=LoggerFactory.getLogger(naverService.class);
     private RestTemplate restTemplate=new RestTemplate();
     private final String get="authorization_code";
     private final String update="refresh_token";
@@ -42,11 +45,11 @@ public class naverService {
     private jwtService jwtService;
 
     public JSONObject getNaverLogin() {
-       System.out.println("getNaverLogin");
+       LOGGER.info("getNaverLogin");
        return naverLoginService.getNaverLogin(naverId);
     }
     public void tryNaverLogin(HttpServletRequest request,HttpServletResponse response) {
-        System.out.println("tryNaverLogin naverService");
+        LOGGER.info("tryNaverLogin naverService");
         uservo uservo=naverLoginService.tryNaverLogin(getToken(request.getParameter("code"), request.getParameter("state")), response);
         Map<String,Object>makeCookies=new HashMap<>();
         makeCookies.put(accessTokenName,jwtService.getAccessToken(uservo.getEmail()));
@@ -56,7 +59,7 @@ public class naverService {
         utillService.makeCookie(makeCookies, response);
     }
     private JSONObject getToken(String code,String state) {
-        System.out.println("getToken");
+        LOGGER.info("getToken");
         return restTemplate.getForObject("https://nid.naver.com/oauth2.0/token?grant_type="+get+"&client_id="+naverId+"&client_secret="+pwd+"&code="+code+"&state="+state+"", JSONObject.class);
     }
 }

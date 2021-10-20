@@ -13,6 +13,8 @@ import com.example.demo.user.service.userService;
 import com.example.demo.utill.utillService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -20,7 +22,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class naverLoginService {
-
+    private final static Logger LOGGER=LoggerFactory.getLogger(naverLoginService.class);
     @Value("${naver.loginCallback}")
     private String loginCallback;
     @Autowired
@@ -29,6 +31,7 @@ public class naverLoginService {
     private requestTo requestTo;
     
     public JSONObject getNaverLogin(String naverId) {
+        LOGGER.info("getNaverLogin");
         String state="";
         try {
             state = URLEncoder.encode(loginCallback, "UTF-8");
@@ -38,15 +41,15 @@ public class naverLoginService {
         } 
     }
     public uservo tryNaverLogin(JSONObject tokens,HttpServletResponse response) {
-        System.out.println("tryNaverLogin naverLoginService");
+        LOGGER.info("tryNaverLogin naverLoginService");
         HttpHeaders headers=requestTo.getHeaders();
         headers.add("Authorization","Bearer " + tokens.get("access_token"));
         JSONObject getNaver=requestTo.requestToApi("https://openapi.naver.com/v1/nid/me", headers); 
-        System.out.println(getNaver);
+        LOGGER.info(getNaver.toString());
         return userService.insertOauth(makeVo((LinkedHashMap<String,Object>)getNaver.get("response")));
     }
     private uservo makeVo(LinkedHashMap<String,Object> getNaver) {
-        System.out.println("makeVo");
+        LOGGER.info("makeVo");
         uservo vo=uservo.builder()
                         .email((String)getNaver.get("email"))
                         .name((String)getNaver.get("name"))
@@ -55,7 +58,7 @@ public class naverLoginService {
                         .provider("naver")
                         .role(Stringenums.role_user.getString())
                         .build();
-        System.out.println("통과");                
+        LOGGER.info("통과");                
         return vo;
     }
 
