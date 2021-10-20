@@ -58,7 +58,8 @@ public class productService {
             return productDao.findByKind(kind,kind,start-1,pageSize);
         }
         LOGGER.info("검색 키워드 존재");
-        return productDao.findByKindWithKeywordNative(kind, keyword, kind, keyword, start, pageSize);
+        LOGGER.info("키워드: "+keyword);
+        return productDao.findByKindWithKeywordNative(kind, keyword, kind, keyword, start-1, pageSize);
     }
   
 }
