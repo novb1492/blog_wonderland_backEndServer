@@ -10,6 +10,7 @@ import com.example.demo.product.model.productDao;
 import com.example.demo.utill.utillService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +28,9 @@ public class productService {
         int nowPage=Integer.parseInt(request.getParameter("page"));
         int start=utillService.getStart(nowPage, pageSize);
         List<getProductInter>productVos=getProductVos(kind, start, keyword);
+        if(productVos.size()==0){
+            return utillService.makeJson(false, "검색결과가 없습니다");
+        }
         int totalPage=utillService.getTotalPage(productVos.get(0).getTotalcount(), pageSize);
         utillService.comparePage(nowPage, totalPage);
         JSONObject response=new JSONObject();
@@ -40,6 +44,7 @@ public class productService {
             product.put("imgPath", p.getProduct_img());
             products.add(product);
         }
+        response.put("flag", true);
         response.put("totalPage", totalPage);
         response.put("products", products);
         return response;
@@ -48,10 +53,10 @@ public class productService {
         System.out.println("getProductVos");
         if(utillService.checkBlankOrNull(keyword)){
             System.out.println("검색어 키워드 없음");
-            return productDao.findByKind(kind,kind,start-1,pageSize).orElseThrow(()->new IllegalArgumentException("존재하지 않는 품목입니다"));
+            return productDao.findByKind(kind,kind,start-1,pageSize);
         }
         System.out.println("검색 키워드 존재");
-        return null;
+        return productDao.findByKindWithKeywordNative(kind, keyword, kind, keyword, start, pageSize);
     }
   
 }
