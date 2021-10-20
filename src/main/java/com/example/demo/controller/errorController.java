@@ -6,6 +6,8 @@ import java.util.List;
 import com.example.demo.utill.utillService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -14,10 +16,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class errorController {
-    
+    private final static Logger LOGGER=LoggerFactory.getLogger(errorController.class);
+
     @ExceptionHandler(RuntimeException.class)
     public JSONObject runtimeException(RuntimeException exception) {
-        System.out.println("runtimeException");
+        LOGGER.info("runtimeException");
         String message=exception.getMessage();
         exception.printStackTrace();
         if(message==null){
@@ -27,7 +30,7 @@ public class errorController {
     }
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public JSONObject processValidationError(MethodArgumentNotValidException exception) {
-        System.out.println("processValidationError 유효성 검사 실패");
+        LOGGER.info("processValidationError 유효성 검사 실패");
         BindingResult bindingResult = exception.getBindingResult();
         StringBuilder builder = new StringBuilder();
         List<String>list=new ArrayList<>();

@@ -19,6 +19,8 @@ import com.example.demo.find.service.findService;
 import com.example.demo.utill.utillService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,7 +30,7 @@ public class emailService {
     private final int maxReuqest=10;
     private final int noDoneNum=intEnums.noDoneNum.getInt();
     private final int doneNum=intEnums.doneNum.getInt();
- 
+    private final static Logger LOGGER=LoggerFactory.getLogger(emailService.class);
     @Autowired
     private emailDao emailDao;
     @Autowired
@@ -40,24 +42,24 @@ public class emailService {
 
     @Transactional(rollbackFor = Exception.class)
     public void sendEmail(trySendSmsDto trySendSmsDto) {
-        System.out.println("sendEmail");
-        System.out.println(trySendSmsDto.getDetail());
+        LOGGER.info("sendEmail");
+        LOGGER.info(trySendSmsDto.getDetail());
     
         emailVo emailVo=new emailVo();
         if(trySendSmsDto.getDetail().equals("confrim")){
-            System.out.println("회원가입시 이메일 요청");
+            LOGGER.info("회원가입시 이메일 요청");
         }else if(trySendSmsDto.getDetail().equals("find")){
-            System.out.println("이미 회원가입 되어있는 이메일 찾기");
-            System.out.println(trySendSmsDto.getUnit());
+            LOGGER.info("이미 회원가입 되어있는 이메일 찾기");
+            LOGGER.info(trySendSmsDto.getUnit());
             getUserJoinInter getUserJoinInter=emailDao.findByEemailJoinUsers(trySendSmsDto.getUnit());
             confrimService.confrimAlready(getUserJoinInter.getAlready());
             if(Optional.ofNullable(getUserJoinInter.getEemail()).orElseGet(()->"emthy").equals("emthy")){
-                System.out.println("첫요청");
+                LOGGER.info("첫요청");
                 emailVo.setDoneemail(0);
                 emailVo.setEcount(0);
                 emailVo.setEcreated(Timestamp.valueOf(LocalDateTime.now()));
             }else{
-                System.out.println("요청 내역존재");
+                LOGGER.info("요청 내역존재");
                 emailVo.setEid(getUserJoinInter.getEid());
                 emailVo.setDoneemail(getUserJoinInter.getDoneemail());
                 emailVo.setEcount(getUserJoinInter.getEcount());
@@ -67,7 +69,7 @@ public class emailService {
         }else{
             throw new RuntimeException("detail이 유요하지 않습니다");
         }
-        System.out.println("이메일 전송"+emailVo);
+        LOGGER.info("이메일 전송"+emailVo);
         sendRandNumInter sendRandNumInter=new sendInter(emailVo.getEcount(),emailVo.getEemail(),emailVo.getEcreated(), utillService.getRandomNum(intEnums.randNumLength.getInt()),emailVo.getDoneemail(),trySendSmsDto.getScope(),trySendSmsDto.getDetail());
         String result=confrimService.sendRandNum(sendRandNumInter);
         if(result.equals(Stringenums.first.getString())){
@@ -85,7 +87,7 @@ public class emailService {
         sendMailService.sendEmail(sendRandNumInter.getEmailOrPhone(),"안녕하세요 wonderland입니다","인증번호는 "+sendRandNumInter.getRandNum()+"입니다");
     }
     private void insert(sendRandNumInter sendRandNumInter) {
-        System.out.println("insert");
+        LOGGER.info("insert");
         emailVo vo=emailVo.builder()
                             .ecount(1)
                             .eemail(sendRandNumInter.getEmailOrPhone())
@@ -96,17 +98,17 @@ public class emailService {
                             emailDao.save(vo);
     }
     private void update(sendRandNumInter sendRandNumInter){
-        System.out.println("update");
-        System.out.println("이메일 요청 횟수 증가");
+        LOGGER.info("update");
+        LOGGER.info("이메일 요청 횟수 증가");
         emailDao.updateEmailNative(sendRandNumInter.getCount()+1, sendRandNumInter.getRandNum(),Timestamp.valueOf(LocalDateTime.now()),sendRandNumInter.getEmailOrPhone());
     }
     private void delete(String email) {
-        System.out.println("delete");
+        LOGGER.info("delete");
         emailDao.deleteByEemail(email);
     }
     @Transactional
     public JSONObject checkNum(tryConfrimRandNumDto tryConfrimRandNumDto) {
-        System.out.println("checkNum");
+        LOGGER.info("checkNum");
         String email=tryConfrimRandNumDto.getPhoneOrEmail();
         emailVo emailVo=emailDao.findByEemail(email).orElseThrow(()->new IllegalArgumentException("인증요청 내역이 존재하지 않습니다"));
         confrimService.confrimNum(tryConfrimRandNumDto.getRandNum(), emailVo.getErandNum(),emailVo.getEcreated());
@@ -114,12 +116,12 @@ public class emailService {
         return  ifFind(tryConfrimRandNumDto.getScope(),email);
     }
     private JSONObject ifFind(String scope,String phoneOrEmail) {
-        System.out.println("ifFind");
+        LOGGER.info("ifFind");
         String message="인증이 완료되었습니다";
         if(scope.equals(Stringenums.confrim.getString())){
-            System.out.println("인증서비스 요청");
+            LOGGER.info("인증서비스 요청");
         }else if(scope.equals("find")){
-            System.out.println("비밀번호 찾기 요청");
+            LOGGER.info("비밀번호 찾기 요청");
             findService.findPwd(phoneOrEmail);
             message="이메일로 링크가 전송되었습니다";
         }else{

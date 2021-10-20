@@ -17,6 +17,8 @@ import com.example.demo.user.model.uservo;
 import com.example.demo.utill.utillService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -24,6 +26,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class loginFilter extends UsernamePasswordAuthenticationFilter {
 
     private jwtService jwtService;
+    private final static Logger LOGGER=LoggerFactory.getLogger(loginFilter.class);
 
     public loginFilter(jwtService jwtService){
         this.jwtService=jwtService;
@@ -31,11 +34,11 @@ public class loginFilter extends UsernamePasswordAuthenticationFilter {
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)throws AuthenticationException {
-        System.out.println("loginFilter");
+        LOGGER.info("loginFilter");
         ObjectMapper objectMapper=new ObjectMapper();
         try {
             tryLoginDto tryLoginDto=objectMapper.readValue(request.getInputStream(), tryLoginDto.class);
-            System.out.println("로그인시도 이메일: "+tryLoginDto.getEmail());
+            LOGGER.info("로그인시도 이메일: "+tryLoginDto.getEmail());
             return jwtService.confrimEmailPwd(tryLoginDto.getEmail(),tryLoginDto.getPwd(),null);
         } catch (IOException  e) {
             e.printStackTrace();
@@ -44,7 +47,7 @@ public class loginFilter extends UsernamePasswordAuthenticationFilter {
     }
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,Authentication authResult) throws IOException, ServletException {
-        System.out.println("successfulAuthentication 로그인성공");
+        LOGGER.info("successfulAuthentication 로그인성공");
         jwtService.setSecuritySession(authResult);
         principalDetail principalDetail=(principalDetail)authResult.getPrincipal();
         uservo uservo=principalDetail.getUservo();
@@ -58,8 +61,8 @@ public class loginFilter extends UsernamePasswordAuthenticationFilter {
     }
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,AuthenticationException failed) throws IOException, ServletException {
-        System.out.println("unsuccessfulAuthentication 로그인실패");
-        System.out.println(failed.getCause()+failed.getLocalizedMessage()+failed.getStackTrace()+failed.getSuppressed());
+        LOGGER.info("unsuccessfulAuthentication 로그인실패");
+        LOGGER.info(failed.getCause()+failed.getLocalizedMessage()+failed.getStackTrace()+failed.getSuppressed());
         RequestDispatcher dp=request.getRequestDispatcher("/login");
 		dp.forward(request, response);
     }

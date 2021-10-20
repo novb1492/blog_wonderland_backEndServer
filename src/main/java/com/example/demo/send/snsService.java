@@ -5,11 +5,14 @@ import com.example.demo.confrim.model.phone.trySendSmsDto;
 import com.example.demo.utill.utillService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class snsService {
+    private final static Logger LOGGER=LoggerFactory.getLogger(snsService.class);
 
     @Autowired
     private phoneService sendPhoneService;
@@ -17,12 +20,12 @@ public class snsService {
     private emailService sendEmailService;
         
     public JSONObject sendNum(trySendSmsDto trySendSmsDto) {
-        System.out.println("sendNum");
+        LOGGER.info("sendNum");
         if(trySendSmsDto.getScope().equals("phone")){
-            System.out.println("문자 인증번호 전송 요청");
+            LOGGER.info("문자 인증번호 전송 요청");
             sendPhoneService.sendPhone(trySendSmsDto); 
         }else if(trySendSmsDto.getScope().equals("email")){
-            System.out.println("이메일 인증번호 전송 요청");
+            LOGGER.info("이메일 인증번호 전송 요청");
             sendEmailService.sendEmail(trySendSmsDto);
         }else{
             return utillService.makeJson(false, "수단이 유효하지 않습니다");
@@ -30,7 +33,7 @@ public class snsService {
         return utillService.makeJson(true, "인증번호 전송이 완료 되었습니다");
     }
     public JSONObject checkRandNum(tryConfrimRandNumDto tryConfrimRandNumDto){
-        System.out.println("checkRandNum");
+        LOGGER.info("checkRandNum");
         String errorMessage="인증번호 검증 오류";
         try {
             String unit=tryConfrimRandNumDto.getUnit();

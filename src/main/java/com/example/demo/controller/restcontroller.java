@@ -19,6 +19,8 @@ import com.example.demo.user.model.tryUpadateDto;
 import com.example.demo.user.service.userService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,6 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class restcontroller {
+    private final static Logger LOGGER=LoggerFactory.getLogger(restcontroller.class);
     @Value("${front.domain}")
     private String frontDamain;
     
@@ -50,85 +53,85 @@ public class restcontroller {
 
     @RequestMapping(value = "/user/crud/**",method = RequestMethod.GET)
     public JSONObject checkLogin(HttpServletRequest request,HttpServletResponse response) {
-        System.out.println("checkLogin restcontroller");
+        LOGGER.info("checkLogin restcontroller");
         return userService.checkLogin(request);
     }
     @RequestMapping(value = "/user/change/**",method = RequestMethod.PUT)
     public JSONObject userChange(@Valid @RequestBody tryUpadateDto tryUpadateDto ,HttpServletResponse response) {
-        System.out.println("userChange restcontroller");
+        LOGGER.info("userChange restcontroller");
         return userService.update(tryUpadateDto);
     }
     @RequestMapping(value = "/confrim/**",method = RequestMethod.POST)
     public JSONObject sendSms(@Valid @RequestBody trySendSmsDto trySendSmsDto ,HttpServletResponse response) {
-        System.out.println("sendSms restcontroller");
+        LOGGER.info("sendSms restcontroller");
         return snsService.sendNum(trySendSmsDto);
     }
     @RequestMapping(value = "/confrim/**",method = RequestMethod.PUT)
     public JSONObject checkRandNum(@Valid @RequestBody tryConfrimRandNumDto tryConfrimRandNumDto ,HttpServletResponse response) {
-        System.out.println("checkRandNum restcontroller");
+        LOGGER.info("checkRandNum restcontroller");
         return snsService.checkRandNum(tryConfrimRandNumDto);
     }
     @RequestMapping(value = "/user/crud/**",method = RequestMethod.POST)
     public JSONObject tryJoin(@Valid @RequestBody tryJoinDto tryJoinDto ,HttpServletResponse response) {
-        System.out.println("tryJoin restcontroller");
+        LOGGER.info("tryJoin restcontroller");
         return userService.insert(tryJoinDto);
     }
     @PostMapping("/login")
     public JSONObject login(HttpServletRequest request ,HttpServletResponse response) {
-        System.out.println("login restcontroller");
+        LOGGER.info("login restcontroller");
         return userService.checkSucLogin();
     }
     
     @RequestMapping(value = "/user/logout",method = RequestMethod.GET)
     public JSONObject logOut(HttpServletRequest request,HttpServletResponse response) {
-        System.out.println("logOut restcontroller");
+        LOGGER.info("logOut restcontroller");
         return userService.logOut(request, response);
     }
     @RequestMapping("/user/jwtex")
     public JSONObject jwtex(HttpServletRequest request ,HttpServletResponse response) {
-        System.out.println("jwtex restcontroller");
+        LOGGER.info("jwtex restcontroller");
         return jwtService.reGetAccessToken(request, response);
     }
     @GetMapping("/naver/showPage")
     public JSONObject showNaverLoginPage(HttpServletRequest request ,HttpServletResponse response) {
-        System.out.println("showNaverLoginPage restcontroller");
+        LOGGER.info("showNaverLoginPage restcontroller");
         return naverService.getNaverLogin();
     }
     @GetMapping("/naver/loginCallback")
     public void naverLoginCallback(HttpServletRequest request ,HttpServletResponse response) {
-        System.out.println("naverLoginCallback restcontroller");
+        LOGGER.info("naverLoginCallback restcontroller");
         naverService.tryNaverLogin(request,response);
         doRedirect(response, frontDamain+"doneLogin?provider=naver");
     }
     @RequestMapping(value = "/kakao/showPage",method = RequestMethod.GET)
     public JSONObject showKakaoPage(HttpServletRequest request ,HttpServletResponse response) {
-        System.out.println("showKakaoLoginPage restcontroller");
+        LOGGER.info("showKakaoLoginPage restcontroller");
         return kakaoService.showPage(request);
     }
     @GetMapping("/kakao/callback/**")
     public void kakaoCallback(HttpServletRequest request ,HttpServletResponse response) {
-        System.out.println("showKakaoLoginPage restcontroller");
+        LOGGER.info("showKakaoLoginPage restcontroller");
         kakaoService.callback(request, response);
         doRedirect(response, frontDamain+"doneLogin?provider=kakao");
     }
     @RequestMapping(value = "/find/**",method = RequestMethod.GET)
     public JSONObject findSomthing(HttpServletRequest request,HttpServletResponse response) {
-        System.out.println("findSomthing");
+        LOGGER.info("findSomthing");
         return findService.findRequest(request.getParameter("token"), request.getParameter("scope"));
     }
     @RequestMapping(value = "/product/select",method = RequestMethod.GET)
     public JSONObject getProducts(HttpServletRequest request,HttpServletResponse response) {
-        System.out.println("getProducts restcontroller");
+        LOGGER.info("getProducts restcontroller");
         return productService.getProducts(request);
     }
     private void doRedirect(HttpServletResponse response,String url) {
-        System.out.println("doRedirect");
-        System.out.println(url+"리다이렉트 요청 url");
+        LOGGER.info("doRedirect");
+        LOGGER.info(url+"리다이렉트 요청 url");
         try {
             response.sendRedirect(url);
         } catch (IOException e) {
             e.printStackTrace();
-            System.out.println("doRedirect error"+e.getMessage());
+            LOGGER.info("doRedirect error"+e.getMessage());
         }
     }
 

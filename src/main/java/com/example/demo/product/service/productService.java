@@ -10,21 +10,23 @@ import com.example.demo.product.model.productDao;
 import com.example.demo.utill.utillService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class productService {
+    private final static Logger LOGGER=LoggerFactory.getLogger(productService.class);
     private final int pageSize=10;
     @Autowired
     private productDao productDao;
     
     public JSONObject getProducts(HttpServletRequest request) {
-        System.out.println("getProducts");
+        LOGGER.info("getProducts");
         String kind=request.getParameter("kind");
         String keyword=request.getParameter("keyword");
-        System.out.println("조회 품목:"+kind+"키워드 :"+keyword);
+        LOGGER.info("조회 품목:"+kind+"키워드 :"+keyword);
         int nowPage=Integer.parseInt(request.getParameter("page"));
         int start=utillService.getStart(nowPage, pageSize);
         List<getProductInter>productVos=getProductVos(kind, start, keyword);
@@ -50,12 +52,12 @@ public class productService {
         return response;
     }
     private List<getProductInter> getProductVos(String kind,int start,String keyword) {
-        System.out.println("getProductVos");
+        LOGGER.info("getProductVos");
         if(utillService.checkBlankOrNull(keyword)){
-            System.out.println("검색어 키워드 없음");
+            LOGGER.info("검색어 키워드 없음");
             return productDao.findByKind(kind,kind,start-1,pageSize);
         }
-        System.out.println("검색 키워드 존재");
+        LOGGER.info("검색 키워드 존재");
         return productDao.findByKindWithKeywordNative(kind, keyword, kind, keyword, start, pageSize);
     }
   

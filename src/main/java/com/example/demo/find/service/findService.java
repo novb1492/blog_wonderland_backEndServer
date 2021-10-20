@@ -13,13 +13,15 @@ import com.example.demo.jwt.service.jwtService;
 import com.example.demo.utill.utillService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
 public class findService {
-  
+    private final static Logger LOGGER=LoggerFactory.getLogger(findService.class);
     @Autowired
     private findPwdDao findPwdDao;
     @Autowired
@@ -33,7 +35,7 @@ public class findService {
 
 
     public void findPwd(String email) {
-        System.out.println("findPwd");
+        LOGGER.info("findPwd");
         String errorMessage=Stringenums.defalutErrorMessage.getString();
         try {
             getJoinUsers getJoinUsers=findPwdDao.findJoinUsers(email,email);
@@ -41,11 +43,11 @@ public class findService {
             String token=jwtService.getRefreshToken();
             findPwdVo findPwdVo=new findPwdVo();
             if(getJoinUsers.getPcount()!=0){
-                System.out.println("기존 비밀번요 변경페이이 요청존재");
+                LOGGER.info("기존 비밀번요 변경페이이 요청존재");
                 LocalDateTime now=LocalDateTime.now();
                 findPwdDao.updateTokenNative(Timestamp.valueOf(now), Timestamp.valueOf(now.plusDays(period)),token, email);
             }else{
-                System.out.println("첫요청");
+                LOGGER.info("첫요청");
                 findPwdVo.setPemail(email);
                 findPwdVo.setPexpire(Timestamp.valueOf(LocalDateTime.now().plusDays(period)));
                 findPwdVo.setPtokenName(token);
@@ -59,30 +61,30 @@ public class findService {
       throw  utillService.makeRuntimeEX(errorMessage, "findPwd");
     }
     private void confrim(int ucount) {
-        System.out.println("confrim");
+        LOGGER.info("confrim");
         if(ucount==0){
-            System.out.println("회원가입된 사용자가 아닙니다");
+            LOGGER.info("회원가입된 사용자가 아닙니다");
             throw new RuntimeException("회원가입된 사용자가 아닙니다");
         }
-        System.out.println("비밀번호 변경/아이디찾기 요청 유효성 통과");
+        LOGGER.info("비밀번호 변경/아이디찾기 요청 유효성 통과");
     }
     public JSONObject findRequest(String token,String scope) {
-        System.out.println("findRequest");
+        LOGGER.info("findRequest");
         int count=0;
         if(scope.equals("pwd")){
-            System.out.println("비밀번호 찾기 내역 확인");
+            LOGGER.info("비밀번호 찾기 내역 확인");
             count=findPwdDao.countByPtokenNameNative(token);
         }else{
-            System.out.println("이메일 찾기 내역 확인");
+            LOGGER.info("이메일 찾기 내역 확인");
         }
-        System.out.println(count+"카운트");
+        LOGGER.info(count+"카운트");
         if(count==0){
            return utillService.makeJson(false, "변경요청 내역 없음");
         }
         return utillService.makeJson(true, "변경요청 내역 존재");
     }
     public void findEmail(String phone) {
-        System.out.println("findEmail");
+        LOGGER.info("findEmail");
         String email=findPwdDao.findEmailNative(phone).orElseThrow(()->new IllegalArgumentException("회원가입된 핸드폰이 아닙니다"));
         //sendMessage.sendMessege(phone, "안녕하세요 wonderland입니다 이메일은 "+email+"입니다");
         findPwdDao.deleteRequest(phone);
