@@ -76,7 +76,7 @@ public class utillService {
     }
     public static boolean checkBlankOrNull(String object) {
         System.out.println("checkBlankOrNull");
-        if(object.isBlank()||object==null){
+        if(object.isBlank()||object==null||object.equals("null")){
             return true;
         }
         return false;

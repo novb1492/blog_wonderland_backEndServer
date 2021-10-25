@@ -30,7 +30,7 @@ public class productService {
         int nowPage=Integer.parseInt(request.getParameter("page"));
         int start=utillService.getStart(nowPage, pageSize);
         List<getProductInter>productVos=getProductVos(kind, start, keyword);
-        if(productVos.size()==0){
+        if(productVos.size()==0||utillService.checkBlankOrNull(kind)){
             return utillService.makeJson(false, "검색결과가 없습니다");
         }
         int totalPage=utillService.getTotalPage(productVos.get(0).getTotalcount(), pageSize);
