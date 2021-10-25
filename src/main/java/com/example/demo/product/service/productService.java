@@ -1,12 +1,17 @@
 package com.example.demo.product.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.example.demo.apis.settle.service.settleService;
 import com.example.demo.product.model.getProductInter;
 import com.example.demo.product.model.productDao;
+import com.example.demo.product.model.productVo;
+import com.example.demo.product.model.tryBuyDto;
 import com.example.demo.utill.utillService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
@@ -21,8 +26,92 @@ public class productService {
     private final int pageSize=10;
     @Autowired
     private productDao productDao;
-    
-    public JSONObject getProducts(HttpServletRequest request) {
+    @Autowired
+    private settleService settleService;
+
+
+    public void tryBuy(tryBuyDto tryBuyDto) {
+        LOGGER.info("tryBuy");
+        String buyKind=tryBuyDto.getBuyKind();
+        Map<String,Object>map=new HashMap<>();
+        if(buyKind.equals("card")){
+            map=getTotalPriceAndOther(tryBuyDto.getBuy(), tryBuyDto.getKind());
+            System.out.println(map.toString());
+        }else if(buyKind.equals("vbank")){
+
+        }else{
+            utillService.makeJson(false, "지원하지 않는 결제수단입니다");
+        }
+        settleService.makeBuyInfor(tryBuyDto,map);
+        
+    }
+    private Map<String,Object> getTotalPriceAndOther(int[][] itemArray,String kind) {
+        System.out.println("getTotalPriceAndOther");
+        int itemArraySize=itemArray.length;
+        int totalPrice=0;
+        String itemName="";
+        int count=0;
+        List<Integer>timesOrSize=new ArrayList<>();
+        Map<String,Object>result=new HashMap<>();
+        for(int i=0;i<itemArraySize;i++){
+            productVo productVo=productDao.findById(itemArray[i][0]).orElseThrow(()->new IllegalArgumentException("존재하지 않는 상품입니다"));
+            totalPrice+=getTotalPrice(productVo.getPrice(),itemArray[i][1]);
+            itemName+=itemArray[i][0];
+            if(i!=itemArraySize-1){
+                itemName+=",";
+            }
+            count+=itemArray[i][1];
+            if(count>productVo.getCount()){
+                throw new RuntimeException("재고가 부족합니다");
+            }
+            if(kind.equals("reservation")){
+                System.out.println("예약 상품 입니다 시간 분리 시작");
+                timesOrSize.add(itemArray[i][2]);
+                if(i==itemArraySize-1){
+                    System.out.println("시간 분리 완료");
+                    result.put("timesOrSize", timesOrSize);
+                }
+            }
+        }
+        
+        result.put("totalPrice", totalPrice);
+        result.put("itemName", itemName);
+        result.put("count", count);
+        return result;
+    }
+    private int getTotalPrice(int  price, int count) {
+        System.out.println("getTotalPrice");
+        return price*count;
+    }
+    public JSONObject selectProduct(HttpServletRequest request) {
+        LOGGER.info("selectProduct");
+        String detail=request.getParameter("detail");
+        if(detail.equals("all")){
+            return getProducts(request);
+        }else if(detail.equals("one")){
+            return getProduct(request);
+        }else{
+            return utillService.makeJson(false, "디테일값이 존재하지 않습니다");
+        }
+    }
+    private JSONObject getProduct(HttpServletRequest request) {
+        LOGGER.info("getProduct");
+        int id=Integer.parseInt(request.getParameter("id"));
+        productVo productVo=productDao.findById(id).orElseGet(()->null);
+        if(productVo==null){
+            return utillService.makeJson(false, "존재하지 않는 상품입니다");
+        }
+        JSONObject response=new JSONObject();
+        response.put("name", productVo.getProductName());
+        response.put("size",productVo.getProductName().split("-")[1]);
+        response.put("price", productVo.getPrice());
+        response.put("img", productVo.getProductImg());
+        response.put("count", productVo.getCount());
+        response.put("flag", true);
+        return response;
+
+    }
+    private JSONObject getProducts(HttpServletRequest request) {
         LOGGER.info("getProducts");
         String kind=request.getParameter("kind");
         String keyword=request.getParameter("keyword");

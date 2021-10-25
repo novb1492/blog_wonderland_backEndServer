@@ -12,6 +12,7 @@ import com.example.demo.confrim.model.phone.tryConfrimRandNumDto;
 import com.example.demo.confrim.model.phone.trySendSmsDto;
 import com.example.demo.find.service.findService;
 import com.example.demo.jwt.service.jwtService;
+import com.example.demo.product.model.tryBuyDto;
 import com.example.demo.product.service.productService;
 import com.example.demo.send.snsService;
 import com.example.demo.user.model.tryJoinDto;
@@ -122,7 +123,12 @@ public class restcontroller {
     @RequestMapping(value = "/product/select",method = RequestMethod.GET)
     public JSONObject getProducts(HttpServletRequest request,HttpServletResponse response) {
         LOGGER.info("getProducts restcontroller");
-        return productService.getProducts(request);
+        return productService.selectProduct(request);
+    }
+    @RequestMapping(value = "/api/product/buy/**",method = RequestMethod.POST)
+    public void tryBuyProduct(@Valid @RequestBody tryBuyDto tryBuyDto,HttpServletResponse response) {
+        LOGGER.info("tryBuyProduct restcontroller");
+        productService.tryBuy(tryBuyDto);
     }
     private void doRedirect(HttpServletResponse response,String url) {
         LOGGER.info("doRedirect");
