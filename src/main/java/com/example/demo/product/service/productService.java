@@ -45,10 +45,11 @@ public class productService {
         return paymentService.makeBuyInfor(tryBuyDto,map);
         
     }
-    public void confrimPayment(HttpServletRequest request) {
+    public JSONObject confrimPayment(HttpServletRequest request) {
         LOGGER.info("confrimPayment");
         settleDto settleDto=utillService.requestToSettleDto(request);
         System.out.println(settleDto.toString());
+        return paymentService.confrimPay(settleDto);
     }
     private Timestamp getVbankExpriedDate(tryBuyDto tryBuyDto) {
         LOGGER.info("getVbankExpriedDate");

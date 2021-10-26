@@ -2,6 +2,7 @@ package com.example.demo.apis.settle.service;
 
 import java.util.Map;
 
+import com.example.demo.apis.settle.model.settleDto;
 import com.example.demo.enums.Stringenums;
 import com.example.demo.hash.aes256;
 import com.example.demo.hash.sha256;
@@ -20,7 +21,8 @@ public class cardService {
     
     @Autowired
     private userService userService;
-    
+
+    private final String sucPayNum=Stringenums.sucPayNum.getString();
     private final String MchtId=Stringenums.cardMchtId.getString();
     private static Logger logger=LoggerFactory.getLogger(cardService.class);
 
@@ -48,6 +50,26 @@ public class cardService {
         response.put("pktHash", hashText);
         response.put("flag", true);
         return response;
+    }
+    public JSONObject confrim(settleDto settleDto) {
+        logger.info("confrim");
+        try {
+            if(!settleDto.getOutStatCd().equals(sucPayNum)){
+                logger.info("결제실패 실패 코드 "+settleDto.getOutRsltCd());
+                throw new RuntimeException("결제실패");
+            }
+            return utillService.makeJson(true, "구매가 완료되었습니다");
+        } catch (Exception e) {
+            if(cancle(settleDto)){
+                return utillService.makeJson(false, "구매에 실패하였습니다");
+            }
+            return utillService.makeJson(false, "환불에 실패하였습니다");
+        }
+        
+    }
+    private boolean cancle(settleDto settleDto){
+        logger.info("cancle");
+        return true;
     }
 
 }

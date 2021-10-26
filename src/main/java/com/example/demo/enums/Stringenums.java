@@ -27,7 +27,8 @@ public enum Stringenums {
     kakaoPay("kakaoPay"),
     vbank("vbank"),
     cardMchtId("nxca_jt_il"),
-    vbanMchtId("nx_mid_il");
+    vbanMchtId("nx_mid_il"),
+    sucPayNum("0021");
 
 
     private String messege;

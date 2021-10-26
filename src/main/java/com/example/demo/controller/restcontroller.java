@@ -133,8 +133,9 @@ public class restcontroller {
     @RequestMapping(value = "/settle/callback",method = RequestMethod.POST)
     public void settleCallbck(HttpServletRequest request,HttpServletResponse response) {
         LOGGER.info("settleCallbck restcontroller"); 
-        productService.confrimPayment(request);
-        //doRedirect(response, frontDamain+"popUpClose?result=true");
+        JSONObject result=productService.confrimPayment(request);
+        LOGGER.info(result.toString());
+        //doRedirect(response, frontDamain+"popUpClose?result="+result.get("flag")+"&message="+result.get("message"));
     }
     private void doRedirect(HttpServletResponse response,String url) {
         LOGGER.info("doRedirect");
