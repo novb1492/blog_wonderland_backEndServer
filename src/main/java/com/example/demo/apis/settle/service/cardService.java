@@ -60,7 +60,17 @@ public class cardService {
         response.put("pktHash", hashText);
         response.put("flag", true);
         paymentService.insertTemp(mchtTrdNo,Integer.parseInt(totalPrice), email);
+        insertTempProducts(maps, tryBuyDto.getKind(),mchtTrdNo,email);
         return response;
+    }
+    private void insertTempProducts(List<Map<String,Object>>maps,String kind,String mchtTrdNo,String email) {
+        logger.info("insertTempProducts");
+        if(kind.equals("product")){
+            paymentService.insertTempOrderProducts(maps,mchtTrdNo,email);
+        }else{
+            throw new RuntimeException("취급하지 않는 상품목록");
+        }
+        
     }
     public JSONObject confrim(settleDto settleDto) {
         logger.info("confrim");

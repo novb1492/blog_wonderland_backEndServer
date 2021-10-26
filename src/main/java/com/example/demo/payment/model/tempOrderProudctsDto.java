@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @Data
-@Table(name = "tempOrderProudcts")
+@Table(name = "temporderproudcts")
 @Entity
 public class tempOrderProudctsDto {
     

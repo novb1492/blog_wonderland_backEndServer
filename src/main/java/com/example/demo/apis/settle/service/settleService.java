@@ -3,11 +3,10 @@ package com.example.demo.apis.settle.service;
 import java.util.List;
 import java.util.Map;
 
-import com.example.demo.enums.Stringenums;
 import com.example.demo.product.model.tryBuyDto;
 import com.example.demo.utill.utillService;
 import com.nimbusds.jose.shaded.json.JSONObject;
-import com.nimbusds.jose.util.JSONObjectUtils;
+
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +17,6 @@ import org.springframework.stereotype.Service;
 public class settleService {
 
     private static Logger logger=LoggerFactory.getLogger(settleService.class);
-    private final String cardMchtId=Stringenums.cardMchtId.getString();
     @Autowired
     private cardService cardService;
 

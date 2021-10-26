@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class productService {
@@ -36,7 +37,7 @@ public class productService {
     @Autowired
     private settleService settleService;
 
-
+    @Transactional(rollbackFor = Exception.class)
     public JSONObject tryBuy(tryBuyDto tryBuyDto) {
         logger.info("tryBuy");
         String buyKind=tryBuyDto.getBuyKind();
@@ -100,10 +101,10 @@ public class productService {
             result.put("price", productVo.getPrice());
             maps.add(result);
             if(i==itemArraySize-1){
-                result.clear();
-                result.put("totalPrice", totalPrice);
-                result.put("itemNames", itemNames);
-                maps.add(result);
+                Map<String,Object>map2=new HashMap<>();
+                map2.put("totalPrice", totalPrice);
+                map2.put("itemNames", itemNames);
+                maps.add(map2);
             }
         }
 
