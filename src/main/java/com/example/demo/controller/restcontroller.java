@@ -8,6 +8,7 @@ import javax.validation.Valid;
 
 import com.example.demo.apis.kakao.kakaoService;
 import com.example.demo.apis.naver.naverService;
+import com.example.demo.apis.settle.service.settleService;
 import com.example.demo.confrim.model.phone.tryConfrimRandNumDto;
 import com.example.demo.confrim.model.phone.trySendSmsDto;
 import com.example.demo.find.service.findService;
@@ -51,6 +52,8 @@ public class restcontroller {
     private findService findService;
     @Autowired
     private productService productService;
+    @Autowired
+    private settleService settleService;
 
     @RequestMapping(value = "/user/crud/**",method = RequestMethod.GET)
     public JSONObject checkLogin(HttpServletRequest request,HttpServletResponse response) {
@@ -134,7 +137,7 @@ public class restcontroller {
     @RequestMapping(value = "/settle/callback",method = RequestMethod.POST)
     public void settleCallbck(HttpServletRequest request,HttpServletResponse response) {
         LOGGER.info("settleCallbck restcontroller"); 
-        JSONObject result=productService.confrimPayment(request);
+        JSONObject result=settleService.confrimPayment(request);
         LOGGER.info(result.toString());
         //doRedirect(response, frontDamain+"popUpClose?result="+result.get("flag")+"&message="+result.get("message"));
     }

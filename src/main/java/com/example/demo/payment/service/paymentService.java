@@ -6,14 +6,11 @@ import java.util.List;
 import java.util.Map;
 
 import com.example.demo.apis.settle.model.settleDto;
-import com.example.demo.apis.settle.service.cardService;
-import com.example.demo.enums.Stringenums;
 import com.example.demo.payment.model.tempOrderDao;
 import com.example.demo.payment.model.tempOrderDto;
 import com.example.demo.payment.model.tempOrderProudctsDao;
 import com.example.demo.payment.model.tempOrderProudctsDto;
-import com.example.demo.product.model.tryBuyDto;
-import com.nimbusds.jose.shaded.json.JSONObject;
+
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,24 +20,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class paymentService {
     private static Logger logger=LoggerFactory.getLogger(paymentService.class);
-    private final String cardMchtId=Stringenums.cardMchtId.getString();
-    @Autowired
-    private cardService cardService;
+
     @Autowired
     private  tempOrderDao tempOrderDao;
     @Autowired
     private tempOrderProudctsDao tempOrderProudctsDao;
 
-
-    public JSONObject confrimPay(settleDto settleDto) {
-        logger.info("confrimPay");
-        JSONObject response=new JSONObject();
-        if(settleDto.getMchtId().equals(cardMchtId)){
-            logger.info("카드결제 검증");
-            response=cardService.confrim(settleDto);
-        }
-        return response;
-    }
     public  void insertTemp(String mchtTrdNo,int price,String email) {
         System.out.println(mchtTrdNo+price+email);
         logger.info("insertTemp");
@@ -70,6 +55,9 @@ public class paymentService {
                                                         temp+=1;
         }
     }  
+    public void confrim(settleDto settleDto) {
+        logger.info("confrim");
+    }
     
     
 }

@@ -9,9 +9,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.example.demo.apis.settle.model.settleDto;
 import com.example.demo.apis.settle.service.settleService;
-import com.example.demo.payment.service.paymentService;
 import com.example.demo.product.model.getProductInter;
 import com.example.demo.product.model.productDao;
 import com.example.demo.product.model.productVo;
@@ -33,8 +31,6 @@ public class productService {
     @Autowired
     private productDao productDao;
     @Autowired
-    private paymentService paymentService;
-    @Autowired
     private settleService settleService;
 
     @Transactional(rollbackFor = Exception.class)
@@ -48,12 +44,6 @@ public class productService {
         }*/
         return settleService.makeBuyInfor(tryBuyDto, maps);
         
-    }
-    public JSONObject confrimPayment(HttpServletRequest request) {
-        logger.info("confrimPayment");
-        settleDto settleDto=utillService.requestToSettleDto(request);
-        System.out.println(settleDto.toString());
-        return paymentService.confrimPay(settleDto);
     }
     private Timestamp getVbankExpriedDate(tryBuyDto tryBuyDto) {
         logger.info("getVbankExpriedDate");
