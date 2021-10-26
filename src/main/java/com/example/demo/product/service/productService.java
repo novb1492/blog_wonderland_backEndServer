@@ -69,7 +69,7 @@ public class productService {
                 throw new RuntimeException("최소 주문수량은 0보다 커야합니다");
             }
             totalPrice+=getTotalPrice(productVo.getPrice(),itemArray[i][1]);
-            itemName+=itemArray[i][0];
+            itemName+=productVo.getProductName();
             if(i!=itemArraySize-1){
                 itemName+=",";
             }
@@ -88,7 +88,7 @@ public class productService {
         }
         
         result.put("totalPrice", totalPrice);
-        result.put("itemId", itemName);
+        result.put("itemName", itemName);
         result.put("count", count);
         return result;
     }
