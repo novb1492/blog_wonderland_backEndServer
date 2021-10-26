@@ -126,8 +126,9 @@ public class restcontroller {
         return productService.selectProduct(request);
     }
     @RequestMapping(value = "/api/product/buy/**",method = RequestMethod.POST)
-    public JSONObject tryBuyProduct(@Valid @RequestBody tryBuyDto tryBuyDto,HttpServletResponse response) {
+    public JSONObject tryBuyProduct(@Valid @RequestBody tryBuyDto tryBuyDto,HttpServletRequest request,HttpServletResponse response) {
         LOGGER.info("tryBuyProduct restcontroller");
+        jwtService.reGetAccessToken(request, response);
         return productService.tryBuy(tryBuyDto);
     }
     @RequestMapping(value = "/settle/callback",method = RequestMethod.POST)

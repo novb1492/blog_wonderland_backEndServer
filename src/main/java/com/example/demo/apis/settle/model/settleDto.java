@@ -34,7 +34,10 @@ public class settleDto {
         String vtlAcntNo;          //가상계좌번호
         String expireDt;                     //입금기한
         String cphoneNo;                     //휴대폰번호
-        String billKey;                
+        String billKey;      
+        
+        ///환불요청시 써야하는 변수
+        int cnclOrd;
 
         
 }
