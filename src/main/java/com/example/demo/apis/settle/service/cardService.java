@@ -1,6 +1,7 @@
 package com.example.demo.apis.settle.service;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.example.demo.apis.requestTo;
@@ -8,6 +9,7 @@ import com.example.demo.apis.settle.model.settleDto;
 import com.example.demo.enums.Stringenums;
 import com.example.demo.hash.aes256;
 import com.example.demo.hash.sha256;
+import com.example.demo.payment.service.paymentService;
 import com.example.demo.product.model.tryBuyDto;
 import com.example.demo.user.service.userService;
 import com.example.demo.utill.utillService;
@@ -25,14 +27,17 @@ public class cardService {
     private userService userService;
     @Autowired
     private requestTo requestTo;
+    @Autowired
+    private paymentService  paymentService;
 
     private final String sucPayNum=Stringenums.sucPayNum.getString();
     private final String MchtId=Stringenums.cardMchtId.getString();
     
     private static Logger logger=LoggerFactory.getLogger(cardService.class);
 
-    public JSONObject makeInfor(tryBuyDto tryBuyDto,Map<String,Object>map) {
+    public JSONObject makeInfor(tryBuyDto tryBuyDto,List<Map<String,Object>>maps) {
         logger.info("makeInfor");
+        Map<String,Object>map=maps.get(maps.size()-1);
         Map<String,String>trdDtTrdTm=utillService.getTrdDtTrdTm();
         String mchtTrdNo=utillService.getRandomNum(10);
         String requestDate=trdDtTrdTm.get("trdDt");
@@ -45,7 +50,7 @@ public class cardService {
         String priceHash=aes256.encrypt(totalPrice);
         JSONObject response=new JSONObject();
         String  email=userService.sendUserInfor().getEmail();
-        response.put("itemName", map.get("itemName"));
+        response.put("itemName", map.get("itemNames"));
         response.put("mchtId", MchtId);
         response.put("mchtCustId", aes256.encrypt(email));
         response.put("mchtTrdNo", mchtTrdNo);
@@ -54,6 +59,7 @@ public class cardService {
         response.put("trdTm", requestTime);
         response.put("pktHash", hashText);
         response.put("flag", true);
+        paymentService.insertTemp(mchtTrdNo,Integer.parseInt(totalPrice), email);
         return response;
     }
     public JSONObject confrim(settleDto settleDto) {

@@ -10,7 +10,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import com.example.demo.apis.settle.model.settleDto;
-import com.example.demo.apis.settle.service.paymentService;
+import com.example.demo.apis.settle.service.settleService;
+import com.example.demo.payment.service.paymentService;
 import com.example.demo.product.model.getProductInter;
 import com.example.demo.product.model.productDao;
 import com.example.demo.product.model.productVo;
@@ -25,86 +26,96 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class productService {
-    private final static Logger LOGGER=LoggerFactory.getLogger(productService.class);
+    private final static Logger logger=LoggerFactory.getLogger(productService.class);
     private final int pageSize=10;
     private final int fullProductDay=7;
     @Autowired
     private productDao productDao;
     @Autowired
     private paymentService paymentService;
+    @Autowired
+    private settleService settleService;
 
 
     public JSONObject tryBuy(tryBuyDto tryBuyDto) {
-        LOGGER.info("tryBuy");
+        logger.info("tryBuy");
         String buyKind=tryBuyDto.getBuyKind();
-        Map<String,Object>map=getTotalPriceAndOther(tryBuyDto.getBuy(), tryBuyDto.getKind());
-        LOGGER.info(map.toString());
-        if(buyKind.equals("vbank")){
+        List<Map<String,Object>>maps=getTotalPriceAndOther(tryBuyDto.getBuy(), tryBuyDto.getKind());
+        logger.info(maps.toString());
+        /*if(buyKind.equals("vbank")){
             map.put("limitedDate", getVbankExpriedDate(tryBuyDto));
-        }
-        return paymentService.makeBuyInfor(tryBuyDto,map);
+        }*/
+        return settleService.makeBuyInfor(tryBuyDto, maps);
         
     }
     public JSONObject confrimPayment(HttpServletRequest request) {
-        LOGGER.info("confrimPayment");
+        logger.info("confrimPayment");
         settleDto settleDto=utillService.requestToSettleDto(request);
         System.out.println(settleDto.toString());
         return paymentService.confrimPay(settleDto);
     }
     private Timestamp getVbankExpriedDate(tryBuyDto tryBuyDto) {
-        LOGGER.info("getVbankExpriedDate");
+        logger.info("getVbankExpriedDate");
         if(tryBuyDto.getKind().equals("reservation")){
-            LOGGER.info("예약상품 가상계좌 요청");
+            logger.info("예약상품 가상계좌 요청");
             return null;
         }else{
-            LOGGER.info("일반상품 가상계좌 요청");
+            logger.info("일반상품 가상계좌 요청");
             return Timestamp.valueOf(LocalDateTime.now().plusDays(fullProductDay));
         }
 
     }
-    private Map<String,Object> getTotalPriceAndOther(int[][] itemArray,String kind) {
-        LOGGER.info("getTotalPriceAndOther");
+    private List<Map<String,Object>> getTotalPriceAndOther(int[][] itemArray,String kind) {
+        logger.info("getTotalPriceAndOther");
+        if(kind.equals("product")){
+            return getTotalPriceAndOther(itemArray);
+        }else {
+            throw new RuntimeException("상품종류가 잘못되었습니다");
+        }
+    }
+    private List<Map<String,Object>> getTotalPriceAndOther(int[][] itemArray) {
+        logger.info("getTotalPriceAndOther");
         int itemArraySize=itemArray.length;
         int totalPrice=0;
-        String itemName="";
+        String itemNames="";
         int count=0;
-        List<Integer>timesOrSize=new ArrayList<>();
-        Map<String,Object>result=new HashMap<>();
+        List<Map<String,Object>>maps=new ArrayList<>();
         for(int i=0;i<itemArraySize;i++){
+            Map<String,Object>result=new HashMap<>();
             productVo productVo=productDao.findById(itemArray[i][0]).orElseThrow(()->new IllegalArgumentException("존재하지 않는 상품입니다"));
             if(itemArray[i][1]<=0){
                 throw new RuntimeException("최소 주문수량은 0보다 커야합니다");
             }
             totalPrice+=getTotalPrice(productVo.getPrice(),itemArray[i][1]);
-            itemName+=productVo.getProductName();
-            if(i!=itemArraySize-1){
-                itemName+=",";
+            itemNames+=productVo.getProductName();
+            if(i<itemArraySize-1){
+                itemNames=",";
             }
             count+=itemArray[i][1];
             if(count>productVo.getCount()){
                 throw new RuntimeException("재고가 부족합니다");
             }
-            if(kind.equals("reservation")){
-                System.out.println("예약 상품 입니다 시간 분리 시작");
-                timesOrSize.add(itemArray[i][2]);
-                if(i==itemArraySize-1){
-                    System.out.println("시간 분리 완료");
-                    result.put("timesOrSize", timesOrSize);
-                }
+            result.put("itemName", productVo.getProductName());
+            result.put("count", itemArray[i][1]);
+            result.put("price", productVo.getPrice());
+            maps.add(result);
+            if(i==itemArraySize-1){
+                result.clear();
+                result.put("totalPrice", totalPrice);
+                result.put("itemNames", itemNames);
+                maps.add(result);
             }
         }
-        
-        result.put("totalPrice", totalPrice);
-        result.put("itemName", itemName);
-        result.put("count", count);
-        return result;
+
+        return maps;
+
     }
     private int getTotalPrice(int  price, int count) {
-        LOGGER.info("getTotalPrice");
+        logger.info("getTotalPrice");
         return price*count;
     }
     public JSONObject selectProduct(HttpServletRequest request) {
-        LOGGER.info("selectProduct");
+        logger.info("selectProduct");
         String detail=request.getParameter("detail");
         if(detail.equals("all")){
             return getProducts(request);
@@ -115,7 +126,7 @@ public class productService {
         }
     }
     private JSONObject getProduct(HttpServletRequest request) {
-        LOGGER.info("getProduct");
+        logger.info("getProduct");
         int id=Integer.parseInt(request.getParameter("id"));
         productVo productVo=productDao.findById(id).orElseGet(()->null);
         if(productVo==null){
@@ -132,10 +143,10 @@ public class productService {
 
     }
     private JSONObject getProducts(HttpServletRequest request) {
-        LOGGER.info("getProducts");
+        logger.info("getProducts");
         String kind=request.getParameter("kind");
         String keyword=request.getParameter("keyword");
-        LOGGER.info("조회 품목:"+kind+"키워드 :"+keyword);
+        logger.info("조회 품목:"+kind+"키워드 :"+keyword);
         int nowPage=Integer.parseInt(request.getParameter("page"));
         int start=utillService.getStart(nowPage, pageSize);
         List<getProductInter>productVos=getProductVos(kind, start, keyword);
@@ -161,13 +172,13 @@ public class productService {
         return response;
     }
     private List<getProductInter> getProductVos(String kind,int start,String keyword) {
-        LOGGER.info("getProductVos");
+        logger.info("getProductVos");
         if(utillService.checkBlankOrNull(keyword)){
-            LOGGER.info("검색어 키워드 없음");
+            logger.info("검색어 키워드 없음");
             return productDao.findByKind(kind,kind,start-1,pageSize);
         }
-        LOGGER.info("검색 키워드 존재");
-        LOGGER.info("키워드: "+keyword);
+        logger.info("검색 키워드 존재");
+        logger.info("키워드: "+keyword);
         return productDao.findByKindWithKeywordNative(kind, keyword, kind, keyword, start-1, pageSize);
     }
   
