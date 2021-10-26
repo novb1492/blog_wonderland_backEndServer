@@ -59,15 +59,14 @@ public class cardService {
     public JSONObject confrim(settleDto settleDto) {
         logger.info("confrim");
         try {
+            settleDto.setCardTrdAmt(utillService.aesToNomal(settleDto.getCardTrdAmt()));
             if(!settleDto.getOutStatCd().equals(sucPayNum)){
                 logger.info("결제실패 실패 코드 "+settleDto.getOutRsltCd());
                 throw new RuntimeException("결제실패");
             }
-            throw new Exception();
-            //return utillService.makeJson(true, "구매가 완료되었습니다");
+            return utillService.makeJson(true, "구매가 완료되었습니다");
         } catch (Exception e) {
             settleDto.setCnclOrd(1);
-            settleDto.setTrdAmt(settleDto.getCardTrdAmt());
             if(requestToSettle(cancle(settleDto))){
                 return utillService.makeJson(false, "구매에 실패하였습니다");
             }
@@ -80,39 +79,40 @@ public class cardService {
         Map<String,String>map=utillService.getTrdDtTrdTm();
         String trdDt=map.get("trdDt");
         String trdTm=map.get("trdTm");
-        String pktHash=requestcancleString(settleDto.getMchtTrdNo(),settleDto.getTrdAmt(), settleDto.getMchtId(),trdDt,trdTm);
-        System.out.println(settleDto.getTrdAmt());
+        String pktHash=requestcancleString(trdDt,trdTm,settleDto.getMchtTrdNo(),settleDto.getCardTrdAmt());
+        logger.info(pktHash+" 해쉬예정문자열");
         JSONObject body=new JSONObject();
         JSONObject params=new JSONObject();
         JSONObject data=new JSONObject();
-        params.put("mchtId", settleDto.getMchtId());
-        params.put("ver", "0A17");
+        params.put("mchtId", MchtId);
+        params.put("ver", "0A18");
         params.put("method", "CA");
         params.put("bizType", "C0");
         params.put("encCd", "23");
         params.put("mchtTrdNo", settleDto.getMchtTrdNo());
-        params.put("trdDt", map.get("trdDt"));
-        params.put("trdTm",map.get("trdTm"));
+        params.put("trdDt",trdDt);
+        params.put("trdTm",trdTm);
         data.put("cnclOrd", settleDto.getCnclOrd());
         data.put("pktHash", sha256.encrypt(pktHash));
         data.put("orgTrdNo", settleDto.getTrdNo());
         data.put("crcCd", "KRW");
-        data.put("cnclAmt", settleDto.getTrdAmt());
+        data.put("cnclAmt", aes256.encrypt(settleDto.getCardTrdAmt()));
         body.put("params", params);
         body.put("data", data);
+        
         return body;
     }
     private boolean requestToSettle(JSONObject body){
-        JSONObject  response=requestTo.requestToSettle("https://gw.settlebank.co.kr/spay/APICancel.do", body);
+        JSONObject  response=requestTo.requestToSettle("https://tbgw.settlebank.co.kr/spay/APICancel.do", body);
         LinkedHashMap<String,Object>params=(LinkedHashMap<String, Object>) response.get("params");
         if(params.get("outStatCd").equals("0021")){
             return true;
         }
         return false;
     }
-    private String requestcancleString(String mchtTrdNo,String price,String mchtId,String trdDt,String trdTm) {
+    private String requestcancleString(String trdDt,String trdTm, String mchtTrdNo,String price) {
         System.out.println("requestcancleString");
-        return  String.format("%s%s%s%s%s%s",trdDt,trdTm,mchtId,mchtTrdNo,price,"ST1009281328226982205"); 
+        return  String.format("%s%s%s%s%s%s",trdDt,trdTm,MchtId,mchtTrdNo,price,"ST1009281328226982205"); 
     }
 
 }

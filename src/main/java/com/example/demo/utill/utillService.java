@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.example.demo.apis.settle.model.settleDto;
 import com.example.demo.enums.Stringenums;
+import com.example.demo.hash.aes256;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
 import org.slf4j.Logger;
@@ -201,5 +202,13 @@ public class utillService {
          .billKey(           request.getParameter("billKey"))
                                 .build();
                                 return dto;
+    }
+    public static String aesToNomal(String hash) {
+        try {
+            byte[] aesCipherRaw2=aes256.decodeBase64(hash);
+            return new String(aes256.aes256DecryptEcb(aesCipherRaw2),"UTF-8");
+        } catch (Exception e) {
+            throw new RuntimeException("복호화 실패");
+        }
     }
 }
