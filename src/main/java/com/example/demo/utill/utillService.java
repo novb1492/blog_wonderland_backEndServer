@@ -12,6 +12,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.example.demo.apis.settle.model.settleDto;
 import com.example.demo.enums.Stringenums;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
@@ -171,5 +172,34 @@ public class utillService {
         map.put("trdDt", trdDt);
         map.put("trdTm", trdTm);
         return map;
+    }
+    public static settleDto requestToSettleDto(HttpServletRequest request) {
+        logger.info("requestToSettleDto");
+        settleDto dto=settleDto.builder()
+         .mchtId(request.getParameter("mchtId"))//상점아이디
+         .outStatCd(request.getParameter("outStatCd"))          //결과코드
+         .outRsltCd(request.getParameter("outRsltCd"))          //거절코드
+         .outRsltMsg( request.getParameter("outRsltMsg"))         //결과메세지
+         .method(          request.getParameter("method"))             //결제수단
+         .mchtTrdNo(         request.getParameter("mchtTrdNo"))          //상점주문번호
+         .mchtCustId(request.getParameter("mchtCustId"))         //상점고객아이디
+         .trdNo(             request.getParameter("trdNo"))              //세틀뱅크 거래번호
+         .trdAmt(            request.getParameter("trdAmt"))             //거래금액
+         .mchtParam(         request.getParameter("mchtParam"))          //상점 예약필드
+         .authDt(            request.getParameter("authDt"))             //승인일시
+         .authNo(            request.getParameter("authNo"))             //승인번호
+        .reqIssueDt(     	request.getParameter("reqIssueDt"))       	//채번요청일시
+         .intMon(            request.getParameter("intMon"))             //할부개월수
+         .fnNm(              request.getParameter("fnNm"))               //카드사명
+         .fnCd(              request.getParameter("fnCd"))               //카드사코드
+         .pointTrdNo(        request.getParameter("pointTrdNo"))         //포인트거래번호
+         .pointTrdAmt(       request.getParameter("pointTrdAmt"))        //포인트거래금액
+         .cardTrdAmt(        request.getParameter("cardTrdAmt"))         //신용카드결제금액
+         .vtlAcntNo(         request.getParameter("vtlAcntNo"))          //가상계좌번호
+         .expireDt(          request.getParameter("expireDt"))           //입금기한
+         .cphoneNo(          request.getParameter("cphoneNo"))           //휴대폰번호
+         .billKey(           request.getParameter("billKey"))
+                                .build();
+                                return dto;
     }
 }

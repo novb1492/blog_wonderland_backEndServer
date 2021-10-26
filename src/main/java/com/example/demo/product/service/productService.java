@@ -9,6 +9,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.example.demo.apis.settle.model.settleDto;
 import com.example.demo.apis.settle.service.paymentService;
 import com.example.demo.product.model.getProductInter;
 import com.example.demo.product.model.productDao;
@@ -43,6 +44,11 @@ public class productService {
         }
         return paymentService.makeBuyInfor(tryBuyDto,map);
         
+    }
+    public void confrimPayment(HttpServletRequest request) {
+        LOGGER.info("confrimPayment");
+        settleDto settleDto=utillService.requestToSettleDto(request);
+        System.out.println(settleDto.toString());
     }
     private Timestamp getVbankExpriedDate(tryBuyDto tryBuyDto) {
         LOGGER.info("getVbankExpriedDate");

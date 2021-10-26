@@ -2,6 +2,8 @@ package com.example.demo.apis.settle.service;
 
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import com.example.demo.product.model.tryBuyDto;
 import com.example.demo.utill.utillService;
 import com.nimbusds.jose.shaded.json.JSONObject;
@@ -30,4 +32,6 @@ public class paymentService {
             return utillService.makeJson(false, "지원하지 않는 결제수단입니다");
         }
     }
+    
+    
 }

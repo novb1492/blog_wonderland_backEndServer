@@ -130,6 +130,12 @@ public class restcontroller {
         LOGGER.info("tryBuyProduct restcontroller");
         return productService.tryBuy(tryBuyDto);
     }
+    @RequestMapping(value = "/settle/callback",method = RequestMethod.POST)
+    public void settleCallbck(HttpServletRequest request,HttpServletResponse response) {
+        LOGGER.info("settleCallbck restcontroller"); 
+        productService.confrimPayment(request);
+        //doRedirect(response, frontDamain+"popUpClose?result=true");
+    }
     private void doRedirect(HttpServletResponse response,String url) {
         LOGGER.info("doRedirect");
         LOGGER.info(url+"리다이렉트 요청 url");
