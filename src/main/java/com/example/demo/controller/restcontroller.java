@@ -126,9 +126,9 @@ public class restcontroller {
         return productService.selectProduct(request);
     }
     @RequestMapping(value = "/api/product/buy/**",method = RequestMethod.POST)
-    public void tryBuyProduct(@Valid @RequestBody tryBuyDto tryBuyDto,HttpServletResponse response) {
+    public JSONObject tryBuyProduct(@Valid @RequestBody tryBuyDto tryBuyDto,HttpServletResponse response) {
         LOGGER.info("tryBuyProduct restcontroller");
-        productService.tryBuy(tryBuyDto);
+        return productService.tryBuy(tryBuyDto);
     }
     private void doRedirect(HttpServletResponse response,String url) {
         LOGGER.info("doRedirect");

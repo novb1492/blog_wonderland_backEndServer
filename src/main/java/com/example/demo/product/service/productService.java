@@ -1,5 +1,7 @@
 package com.example.demo.product.service;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -7,7 +9,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.example.demo.apis.settle.service.settleService;
+import com.example.demo.apis.settle.service.paymentService;
 import com.example.demo.product.model.getProductInter;
 import com.example.demo.product.model.productDao;
 import com.example.demo.product.model.productVo;
@@ -24,29 +26,37 @@ import org.springframework.stereotype.Service;
 public class productService {
     private final static Logger LOGGER=LoggerFactory.getLogger(productService.class);
     private final int pageSize=10;
+    private final int fullProductDay=7;
     @Autowired
     private productDao productDao;
     @Autowired
-    private settleService settleService;
+    private paymentService paymentService;
 
 
-    public void tryBuy(tryBuyDto tryBuyDto) {
+    public JSONObject tryBuy(tryBuyDto tryBuyDto) {
         LOGGER.info("tryBuy");
         String buyKind=tryBuyDto.getBuyKind();
-        Map<String,Object>map=new HashMap<>();
-        if(buyKind.equals("card")){
-            map=getTotalPriceAndOther(tryBuyDto.getBuy(), tryBuyDto.getKind());
-            System.out.println(map.toString());
-        }else if(buyKind.equals("vbank")){
-
-        }else{
-            utillService.makeJson(false, "지원하지 않는 결제수단입니다");
+        Map<String,Object>map=getTotalPriceAndOther(tryBuyDto.getBuy(), tryBuyDto.getKind());
+        LOGGER.info(map.toString());
+        if(buyKind.equals("vbank")){
+            map.put("limitedDate", getVbankExpriedDate(tryBuyDto));
         }
-        settleService.makeBuyInfor(tryBuyDto,map);
+        return paymentService.makeBuyInfor(tryBuyDto,map);
         
     }
+    private Timestamp getVbankExpriedDate(tryBuyDto tryBuyDto) {
+        LOGGER.info("getVbankExpriedDate");
+        if(tryBuyDto.getKind().equals("reservation")){
+            LOGGER.info("예약상품 가상계좌 요청");
+            return null;
+        }else{
+            LOGGER.info("일반상품 가상계좌 요청");
+            return Timestamp.valueOf(LocalDateTime.now().plusDays(fullProductDay));
+        }
+
+    }
     private Map<String,Object> getTotalPriceAndOther(int[][] itemArray,String kind) {
-        System.out.println("getTotalPriceAndOther");
+        LOGGER.info("getTotalPriceAndOther");
         int itemArraySize=itemArray.length;
         int totalPrice=0;
         String itemName="";
@@ -55,6 +65,9 @@ public class productService {
         Map<String,Object>result=new HashMap<>();
         for(int i=0;i<itemArraySize;i++){
             productVo productVo=productDao.findById(itemArray[i][0]).orElseThrow(()->new IllegalArgumentException("존재하지 않는 상품입니다"));
+            if(itemArray[i][1]<=0){
+                throw new RuntimeException("최소 주문수량은 0보다 커야합니다");
+            }
             totalPrice+=getTotalPrice(productVo.getPrice(),itemArray[i][1]);
             itemName+=itemArray[i][0];
             if(i!=itemArraySize-1){
@@ -75,12 +88,12 @@ public class productService {
         }
         
         result.put("totalPrice", totalPrice);
-        result.put("itemName", itemName);
+        result.put("itemId", itemName);
         result.put("count", count);
         return result;
     }
     private int getTotalPrice(int  price, int count) {
-        System.out.println("getTotalPrice");
+        LOGGER.info("getTotalPrice");
         return price*count;
     }
     public JSONObject selectProduct(HttpServletRequest request) {
