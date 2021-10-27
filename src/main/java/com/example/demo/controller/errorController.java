@@ -22,10 +22,10 @@ public class errorController {
     public JSONObject runtimeException(RuntimeException exception) {
         LOGGER.info("runtimeException");
         String message=exception.getMessage();
-        exception.printStackTrace();
-        if(message==null){
+        if(!message.startsWith("메")){
             message="알수 없는 오류발생";
         }
+        exception.printStackTrace();
         return utillService.makeJson(false, message);
     }
     @ExceptionHandler(MethodArgumentNotValidException.class)

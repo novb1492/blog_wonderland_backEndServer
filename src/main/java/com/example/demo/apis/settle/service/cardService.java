@@ -125,15 +125,18 @@ public class cardService {
             paymentService.confrim(settleDto);
             insert(settleDto);
             paymentService.updateTemp(mchtTrdNo);
-            throw new RuntimeException();
-            //return utillService.makeJson(true, "구매가 완료되었습니다");
+            //throw new RuntimeException();
+            return utillService.makeJson(true, "구매가 완료되었습니다");
         } catch (Exception e) {
             settleDto.setCnclOrd(1);
-            throw new RuntimeException("message");
-           /* if(requestToSettle(cancle(settleDto))){
-                return utillService.makeJson(false, "구매에 실패하였습니다");
+            String message="메시지: 환불에 실패했습니다";
+            if(!e.getMessage().startsWith("메")){
+                message="구매에 실패하였습니다";
             }
-            return utillService.makeJson(false, "환불에 실패하였습니다");*/
+            if(requestToSettle(cancle(settleDto))){
+                message=e.getMessage()+" 환불되었습니다";
+            }
+            throw utillService.makeRuntimeEX(message, "cardConfrim");
         }
         
     }
