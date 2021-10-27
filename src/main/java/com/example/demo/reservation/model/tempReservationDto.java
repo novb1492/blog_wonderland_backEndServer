@@ -20,20 +20,20 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @Data
-@Table(name = "paidreservations")
+@Table(name = "tempreservations")
 @Entity
-public class reservationDto {
+public class tempReservationDto {
     
     @Id
-    @Column(name="prid",nullable = false)
+    @Column(name="trid",nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int prid;
+    private int trid;
  
-    @Column(name = "prMchtTrdNo")
-    private String prMchtTrdNo;
+    @Column(name = "trMchtTrdNo")
+    private String trMchtTrdNo;
 
 
-    @Column(name = "prcreated")
+    @Column(name = "trcreated")
     @CreationTimestamp
-    private Timestamp prcreated;
+    private Timestamp trcreated;
 }

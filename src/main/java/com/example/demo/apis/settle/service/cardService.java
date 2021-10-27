@@ -126,10 +126,12 @@ public class cardService {
             }
             paymentService.confrim(settleDto);
             insert(settleDto);
-            deleteJoin(settleDto.getMchtTrdNo());
+            deleteTempJoin(settleDto.getMchtTrdNo());
             return utillService.makeJson(true, "구매가 완료되었습니다");
         } catch (Exception e) {
             settleDto.setCnclOrd(1);
+            deleteTempJoin(settleDto.getMchtTrdNo());
+            deleteMainJoin(settleDto.getMchtTrdNo());
             if(requestToSettle(cancle(settleDto))){
                 return utillService.makeJson(false, "구매에 실패하였습니다");
             }
@@ -137,9 +139,13 @@ public class cardService {
         }
         
     }
-    private void deleteJoin(String mchtTrdNo) {
+    private void deleteTempJoin(String mchtTrdNo) {
         logger.info("deleteJoin");
         paidCardsDao.deleteTempJoin(mchtTrdNo);
+    }
+    private void deleteMainJoin(String mchtTrdNo) {
+        logger.info("deleteMainJoin");
+        paidCardsDao.deleteMainJoin(mchtTrdNo);
     }
     private void insert(settleDto settleDto) {
         logger.info("insert");
