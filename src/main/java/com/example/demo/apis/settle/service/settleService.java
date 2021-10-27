@@ -39,7 +39,6 @@ public class settleService {
             return utillService.makeJson(false, "지원하지 않는 결제수단입니다");
         }
     }
-    @Transactional(rollbackFor = Exception.class)
     public JSONObject confrimPayment(HttpServletRequest request) {
         logger.info("confrimPayment");
         settleDto settleDto=utillService.requestToSettleDto(request);

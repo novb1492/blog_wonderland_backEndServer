@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class cardService {
@@ -108,6 +109,7 @@ public class cardService {
         System.out.println("requestcancleString");
         return  String.format("%s%s%s%s%s%s",trdDt,trdTm,MchtId,mchtTrdNo,price,"ST1009281328226982205"); 
     }
+    @Transactional(rollbackFor = Exception.class)
     public JSONObject cardConfrim(settleDto settleDto) {
         logger.info("cardConfrim");
         String mchtTrdNo=settleDto.getMchtTrdNo();
@@ -127,10 +129,11 @@ public class cardService {
             //return utillService.makeJson(true, "구매가 완료되었습니다");
         } catch (Exception e) {
             settleDto.setCnclOrd(1);
-            if(requestToSettle(cancle(settleDto))){
+            throw new RuntimeException("message");
+           /* if(requestToSettle(cancle(settleDto))){
                 return utillService.makeJson(false, "구매에 실패하였습니다");
             }
-            return utillService.makeJson(false, "환불에 실패하였습니다");
+            return utillService.makeJson(false, "환불에 실패하였습니다");*/
         }
         
     }
