@@ -134,8 +134,6 @@ public class cardService {
             return utillService.makeJson(true, "구매가 완료되었습니다");
         } catch (Exception e) {
             settleDto.setCnclOrd(1);
-            deleteTempJoin(mchtTrdNo);
-            deleteMainJoin(mchtTrdNo);
             if(requestToSettle(cancle(settleDto))){
                 return utillService.makeJson(false, "구매에 실패하였습니다");
             }
