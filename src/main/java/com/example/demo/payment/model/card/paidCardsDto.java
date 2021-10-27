@@ -36,7 +36,7 @@ public class paidCardsDto {
     private String pcMcht_id;
 
     
-    @Column(name = "pcMchtTrdNo",nullable = false)
+    @Column(name = "pcMchtTrdNo",nullable = false,unique=true)
     private String pcMchtTrdNo;
         
     @Column(name = "pcMethod",nullable = false)

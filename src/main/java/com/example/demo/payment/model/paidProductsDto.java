@@ -32,7 +32,7 @@ public class paidProductsDto {
     @Column(name = "poEmail",nullable = false,length = 50)
     private String poemail;
 
-    @Column(name = "poMchtTrdNo",nullable = false)
+    @Column(name = "poMchtTrdNo",nullable = false,unique=true)
     private String poMchtTrdNo;
     
     @Column(name = "poPrice",nullable = false)

@@ -32,7 +32,7 @@ public class tempOrderDto {
     @Column(name = "toEmail",nullable = false,length = 50)
     private String toemail;
 
-    @Column(name = "toMchtTrdNo",nullable = false)
+    @Column(name = "toMchtTrdNo",nullable = false,unique=true)
     private String toMchtTrdNo;
 
     @Column(name = "buyKind",nullable = false)

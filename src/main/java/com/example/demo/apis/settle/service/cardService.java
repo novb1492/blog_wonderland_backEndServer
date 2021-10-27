@@ -1,7 +1,6 @@
 package com.example.demo.apis.settle.service;
 
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
+
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -124,7 +123,8 @@ public class cardService {
             paymentService.confrim(settleDto);
             insert(settleDto);
             paymentService.updateTemp(mchtTrdNo);
-            return utillService.makeJson(true, "구매가 완료되었습니다");
+            throw new RuntimeException();
+            //return utillService.makeJson(true, "구매가 완료되었습니다");
         } catch (Exception e) {
             settleDto.setCnclOrd(1);
             if(requestToSettle(cancle(settleDto))){

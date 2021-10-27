@@ -32,7 +32,7 @@ public class tempOrderProudctsDto {
     @Column(name = "topEmail",nullable = false,length = 50)
     private String topemail;
 
-    @Column(name = "topMchtTrdNo",nullable = false)
+    @Column(name = "topMchtTrdNo",nullable = false,unique=true)
     private String topMchtTrdNo;
     
     @Column(name = "topPrice",nullable = false)

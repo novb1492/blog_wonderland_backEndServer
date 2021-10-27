@@ -28,7 +28,7 @@ public class uservo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int uid;
 
-    @Column(name = "email",nullable = false,length = 50)
+    @Column(name = "email",nullable = false,length = 50,unique=true)
     private String email;
     
     @Column(name = "name",nullable = false,length = 20)
@@ -40,7 +40,7 @@ public class uservo {
     @Column(name = "provider",length = 30)
     private String provider;
 
-    @Column(name = "phoneNum",nullable = false,length = 30)
+    @Column(name = "phoneNum",nullable = false,length = 30,unique=true)
     private String phoneNum;
 
     @Column(name = "address",nullable = false,length = 50)

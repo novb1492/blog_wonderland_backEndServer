@@ -1,6 +1,5 @@
 package com.example.demo.product.model;
 
-import java.util.List;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
