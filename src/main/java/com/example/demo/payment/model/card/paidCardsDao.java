@@ -16,4 +16,6 @@ public interface paidCardsDao extends JpaRepository<paidCardsDto,Integer>{
     @Transactional
     @Query(value = "delete a.*,b.*,c.*  from paidcards a left join paidproducts b on a.pc_mcht_trd_no=b.po_mcht_trd_no left join paidreservations c on a.pc_mcht_trd_no=c.pr_mcht_trd_no  where a.pc_mcht_trd_no=? ",nativeQuery = true)
     void deleteMainJoin(String mchtTrdNo);
+
+    int countByPcMchtTrdNo(String mchtTrdNo);
 }

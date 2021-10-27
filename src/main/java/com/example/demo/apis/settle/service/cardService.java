@@ -118,20 +118,24 @@ public class cardService {
     }
     public JSONObject cardConfrim(settleDto settleDto) {
         logger.info("cardConfrim");
+        String mchtTrdNo=settleDto.getMchtTrdNo();
         try {
             settleDto.setTrdAmt(utillService.aesToNomal(settleDto.getTrdAmt()));
+            if(paidCardsDao.countByPcMchtTrdNo(mchtTrdNo)!=0){
+                return utillService.makeJson(true, "구매가 완료되었습니다");
+            }
             if(!settleDto.getOutStatCd().equals(sucPayNum)){
                 logger.info("결제실패 실패 코드 "+settleDto.getOutRsltCd());
                 throw new RuntimeException("결제실패");
             }
             paymentService.confrim(settleDto);
             insert(settleDto);
-            deleteTempJoin(settleDto.getMchtTrdNo());
+            deleteTempJoin(mchtTrdNo);
             return utillService.makeJson(true, "구매가 완료되었습니다");
         } catch (Exception e) {
             settleDto.setCnclOrd(1);
-            deleteTempJoin(settleDto.getMchtTrdNo());
-            deleteMainJoin(settleDto.getMchtTrdNo());
+            deleteTempJoin(mchtTrdNo);
+            deleteMainJoin(mchtTrdNo);
             if(requestToSettle(cancle(settleDto))){
                 return utillService.makeJson(false, "구매에 실패하였습니다");
             }
