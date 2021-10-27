@@ -52,12 +52,10 @@ public class tempOrderDto {
     private Timestamp toCreated;
 
     @Column(name = "toDoneDate")
-    @CreationTimestamp
     private Timestamp toDoneDate;
 
     
     @Column(name = "toFailDate")
-    @CreationTimestamp
     private Timestamp toFailDate;
 
   
