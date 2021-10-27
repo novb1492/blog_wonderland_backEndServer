@@ -6,11 +6,13 @@ import java.util.List;
 import java.util.Map;
 
 import com.example.demo.apis.settle.model.settleDto;
+import com.example.demo.payment.model.getJoinProducts;
+import com.example.demo.payment.model.paidProductsDao;
 import com.example.demo.payment.model.tempOrderDao;
 import com.example.demo.payment.model.tempOrderDto;
 import com.example.demo.payment.model.tempOrderProudctsDao;
 import com.example.demo.payment.model.tempOrderProudctsDto;
-
+import com.example.demo.utill.utillService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +27,8 @@ public class paymentService {
     private  tempOrderDao tempOrderDao;
     @Autowired
     private tempOrderProudctsDao tempOrderProudctsDao;
+    @Autowired
+    private paidProductsDao paidProductsDao;
 
     public  void insertTemp(String mchtTrdNo,int price,String email) {
         System.out.println(mchtTrdNo+price+email);
@@ -57,6 +61,31 @@ public class paymentService {
     }  
     public void confrim(settleDto settleDto) {
         logger.info("confrim");
+        List<getJoinProducts>getJoinProducts=tempOrderDao.findJoinProducts(settleDto.getMchtTrdNo());
+        if(getJoinProducts.size()==0){
+            throw new RuntimeException("거래요청내역이 존재하지 않습니다");
+        }
+        int totalPrice=getJoinProducts.get(0).getTo_price();
+        String mchtTrdNo=getJoinProducts.get(0).getTo_mcht_trd_no();
+        confrim(totalPrice, mchtTrdNo, settleDto);
+        productsTempToMain(getJoinProducts);
+    }
+    private void productsTempToMain( List<getJoinProducts>getJoinProducts) {
+        logger.info("tempToMain");
+        
+    }
+    private void confrim(int totalPrice,String mchtTrdNo,settleDto settleDto) {
+        logger.info("confrim");
+        String message=null;
+        if(!mchtTrdNo.equals(settleDto.getMchtTrdNo())){
+            message="거래번호가 일치하지 않습니다 ";
+        }else if(totalPrice!=Integer.parseInt(settleDto.getTrdAmt())){
+            message="거래금액이 일치하지 않습니다";
+        }else{
+            logger.info("거래 유효성 통과");
+            return;
+        }
+        throw utillService.makeRuntimeEX(message, "confrim");
     }
     
     

@@ -20,32 +20,31 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @Data
-@Table(name = "temporderproducts")
+@Table(name = "paidproducts")
 @Entity
-public class tempOrderProudctsDto {
+public class paidProductsDto {
     
     @Id
-    @Column(name="topid",nullable = false)
+    @Column(name="poid",nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int topid;
+    private int poid;
 
-    @Column(name = "topEmail",nullable = false,length = 50)
-    private String topemail;
+    @Column(name = "poEmail",nullable = false,length = 50)
+    private String poemail;
 
-    @Column(name = "topMchtTrdNo",nullable = false)
-    private String topMchtTrdNo;
+    @Column(name = "poMchtTrdNo",nullable = false)
+    private String poMchtTrdNo;
     
-    @Column(name = "topPrice",nullable = false)
-    private int topPrice;
+    @Column(name = "poPrice",nullable = false)
+    private int poPrice;
 
-    @Column(name = "topName",nullable = false)
-    private String topName;
+    @Column(name = "poName",nullable = false)
+    private String poName;
 
-    @Column(name = "topCount",nullable = false)
-    private int topCount;
+    @Column(name = "poCount",nullable = false)
+    private int poCount;
 
-    @Column(name = "topCreated")
+    @Column(name = "poCreated")
     @CreationTimestamp
-    private Timestamp topCreated;
-
+    private Timestamp poCreated;
 }

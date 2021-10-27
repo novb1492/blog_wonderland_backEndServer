@@ -72,31 +72,12 @@ public class cardService {
         }
         
     }
-    public JSONObject confrim(settleDto settleDto) {
-        logger.info("confrim");
-        try {
-            settleDto.setCardTrdAmt(utillService.aesToNomal(settleDto.getCardTrdAmt()));
-            if(!settleDto.getOutStatCd().equals(sucPayNum)){
-                logger.info("결제실패 실패 코드 "+settleDto.getOutRsltCd());
-                throw new RuntimeException("결제실패");
-            }
-            
-            return utillService.makeJson(true, "구매가 완료되었습니다");
-        } catch (Exception e) {
-            settleDto.setCnclOrd(1);
-            if(requestToSettle(cancle(settleDto))){
-                return utillService.makeJson(false, "구매에 실패하였습니다");
-            }
-            return utillService.makeJson(false, "환불에 실패하였습니다");
-        }
-        
-    }
     private JSONObject cancle(settleDto settleDto){
         logger.info("cancle");
         Map<String,String>map=utillService.getTrdDtTrdTm();
         String trdDt=map.get("trdDt");
         String trdTm=map.get("trdTm");
-        String pktHash=requestcancleString(trdDt,trdTm,settleDto.getMchtTrdNo(),settleDto.getCardTrdAmt());
+        String pktHash=requestcancleString(trdDt,trdTm,settleDto.getMchtTrdNo(),settleDto.getTrdAmt());
         logger.info(pktHash+" 해쉬예정문자열");
         JSONObject body=new JSONObject();
         JSONObject params=new JSONObject();
@@ -113,7 +94,7 @@ public class cardService {
         data.put("pktHash", sha256.encrypt(pktHash));
         data.put("orgTrdNo", settleDto.getTrdNo());
         data.put("crcCd", "KRW");
-        data.put("cnclAmt", aes256.encrypt(settleDto.getCardTrdAmt()));
+        data.put("cnclAmt", aes256.encrypt(settleDto.getTrdAmt()));
         body.put("params", params);
         body.put("data", data);
         
@@ -130,6 +111,25 @@ public class cardService {
     private String requestcancleString(String trdDt,String trdTm, String mchtTrdNo,String price) {
         System.out.println("requestcancleString");
         return  String.format("%s%s%s%s%s%s",trdDt,trdTm,MchtId,mchtTrdNo,price,"ST1009281328226982205"); 
+    }
+    public JSONObject cardConfrim(settleDto settleDto) {
+        logger.info("cardConfrim");
+        try {
+            settleDto.setTrdAmt(utillService.aesToNomal(settleDto.getTrdAmt()));
+            if(!settleDto.getOutStatCd().equals(sucPayNum)){
+                logger.info("결제실패 실패 코드 "+settleDto.getOutRsltCd());
+                throw new RuntimeException("결제실패");
+            }
+            paymentService.confrim(settleDto);
+            return utillService.makeJson(true, "구매가 완료되었습니다");
+        } catch (Exception e) {
+            settleDto.setCnclOrd(1);
+            if(requestToSettle(cancle(settleDto))){
+                return utillService.makeJson(false, "구매에 실패하였습니다");
+            }
+            return utillService.makeJson(false, "환불에 실패하였습니다");
+        }
+        
     }
 
 }

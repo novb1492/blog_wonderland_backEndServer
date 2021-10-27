@@ -7,7 +7,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.example.demo.apis.settle.model.settleDto;
 import com.example.demo.enums.Stringenums;
-import com.example.demo.payment.service.paymentService;
 import com.example.demo.product.model.tryBuyDto;
 import com.example.demo.utill.utillService;
 import com.nimbusds.jose.shaded.json.JSONObject;
@@ -26,8 +25,7 @@ public class settleService {
     private final String cardMchtId=Stringenums.cardMchtId.getString();
     @Autowired
     private cardService cardService;
-    @Autowired
-    private paymentService paymentService;
+
 
 
     public JSONObject makeBuyInfor(tryBuyDto tryBuyDto,List<Map<String,Object>>maps) {
@@ -48,7 +46,7 @@ public class settleService {
         System.out.println(settleDto.toString());
         JSONObject reponse=new JSONObject();
         if(settleDto.getMchtId().equals(cardMchtId)){
-            reponse=cardService.confrim(settleDto);
+            reponse=cardService.cardConfrim(settleDto);
         }else{
             return utillService.makeJson(false, "지원하지 않는 결제 형식입니다");
         }

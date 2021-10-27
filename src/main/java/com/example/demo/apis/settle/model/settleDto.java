@@ -36,6 +36,8 @@ public class settleDto {
         String cphoneNo;                     //휴대폰번호
         String billKey;      
         
+
+
         ///환불요청시 써야하는 변수
         int cnclOrd;
 
