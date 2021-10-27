@@ -45,6 +45,10 @@ public class productVo {
     @Column(name = "bigKind" ,nullable = false,length = 50)
     private String bigKind;
 
+        
+    @Column(name = "middleKind" ,nullable = false,length = 50)
+    private String middleKind;
+
     @Column(name = "productImg")
     private String productImg;
 
