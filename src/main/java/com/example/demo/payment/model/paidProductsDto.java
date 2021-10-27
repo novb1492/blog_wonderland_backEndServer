@@ -44,7 +44,14 @@ public class paidProductsDto {
     @Column(name = "poCount",nullable = false)
     private int poCount;
 
+        
+    @Column(name = "poCancleFlag",nullable = false)
+    private int poCancleFlag;
+
     @Column(name = "poCreated")
     @CreationTimestamp
     private Timestamp poCreated;
+
+    @Column(name = "poCancleDate")
+    private Timestamp poCancleDate;
 }

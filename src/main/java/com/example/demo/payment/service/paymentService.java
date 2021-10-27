@@ -31,13 +31,16 @@ public class paymentService {
     @Autowired
     private paidProductsDao paidProductsDao;
 
-    public  void insertTemp(String mchtTrdNo,int price,String email) {
+
+    public  void insertTemp(String mchtTrdNo,int price,String email,String buyKind) {
         System.out.println(mchtTrdNo+price+email);
         logger.info("insertTemp");
         tempOrderDto  dto=tempOrderDto.builder()
                                         .toMchtTrdNo(mchtTrdNo)
                                         .toPrice(price)
                                         .toemail(email)
+                                        .toDoneFlag(0)
+                                        .buyKind(buyKind)
                                         .build();
                                         tempOrderDao.save(dto);
     } 
@@ -55,6 +58,7 @@ public class paymentService {
                                                         .topName((String)m.get("itemName"))
                                                         .topPrice((int)m.get("price"))
                                                         .topemail(email)
+                                                        .topDoneFlag(0)
                                                         .build();
                                                         tempOrderProudctsDao.save(dto);
                                                         temp+=1;

@@ -41,8 +41,13 @@ public class productVo {
     @Column(name = "kind" ,nullable = false,length = 100)
     private String kind;
 
+    
+    @Column(name = "bigKind" ,nullable = false,length = 50)
+    private String bigKind;
+
     @Column(name = "productImg")
     private String productImg;
+
 
     @Column(name = "pcreated")
     @CreationTimestamp

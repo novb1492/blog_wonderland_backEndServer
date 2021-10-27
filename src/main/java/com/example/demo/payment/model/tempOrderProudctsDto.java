@@ -44,8 +44,20 @@ public class tempOrderProudctsDto {
     @Column(name = "topCount",nullable = false)
     private int topCount;
 
+    @Column(name = "topDoneFlag",nullable = false)
+    private int topDoneFlag;
+
+    @Column(name = "topFailFlag",nullable = false)
+    private int topFailFlag;
+
     @Column(name = "topCreated")
     @CreationTimestamp
     private Timestamp topCreated;
+
+    @Column(name = "topFailDate")
+    private Timestamp topFailDate;
+    
+    @Column(name = "topDoneDate")
+    private Timestamp topDoneDate;
 
 }

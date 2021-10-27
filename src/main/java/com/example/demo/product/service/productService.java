@@ -89,6 +89,7 @@ public class productService {
             result.put("itemName", productVo.getProductName());
             result.put("count", itemArray[i][1]);
             result.put("price", productVo.getPrice());
+            result.put("bigKind",productVo.getBigKind());
             maps.add(result);
             if(i==itemArraySize-1){
                 Map<String,Object>map2=new HashMap<>();

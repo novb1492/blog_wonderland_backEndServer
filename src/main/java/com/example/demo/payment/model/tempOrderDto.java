@@ -34,13 +34,31 @@ public class tempOrderDto {
 
     @Column(name = "toMchtTrdNo",nullable = false)
     private String toMchtTrdNo;
+
+    @Column(name = "buyKind",nullable = false)
+    private String buyKind;
     
     @Column(name = "toPrice",nullable = false)
     private int toPrice;
+  
+    @Column(name = "toDoneFlag",nullable = false)
+    private int toDoneFlag;
+
+    @Column(name = "toFailFlag",nullable = false)
+    private int toFailFlag;
 
     @Column(name = "toCreated")
     @CreationTimestamp
     private Timestamp toCreated;
+
+    @Column(name = "toDoneDate")
+    @CreationTimestamp
+    private Timestamp toDoneDate;
+
+    
+    @Column(name = "toFailDate")
+    @CreationTimestamp
+    private Timestamp toFailDate;
 
   
 }

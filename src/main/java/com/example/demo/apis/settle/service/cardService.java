@@ -1,5 +1,7 @@
 package com.example.demo.apis.settle.service;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +45,7 @@ public class cardService {
         logger.info("makeInfor");
         Map<String,Object>map=maps.get(maps.size()-1);
         Map<String,String>trdDtTrdTm=utillService.getTrdDtTrdTm();
-        String mchtTrdNo=utillService.getRandomNum(10);
+        String mchtTrdNo=maps.get(0).get("bigKind")+utillService.getRandomNum(10);
         String requestDate=trdDtTrdTm.get("trdDt");
         String requestTime=trdDtTrdTm.get("trdTm");
         String totalPrice=Integer.toString((int)map.get("totalPrice"));
@@ -63,7 +65,7 @@ public class cardService {
         response.put("trdTm", requestTime);
         response.put("pktHash", hashText);
         response.put("flag", true);
-        paymentService.insertTemp(mchtTrdNo,Integer.parseInt(totalPrice), email);
+        paymentService.insertTemp(mchtTrdNo,Integer.parseInt(totalPrice), email,"card");
         insertTempProducts(maps, tryBuyDto.getKind(),mchtTrdNo,email);
         return response;
     }
@@ -130,10 +132,11 @@ public class cardService {
             }
             paymentService.confrim(settleDto);
             insert(settleDto);
-            deleteTempJoin(mchtTrdNo);
+            updateTempJoin(mchtTrdNo, 1, Timestamp.valueOf(LocalDateTime.now()),true);
             return utillService.makeJson(true, "구매가 완료되었습니다");
         } catch (Exception e) {
             settleDto.setCnclOrd(1);
+            updateTempJoin(mchtTrdNo,1, Timestamp.valueOf(LocalDateTime.now()),false);
             if(requestToSettle(cancle(settleDto))){
                 return utillService.makeJson(false, "구매에 실패하였습니다");
             }
@@ -141,13 +144,14 @@ public class cardService {
         }
         
     }
-    private void deleteTempJoin(String mchtTrdNo) {
-        logger.info("deleteJoin");
-        paidCardsDao.deleteTempJoin(mchtTrdNo);
-    }
-    private void deleteMainJoin(String mchtTrdNo) {
-        logger.info("deleteMainJoin");
-        paidCardsDao.deleteMainJoin(mchtTrdNo);
+    private void updateTempJoin(String mchtTrdNo,int zeroOrOne,Timestamp timestamp,boolean sucOrNot) {
+        logger.info("updateTempJoin");
+        if(sucOrNot){
+            logger.info("결제검증완료 임시db수정시도");
+            return;
+        }
+        logger.info("결제검증ㅅ실패 임시db수정시도");
+
     }
     private void insert(settleDto settleDto) {
         logger.info("insert");
@@ -160,6 +164,7 @@ public class cardService {
                                     .pcMethod(settleDto.getMethod())
                                     .pcTrd_amt(Integer.parseInt(settleDto.getTrdAmt()))
                                     .pcTrd_no(settleDto.getTrdNo())
+                                    .pcCancleFlag(0)
                                     .build();
                                     paidCardsDao.save(dto);
                                     

@@ -53,8 +53,15 @@ public class paidCardsDto {
 
     @Column(name = "pcEmail",nullable = false)
     private String pcEmail;
+    
+    @Column(name = "pcCancleFlag",nullable = false)
+    private int pcCancleFlag;
 
     @Column(name = "pcCreated")
     @CreationTimestamp
     private Timestamp poCreated;
+
+    @Column(name = "pcCancleDate")
+    @CreationTimestamp
+    private Timestamp poCancleDate;
 }
