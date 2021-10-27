@@ -69,12 +69,12 @@ public class paymentService {
         int totalPrice=getJoinProducts.get(0).getTo_price();
         String mchtTrdNo=getJoinProducts.get(0).getTo_mcht_trd_no();
         confrim(totalPrice, mchtTrdNo, settleDto);
-        productsTempToMain(getJoinProducts);
+        insert(getJoinProducts);
     }
-    private void productsTempToMain( List<getJoinProducts>getJoinProducts) {
-        logger.info("tempToMain");
+    private void insert( List<getJoinProducts>getJoinProducts) {
+        logger.info("productsTempToMain");
         int size=getJoinProducts.size();
-        for(int i=1;i<size;i++){
+        for(int i=0;i<size;i++){
             paidProductsDto dto=paidProductsDto.builder()
                                                 .poCount(getJoinProducts.get(i).getTop_count())
                                                 .poMchtTrdNo(getJoinProducts.get(0).getTo_mcht_trd_no())

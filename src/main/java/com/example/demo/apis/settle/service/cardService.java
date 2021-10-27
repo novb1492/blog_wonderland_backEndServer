@@ -126,6 +126,7 @@ public class cardService {
             }
             paymentService.confrim(settleDto);
             insert(settleDto);
+            deleteJoin(settleDto.getMchtTrdNo());
             return utillService.makeJson(true, "구매가 완료되었습니다");
         } catch (Exception e) {
             settleDto.setCnclOrd(1);
@@ -135,6 +136,10 @@ public class cardService {
             return utillService.makeJson(false, "환불에 실패하였습니다");
         }
         
+    }
+    private void deleteJoin(String mchtTrdNo) {
+        logger.info("deleteJoin");
+        paidCardsDao.deleteTempJoin(mchtTrdNo);
     }
     private void insert(settleDto settleDto) {
         logger.info("insert");
