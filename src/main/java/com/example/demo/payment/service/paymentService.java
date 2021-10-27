@@ -2,6 +2,8 @@ package com.example.demo.payment.service;
 
 
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -23,7 +25,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class paymentService {
     private static Logger logger=LoggerFactory.getLogger(paymentService.class);
-
+    private final int doneFlag=1;
     @Autowired
     private  tempOrderDao tempOrderDao;
     @Autowired
@@ -32,6 +34,14 @@ public class paymentService {
     private paidProductsDao paidProductsDao;
 
 
+    public void updateTemp(String mchtTrdNo) {
+        logger.info("updateTemp");
+        Timestamp now=Timestamp.valueOf(LocalDateTime.now());
+    
+        if(mchtTrdNo.startsWith("product")){
+            tempOrderDao.updateTempProducts(doneFlag,doneFlag,now,now,mchtTrdNo);
+        }
+    }
     public  void insertTemp(String mchtTrdNo,int price,String email,String buyKind) {
         System.out.println(mchtTrdNo+price+email);
         logger.info("insertTemp");
@@ -43,8 +53,14 @@ public class paymentService {
                                         .buyKind(buyKind)
                                         .build();
                                         tempOrderDao.save(dto);
-    } 
-    public void insertTempOrderProducts(List<Map<String,Object>>maps,String mchtTrdNo,String email) {
+    }
+    public void insertTemp(List<Map<String,Object>>maps,String mchtTrdNo,String email) {
+        logger.info("insertTemp");
+        if(mchtTrdNo.startsWith("product")){
+            insertTempOrderProducts(maps, mchtTrdNo, email);
+        }
+    }
+    private void insertTempOrderProducts(List<Map<String,Object>>maps,String mchtTrdNo,String email) {
         logger.info("insertTempOrderProducts");
         int temp=0;
         int size=maps.size();

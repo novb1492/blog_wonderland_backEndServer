@@ -62,6 +62,5 @@ public class paidCardsDto {
     private Timestamp poCreated;
 
     @Column(name = "pcCancleDate")
-    @CreationTimestamp
     private Timestamp poCancleDate;
 }

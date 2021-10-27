@@ -44,9 +44,6 @@ public class tempOrderDto {
     @Column(name = "toDoneFlag",nullable = false)
     private int toDoneFlag;
 
-    @Column(name = "toFailFlag",nullable = false)
-    private int toFailFlag;
-
     @Column(name = "toCreated")
     @CreationTimestamp
     private Timestamp toCreated;
@@ -54,9 +51,7 @@ public class tempOrderDto {
     @Column(name = "toDoneDate")
     private Timestamp toDoneDate;
 
-    
-    @Column(name = "toFailDate")
-    private Timestamp toFailDate;
+
 
   
 }

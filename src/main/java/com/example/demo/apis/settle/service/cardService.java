@@ -66,17 +66,8 @@ public class cardService {
         response.put("pktHash", hashText);
         response.put("flag", true);
         paymentService.insertTemp(mchtTrdNo,Integer.parseInt(totalPrice), email,"card");
-        insertTempProducts(maps, tryBuyDto.getKind(),mchtTrdNo,email);
+        paymentService.insertTemp(maps, mchtTrdNo, email);
         return response;
-    }
-    private void insertTempProducts(List<Map<String,Object>>maps,String kind,String mchtTrdNo,String email) {
-        logger.info("insertTempProducts");
-        if(kind.equals("product")){
-            paymentService.insertTempOrderProducts(maps,mchtTrdNo,email);
-        }else{
-            throw new RuntimeException("취급하지 않는 상품목록");
-        }
-        
     }
     private JSONObject cancle(settleDto settleDto){
         logger.info("cancle");
@@ -132,26 +123,16 @@ public class cardService {
             }
             paymentService.confrim(settleDto);
             insert(settleDto);
-            updateTempJoin(mchtTrdNo, 1, Timestamp.valueOf(LocalDateTime.now()),true);
+            paymentService.updateTemp(mchtTrdNo);
             return utillService.makeJson(true, "구매가 완료되었습니다");
         } catch (Exception e) {
             settleDto.setCnclOrd(1);
-            updateTempJoin(mchtTrdNo,1, Timestamp.valueOf(LocalDateTime.now()),false);
             if(requestToSettle(cancle(settleDto))){
                 return utillService.makeJson(false, "구매에 실패하였습니다");
             }
             return utillService.makeJson(false, "환불에 실패하였습니다");
         }
         
-    }
-    private void updateTempJoin(String mchtTrdNo,int zeroOrOne,Timestamp timestamp,boolean sucOrNot) {
-        logger.info("updateTempJoin");
-        if(sucOrNot){
-            logger.info("결제검증완료 임시db수정시도");
-            return;
-        }
-        logger.info("결제검증ㅅ실패 임시db수정시도");
-
     }
     private void insert(settleDto settleDto) {
         logger.info("insert");
