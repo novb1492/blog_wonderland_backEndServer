@@ -8,6 +8,7 @@ import java.util.Map;
 import com.example.demo.apis.settle.model.settleDto;
 import com.example.demo.payment.model.getJoinProducts;
 import com.example.demo.payment.model.paidProductsDao;
+import com.example.demo.payment.model.paidProductsDto;
 import com.example.demo.payment.model.tempOrderDao;
 import com.example.demo.payment.model.tempOrderDto;
 import com.example.demo.payment.model.tempOrderProudctsDao;
@@ -72,7 +73,17 @@ public class paymentService {
     }
     private void productsTempToMain( List<getJoinProducts>getJoinProducts) {
         logger.info("tempToMain");
-        
+        int size=getJoinProducts.size();
+        for(int i=1;i<size;i++){
+            paidProductsDto dto=paidProductsDto.builder()
+                                                .poCount(getJoinProducts.get(i).getTop_count())
+                                                .poMchtTrdNo(getJoinProducts.get(0).getTo_mcht_trd_no())
+                                                .poName(getJoinProducts.get(i).getTop_name())
+                                                .poPrice(getJoinProducts.get(i).getTop_price())
+                                                .poemail(getJoinProducts.get(0).getTo_email())
+                                                .build();
+                                                paidProductsDao.save(dto);
+        }
     }
     private void confrim(int totalPrice,String mchtTrdNo,settleDto settleDto) {
         logger.info("confrim");

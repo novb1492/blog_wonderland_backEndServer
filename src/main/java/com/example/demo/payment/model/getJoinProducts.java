@@ -2,7 +2,6 @@ package com.example.demo.payment.model;
 
 import java.sql.Timestamp;
 
-import lombok.ToString;
 
 public interface getJoinProducts {
     

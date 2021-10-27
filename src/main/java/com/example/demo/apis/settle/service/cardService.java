@@ -9,6 +9,8 @@ import com.example.demo.apis.settle.model.settleDto;
 import com.example.demo.enums.Stringenums;
 import com.example.demo.hash.aes256;
 import com.example.demo.hash.sha256;
+import com.example.demo.payment.model.card.paidCardsDao;
+import com.example.demo.payment.model.card.paidCardsDto;
 import com.example.demo.payment.service.paymentService;
 import com.example.demo.product.model.tryBuyDto;
 import com.example.demo.user.service.userService;
@@ -29,6 +31,8 @@ public class cardService {
     private requestTo requestTo;
     @Autowired
     private paymentService  paymentService;
+    @Autowired
+    private paidCardsDao paidCardsDao;
 
     private final String sucPayNum=Stringenums.sucPayNum.getString();
     private final String MchtId=Stringenums.cardMchtId.getString();
@@ -121,6 +125,7 @@ public class cardService {
                 throw new RuntimeException("결제실패");
             }
             paymentService.confrim(settleDto);
+            insert(settleDto);
             return utillService.makeJson(true, "구매가 완료되었습니다");
         } catch (Exception e) {
             settleDto.setCnclOrd(1);
@@ -130,6 +135,21 @@ public class cardService {
             return utillService.makeJson(false, "환불에 실패하였습니다");
         }
         
+    }
+    private void insert(settleDto settleDto) {
+        logger.info("insert");
+        paidCardsDto dto=paidCardsDto.builder()
+                                    .pcCncl_ord(0)
+                                    .pcEmail(userService.sendUserInfor().getEmail())
+                                    .pcFn_nm(settleDto.getFnNm())
+                                    .pcMchtTrdNo(settleDto.getMchtTrdNo())
+                                    .pcMcht_id(settleDto.getMchtId())
+                                    .pcMethod(settleDto.getMethod())
+                                    .pcTrd_amt(Integer.parseInt(settleDto.getTrdAmt()))
+                                    .pcTrd_no(settleDto.getTrdNo())
+                                    .build();
+                                    paidCardsDao.save(dto);
+                                    
     }
 
 }
