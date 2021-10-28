@@ -94,7 +94,7 @@ public class productService {
             Map<String,Object>eventmap=new HashMap<>();
             confrimCoupon(couponName,getEventsAndProducts,eventmap);
             confrimCode(codeName, getEventsAndProducts,eventmap);
-            onlyCash=getTotalPrice(getEventsAndProducts.getPrice(),count,onlyPoint,eventmap,getEventsAndProducts.getMax_discount_percent());
+            onlyCash=getOnlyCash(getEventsAndProducts.getPrice(),count,onlyPoint,eventmap,getEventsAndProducts.getMax_discount_percent());
             totalCash+=onlyCash;
             int price=onlyCash+onlyPoint;
             totalPrice+=onlyCash+onlyPoint;
@@ -126,8 +126,8 @@ public class productService {
         return maps;
 
     }
-    private int getTotalPrice(int  price, int count,int point,Map<String,Object>eventmap,int maxDiscountPercent) {
-        logger.info("getTotalPrice");
+    private int getOnlyCash(int  price, int count,int point,Map<String,Object>eventmap,int maxDiscountPercent) {
+        logger.info("getOnlyCash");
         logger.info(eventmap.toString());
         String codeAction=(String)eventmap.get("codeaction");
         int codeNum=(int)eventmap.get("codenum");
