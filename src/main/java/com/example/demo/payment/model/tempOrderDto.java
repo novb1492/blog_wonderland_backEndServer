@@ -44,6 +44,13 @@ public class tempOrderDto {
     @Column(name = "toDoneFlag",nullable = false)
     private int toDoneFlag;
 
+    @Column(name = "toCash",nullable = false)
+    private int toCash;
+
+    @Column(name = "toPoint",nullable = false)
+    private int toPoint;
+
+
     @Column(name = "toCreated")
     @CreationTimestamp
     private Timestamp toCreated;

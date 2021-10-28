@@ -75,6 +75,10 @@ public class paymentService {
                                                         .topPrice((int)m.get("price"))
                                                         .topemail(email)
                                                         .topDoneFlag(0)
+                                                        .topCash((int)m.get("onlyCash"))
+                                                        .topPoint((int)m.get("onlyPoint"))
+                                                        .topUsecoupon((String)m.get("coupone"))
+                                                        .topUsecode((String)m.get("coupone"))
                                                         .build();
                                                         tempOrderProudctsDao.save(dto);
                                                         temp+=1;

@@ -38,16 +38,31 @@ public class tempOrderProudctsDto {
     @Column(name = "topPrice",nullable = false)
     private int topPrice;
 
+    @Column(name = "topCash",nullable = false)
+    private int topCash;
+
+    @Column(name = "topPoint",nullable = false)
+    private int topPoint;
+
     @Column(name = "topName",nullable = false)
     private String topName;
 
     @Column(name = "topCount",nullable = false)
     private int topCount;
 
+    @Column(name = "topBuyKind",nullable = false)
+    private int topBuyKind;
+
     @Column(name = "topDoneFlag",nullable = false)
     private int topDoneFlag;
 
-    @Column(name = "topCreated")
+    @Column(name = "topUsecoupon")
+    private String topUsecoupon;
+
+    @Column(name = "topUsecode")
+    private String topUsecode;
+
+    @Column(name = "toppCreated")
     @CreationTimestamp
     private Timestamp topCreated;
 

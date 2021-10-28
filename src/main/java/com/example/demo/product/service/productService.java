@@ -73,36 +73,45 @@ public class productService {
         int itemArraySize=itemArray.length;
         int totalPrice=0;
         String itemNames="";
-
+        int onlyCash=0;
+        int onlyPoint=0;
+        int totalCash=0;
+        int totalPoint=0;
         String email=userService.sendUserInfor().getEmail();
         List<Map<String,Object>>maps=new ArrayList<>();
         for(int i=0;i<itemArraySize;i++){
             Map<String,Object>result=new HashMap<>();
-            
-            getEventsAndProducts getEventsAndProducts=productDao.findProductJoinEvents(itemArray[i][2].toString(),itemArray[i][3].toString(),email,Integer.parseInt(itemArray[i][0].toString()));
-            if(Integer.parseInt(itemArray[i][1].toString())<=0){
-                throw utillService.makeRuntimeEX("최소 주문수량은 0보다 커야합니다","getTotalPriceAndOther");
-            }
+            String couponName=itemArray[i][2].toString();
+            String codeName=itemArray[i][3].toString();
+            String point=itemArray[i][4].toString();
+            getEventsAndProducts getEventsAndProducts=productDao.findProductJoinEvents(couponName,codeName,email,Integer.parseInt(itemArray[i][0].toString()));
             int count=Integer.parseInt(itemArray[i][1].toString());
-            totalPrice+=getTotalPrice(getEventsAndProducts.getPrice(),Integer.parseInt(itemArray[i][1].toString()));
+            confrimCount(count, getEventsAndProducts.getCount());
+            Map<String,Integer>map=confrimPoint(onlyPoint, point, getEventsAndProducts.getPo_having(), totalPoint);
+            onlyPoint=map.get("onlyPoint");
+            totalPoint=map.get("totalPoint");
+            onlyCash=getTotalPrice(getEventsAndProducts.getPrice(),count,onlyPoint);
+            totalCash+=onlyCash;
+            int price=onlyCash+onlyPoint;
+            totalPrice+=onlyCash+onlyPoint;
             itemNames+=getEventsAndProducts.getProduct_name();
             if(i<itemArraySize-1){
                 itemNames=",";
             }
-            if(count>getEventsAndProducts.getCount()){
-                throw utillService.makeRuntimeEX("재고가 부족합니다","getTotalPriceAndOther");
-            }
             result.put("itemName", getEventsAndProducts.getProduct_name());
             result.put("count", count);
-            result.put("price", getEventsAndProducts.getPrice());
+            result.put("price",price);
             result.put("bigKind",getEventsAndProducts.getBig_kind());
             result.put("coupon", getEventsAndProducts.getCoupon_name());
             result.put("code", getEventsAndProducts.getCode_name());
-            result.put("point", itemArray[i][4]);
+            result.put("onlyCash",onlyCash);
+            result.put("onlyPoint",onlyPoint);
             maps.add(result);
             if(i==itemArraySize-1){
                 Map<String,Object>map2=new HashMap<>();
                 map2.put("totalPrice", totalPrice);
+                map2.put("totalCash", totalCash);
+                map2.put("totalPoint", totalPoint);
                 map2.put("itemNames", itemNames);
                 maps.add(map2);
             }
@@ -111,9 +120,39 @@ public class productService {
         return maps;
 
     }
-    private int getTotalPrice(int  price, int count) {
+    private Map<String,Integer> confrimPoint(int onlyPoint,String point,int dbPoint,int totalPoint) {
+        logger.info("confrimPoint");
+        Map<String,Integer>map=new HashMap<>();
+        try {
+            onlyPoint=Integer.parseInt(point);
+        } catch (Exception e) {
+            if(!point.equals("")){
+                throw utillService.makeRuntimeEX("포인트는 숫자만가능합니다","getTotalPriceAndOther");
+            }
+        }
+        logger.info("포인트 유효성 통과");
+        totalPoint+=onlyPoint;
+        if(dbPoint<totalPoint){
+            throw utillService.makeRuntimeEX("포인트가 부족합니다","getTotalPriceAndOther");
+        }
+        map.put("onlyPoint", onlyPoint);
+        map.put("totalPoint", totalPoint);
+        logger.info("포인트 유효성 통과");
+        return map;
+    }
+    private void confrimCount(int count,int dbCount) {
+        logger.info("confrimCount");
+        if(count<=0){
+            throw utillService.makeRuntimeEX("최소 주문수량은 0보다 커야합니다","getTotalPriceAndOther");
+        }
+        if(count>dbCount){
+            throw utillService.makeRuntimeEX("재고가 부족합니다","getTotalPriceAndOther");
+        }
+        logger.info("개수 유효성 통과");
+    }
+    private int getTotalPrice(int  price, int count,int point) {
         logger.info("getTotalPrice");
-        return price*count;
+        return price*count-point;
     }
     public JSONObject selectProduct(HttpServletRequest request) {
         logger.info("selectProduct");
