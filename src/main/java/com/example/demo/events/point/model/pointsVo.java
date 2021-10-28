@@ -29,7 +29,7 @@ public class pointsVo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int poid;
 
-    @Column(name = "poEmail",length = 50)
+    @Column(name = "poEmail",length = 50,unique = true)
     private String poEmail;
 
     @Column(name = "poHaving",nullable = true)

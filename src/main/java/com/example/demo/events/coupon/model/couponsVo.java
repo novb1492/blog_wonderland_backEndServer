@@ -33,7 +33,7 @@ public class couponsVo {
     @Column(name = "coUsedEmail",length = 50)
     private String coUsedEmail;
 
-    @Column(name = "couponName",nullable = false)
+    @Column(name = "couponName",nullable = false,unique = true)
     private String couponName;
     
     @Column(name = "usedFlag",nullable = false)
