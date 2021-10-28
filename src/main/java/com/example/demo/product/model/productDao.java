@@ -14,6 +14,10 @@ public interface productDao extends JpaRepository<productVo,Integer> {
     @Query(value = "select *,(select count(*) from products where kind=? and product_name like %?%)totalcount from products where kind=? and product_name like %?% order by pid asc limit ?,?",nativeQuery = true)
     List<getProductInter> findByKindWithKeywordNative(String kind,String keyword,String kind2,String keyword2,int start,int pageSize);
 
-    @Query(value = "SELECT A.*, B.*,c.*,d.* FROM products A left JOIN (SELECT * FROM coupons  where coupon_name=? )B ON 1 = 1 left JOIN (SELECT * FROM codes  where code_name=? )c ON 1 = 1 left JOIN (SELECT * FROM points  where po_email=? )d ON 1 = 1  where a.pid=?",nativeQuery = true)
-    getEventsAndProducts findProductJoinEvents(String couponName,String codeName,String email,int productName);
+    @Query(value = "SELECT a.*,d.* FROM products a left JOIN (SELECT * FROM points  where po_email=? )d ON 1 = 1  where a.pid=?",nativeQuery = true)
+    getPointAndProducts findProductJoinPoints(String email,int productName);
+
+    
+
+
 }

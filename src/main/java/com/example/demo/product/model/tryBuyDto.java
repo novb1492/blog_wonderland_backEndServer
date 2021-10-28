@@ -20,7 +20,8 @@ public class tryBuyDto {
 
     @NotBlank(message = "품목이 잘못되었습니다")
     private String kind;
-    
+
+    private String point;
 
    
 }
