@@ -8,6 +8,7 @@ public interface getEventsAndProducts {
     int getPrice();
     String getProduct_name();
     String getBig_kind();
+    int getCount();
     //쿠폰정보
     int getUsed_flag();
     Timestamp getCo_expired();

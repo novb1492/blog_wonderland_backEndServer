@@ -16,7 +16,7 @@ public class tryBuyDto {
     private String buyKind;
 
     @Size(min = 1,message = "구매 수량을 선택해주세요")
-    private int[][]buy;
+    private Object[][]buy;
 
     @NotBlank(message = "품목이 잘못되었습니다")
     private String kind;

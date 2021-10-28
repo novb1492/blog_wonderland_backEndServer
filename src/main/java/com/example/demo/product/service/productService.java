@@ -10,10 +10,12 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import com.example.demo.apis.settle.service.settleService;
+import com.example.demo.product.model.getEventsAndProducts;
 import com.example.demo.product.model.getProductInter;
 import com.example.demo.product.model.productDao;
 import com.example.demo.product.model.productVo;
 import com.example.demo.product.model.tryBuyDto;
+import com.example.demo.user.service.userService;
 import com.example.demo.utill.utillService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
@@ -32,6 +34,8 @@ public class productService {
     private productDao productDao;
     @Autowired
     private settleService settleService;
+    @Autowired
+    private userService userService;
 
     @Transactional(rollbackFor = Exception.class)
     public JSONObject tryBuy(tryBuyDto tryBuyDto) {
@@ -56,7 +60,7 @@ public class productService {
         }
 
     }
-    private List<Map<String,Object>> getTotalPriceAndOther(int[][] itemArray,String kind) {
+    private List<Map<String,Object>> getTotalPriceAndOther(Object[][] itemArray,String kind) {
         logger.info("getTotalPriceAndOther");
         if(kind.equals("product")){
             return getTotalPriceAndOther(itemArray);
@@ -64,32 +68,37 @@ public class productService {
             throw utillService.makeRuntimeEX("상품종류가 잘못되었습니다","getTotalPriceAndOther");
         }
     }
-    private List<Map<String,Object>> getTotalPriceAndOther(int[][] itemArray) {
+    private List<Map<String,Object>> getTotalPriceAndOther(Object[][] itemArray) {
         logger.info("getTotalPriceAndOther");
         int itemArraySize=itemArray.length;
         int totalPrice=0;
         String itemNames="";
-        int count=0;
+
+        String email=userService.sendUserInfor().getEmail();
         List<Map<String,Object>>maps=new ArrayList<>();
         for(int i=0;i<itemArraySize;i++){
             Map<String,Object>result=new HashMap<>();
-            productVo productVo=productDao.findById(itemArray[i][0]).orElseThrow(()->new IllegalArgumentException("존재하지 않는 상품입니다"));
-            if(itemArray[i][1]<=0){
+            
+            getEventsAndProducts getEventsAndProducts=productDao.findProductJoinEvents(itemArray[i][2].toString(),itemArray[i][3].toString(),email,Integer.parseInt(itemArray[i][0].toString()));
+            if(Integer.parseInt(itemArray[i][1].toString())<=0){
                 throw utillService.makeRuntimeEX("최소 주문수량은 0보다 커야합니다","getTotalPriceAndOther");
             }
-            totalPrice+=getTotalPrice(productVo.getPrice(),itemArray[i][1]);
-            itemNames+=productVo.getProductName();
+            int count=Integer.parseInt(itemArray[i][1].toString());
+            totalPrice+=getTotalPrice(getEventsAndProducts.getPrice(),Integer.parseInt(itemArray[i][1].toString()));
+            itemNames+=getEventsAndProducts.getProduct_name();
             if(i<itemArraySize-1){
                 itemNames=",";
             }
-            count+=itemArray[i][1];
-            if(count>productVo.getCount()){
+            if(count>getEventsAndProducts.getCount()){
                 throw utillService.makeRuntimeEX("재고가 부족합니다","getTotalPriceAndOther");
             }
-            result.put("itemName", productVo.getProductName());
-            result.put("count", itemArray[i][1]);
-            result.put("price", productVo.getPrice());
-            result.put("bigKind",productVo.getBigKind());
+            result.put("itemName", getEventsAndProducts.getProduct_name());
+            result.put("count", count);
+            result.put("price", getEventsAndProducts.getPrice());
+            result.put("bigKind",getEventsAndProducts.getBig_kind());
+            result.put("coupon", getEventsAndProducts.getCoupon_name());
+            result.put("code", getEventsAndProducts.getCode_name());
+            result.put("point", itemArray[i][4]);
             maps.add(result);
             if(i==itemArraySize-1){
                 Map<String,Object>map2=new HashMap<>();
