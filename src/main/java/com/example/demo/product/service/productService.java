@@ -101,6 +101,8 @@ public class productService {
             if(i<itemArraySize-1){
                 itemNames=",";
             }
+            result.put("coupone", couponName);
+            result.put("code", codeName);
             result.put("itemName", getEventsAndProducts.getProduct_name());
             result.put("count", count);
             result.put("price",price);
