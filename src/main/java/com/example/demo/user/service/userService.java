@@ -72,6 +72,12 @@ public class userService {
         uservo uservo=sendUserInfor();
         logger.info(request.getRequestURI());
         if(Optional.ofNullable(request.getParameter("scope")).orElseGet(()->"emthy").equals("all")){
+            pointsVo pointsVo=pointsDao.findByPoEmail(uservo.getEmail());
+            int point=0;
+            if(pointsVo.getPoExpired().toLocalDateTime().isBefore(LocalDateTime.now())){
+                point=pointsVo.getPoHaving();
+            }
+            response.put("point", point);
             response.put(data, uservo);
         }else{
             response.put("email", uservo.getEmail());
