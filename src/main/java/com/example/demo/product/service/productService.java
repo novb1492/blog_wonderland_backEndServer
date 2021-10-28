@@ -90,8 +90,9 @@ public class productService {
             Map<String,Integer>map=confrimPoint(onlyPoint, point, getEventsAndProducts.getPo_having(), totalPoint);
             onlyPoint=map.get("onlyPoint");
             totalPoint=map.get("totalPoint");
-            confrimCoupon(couponName,getEventsAndProducts);
-            confrimCode(codeName, getEventsAndProducts);
+            Map<String,Object>eventmap=new HashMap<>();
+            confrimCoupon(couponName,getEventsAndProducts,eventmap);
+            confrimCode(codeName, getEventsAndProducts,eventmap);
             onlyCash=getTotalPrice(getEventsAndProducts.getPrice(),count,onlyPoint);
             totalCash+=onlyCash;
             int price=onlyCash+onlyPoint;
@@ -122,7 +123,7 @@ public class productService {
         return maps;
 
     }
-    private void confrimCode(String codeName,getEventsAndProducts getEventsAndProducts) {
+    private void confrimCode(String codeName,getEventsAndProducts getEventsAndProducts,Map<String,Object>eventmap) {
         logger.info("confrimCode");
         boolean flag=utillService.checkBlankOrNull(codeName);
         if(flag==false&&utillService.checkBlankOrNull(getEventsAndProducts.getCode_name())){
@@ -130,9 +131,18 @@ public class productService {
         }else if(flag==false&&LocalDateTime.now().isAfter(getEventsAndProducts.getCd_expired().toLocalDateTime())){
             throw utillService.makeRuntimeEX("기간이 지난 추천코드입니다", "getTotalPriceAndOther");
         }
-        logger.info("추천코드 유효성 통과");
+        logger.info("코드 유효성 통과");
+        if(flag){
+            eventmap.put("codeaction", "minus");
+            eventmap.put("codenum", 0);
+          
+        }else{
+            eventmap.put("codeaction", getEventsAndProducts.getCd_kind());
+            eventmap.put("codenum", getEventsAndProducts.getCd_num());
+        }
+        logger.info("코드액션 담기완료");
     }
-    private void confrimCoupon(String couponName,getEventsAndProducts getEventsAndProducts){
+    private void confrimCoupon(String couponName,getEventsAndProducts getEventsAndProducts,Map<String,Object>eventmap){
         logger.info("confrimCoupon");
         boolean flag=utillService.checkBlankOrNull(couponName);
         if(flag==false&&utillService.checkBlankOrNull(getEventsAndProducts.getCoupon_name())){
@@ -143,7 +153,15 @@ public class productService {
             throw utillService.makeRuntimeEX("이미 사용된 쿠폰입니다", "getTotalPriceAndOther");
         }
         logger.info("쿠폰 유효성 통과");
-
+        if(flag){
+            eventmap.put("couponaction", "minus");
+            eventmap.put("couponnum", 0);
+          
+        }else{
+            eventmap.put("couponaction", getEventsAndProducts.getCo_kind());
+            eventmap.put("couponnum", getEventsAndProducts.getCo_num());
+        }
+        logger.info("쿠폰액션 담기완료");
     }
     private Map<String,Integer> confrimPoint(int onlyPoint,String point,int dbPoint,int totalPoint) {
         logger.info("confrimPoint");
