@@ -106,35 +106,31 @@ public class productService {
             confrimCode(codeName, count, eventmap);
             logger.info(eventmap.toString()+" 코드쿠폰"+onlyPoint+"사용요청 포인트");
             onlyCash=getOnlyCash(getPointAndProducts.getPrice(),count,onlyPoint,eventmap,getPointAndProducts.getMax_discount_percent());
-           
-            /*String codeName=itemArray[i][3].toString();
-            onlyCash=getOnlyCash(getEventsAndProducts.getPrice(),count,onlyPoint,eventmap,getEventsAndProducts.getMax_discount_percent());
             totalCash+=onlyCash;
             int price=onlyCash+onlyPoint;
             totalPrice+=onlyCash+onlyPoint;
-            itemNames+=getEventsAndProducts.getProduct_name();
+            itemNames+=getPointAndProducts.getProduct_name();
             if(i<itemArraySize-1){
                 itemNames=",";
             }
             result.put("coupone", couponName);
             result.put("code", codeName);
-            result.put("itemName", getEventsAndProducts.getProduct_name());
+            result.put("itemName", getPointAndProducts.getProduct_name());
             result.put("count", count);
             result.put("price",price);
-            result.put("bigKind",getEventsAndProducts.getBig_kind());
+            result.put("bigKind",getPointAndProducts.getBig_kind());
             result.put("coupon", couponName);
             result.put("code", codeName);
             result.put("onlyCash",onlyCash);
-            result.put("onlyPoint",onlyPoint);
             maps.add(result);
             if(i==itemArraySize-1){
                 Map<String,Object>map2=new HashMap<>();
                 map2.put("totalPrice", totalPrice);
                 map2.put("totalCash", totalCash);
-                map2.put("totalPoint", totalPoint);
+                map2.put("totalPoint", onlyPoint);
                 map2.put("itemNames", itemNames);
                 maps.add(map2);
-            }*/
+            }
         }
 
         return maps;
@@ -197,9 +193,13 @@ public class productService {
         }
         logger.info("할인코드 존재");
         String[] splite=codeName.split(",");
-        for(String s:splite){
-            for(String ss:splite){
-                if(ss.equals(s)){
+        int size=splite.length;
+        for(int i=0;i<size;i++){
+            for(int ii=0;ii<size;ii++){
+                if(i==ii){
+                    continue;
+                }
+                if(splite[i].equals(splite[ii])){
                     throw utillService.makeRuntimeEX("동일코드는 사용불가능합니다", "getTotalPriceAndOther");
                 }
             }
@@ -245,13 +245,17 @@ public class productService {
         }
         logger.info("쿠폰 존재");
         String[] splite=couponName.split(",");
+        int size=splite.length;
         if(splite.length>count){
             throw utillService.makeRuntimeEX("주문 개수보다 쿠폰 개수가 많습니다", "getTotalPriceAndOther");
         }
-        for(String s:splite){
-            for(String ss:splite){
-                if(ss.equals(s)){
-                    throw utillService.makeRuntimeEX("동일쿠폰은 사용불가능합니다", "getTotalPriceAndOther");
+        for(int i=0;i<size;i++){
+            for(int ii=0;ii<size;ii++){
+                if(i==ii){
+                    continue;
+                }
+                if(splite[i].equals(splite[ii])){
+                    throw utillService.makeRuntimeEX("동일쿠폰는 사용불가능합니다", "getTotalPriceAndOther");
                 }
             }
         }
