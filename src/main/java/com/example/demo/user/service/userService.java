@@ -114,7 +114,7 @@ public class userService {
         LOGGER.info("checkPhoneConfrim");
             String phone=tryJoinDto.getPhone();
             inserConfrimInter inserConfrimInter=userDao.findByEmailJoinConfrim(phone,tryJoinDto.getEmail(), phone,confrim);
-            int done=inserConfrimInter.getDone().orElseThrow(()->new IllegalArgumentException("요청내역이 존재하지 않습니다"));
+            int done=inserConfrimInter.getDone().orElseThrow(()->new IllegalArgumentException("메세지: 요청내역이 존재하지 않습니다"));
             String message=null;
             if(done==0){
                 LOGGER.info("인증되지 않은 핸든폰입니다");
@@ -134,7 +134,7 @@ public class userService {
                 LOGGER.info("회원가입 유효성 통과");
                 return;
             }
-            throw new RuntimeException(message);  
+            throw utillService.makeRuntimeEX(message,"checkPhoneConfrim");  
     }
     public JSONObject checkSucLogin() {
         LOGGER.info("checkSucLogin");
@@ -181,9 +181,9 @@ public class userService {
     }
     private void updateAddress(tryUpadateDto tryUpadateDto) {
         LOGGER.info("updateAddress");
-        String postcode=Optional.ofNullable(tryUpadateDto.getPostcode()).orElseThrow(()->new IllegalAddException("우편번호가 빈칸입니다"));
-        String address=Optional.ofNullable(tryUpadateDto.getAddress()).orElseThrow(()->new IllegalAddException("주소가 빈칸입니다"));
-        String detailAddress=Optional.ofNullable(tryUpadateDto.getDetailAddress()).orElseThrow(()->new IllegalAddException("상세주소가 빈칸입니다"));
+        String postcode=Optional.ofNullable(tryUpadateDto.getPostcode()).orElseThrow(()->new IllegalAddException("메세지: 우편번호가 빈칸입니다"));
+        String address=Optional.ofNullable(tryUpadateDto.getAddress()).orElseThrow(()->new IllegalAddException("메세지: 주소가 빈칸입니다"));
+        String detailAddress=Optional.ofNullable(tryUpadateDto.getDetailAddress()).orElseThrow(()->new IllegalAddException("메세지: 상세주소가 빈칸입니다"));
         confrim(postcode, address, detailAddress);
         String email=sendUserInfor().getEmail();
         String fullAddress=postcode+","+address+","+detailAddress;
@@ -192,7 +192,7 @@ public class userService {
     private void confrim(String postcode,String address,String detailAddress) {
         LOGGER.info("confrim");
         if(utillService.checkBlankOrNull(postcode)||utillService.checkBlankOrNull(address)||utillService.checkBlankOrNull(detailAddress)){
-            throw new RuntimeException("주소에 빈칸이 존재합니다");
+            throw utillService.makeRuntimeEX("주소에 빈칸이 존재합니다","confrim");
         }
         LOGGER.info("주소유효성 통과");
     }
@@ -208,13 +208,13 @@ public class userService {
                 email=getJoinRequest.getEmail();
             }else if(tryUpadateDto.getDetail().equals("update")){
                 email=sendUserInfor().getEmail();
-                uservo uservo=userDao.findByEmail(email).orElseThrow(()->new IllegalArgumentException("존재하지 않는 사용자입니다"));
+                uservo uservo=userDao.findByEmail(email).orElseThrow(()->new IllegalArgumentException("메세지: 존재하지 않는 사용자입니다"));
                 LOGGER.info(tryUpadateDto.getOriginPwd()+"기존");
                 if(!securityConfig.pwdEncoder().matches(tryUpadateDto.getOriginPwd(),uservo.getPwd())){
-                    throw new RuntimeException("기존비밀번호가 불일치 합니다");
+                    throw utillService.makeRuntimeEX("기존비밀번호가 불일치 합니다","updatePwd");
                 }
             }else{
-                throw new RuntimeException("디테일값이 유효하지 않습니다");
+                throw utillService.makeRuntimeEX("디테일값이 유효하지 않습니다","updatePwd");
             }
             userDao.updatePwd(securityConfig.pwdEncoder().encode(tryUpadateDto.getPwd()),email);
             return;
@@ -236,7 +236,7 @@ public class userService {
             LOGGER.info("유효성검사 통과");
             return;
         }
-        throw new RuntimeException(message);
+        throw utillService.makeRuntimeEX(message,"confrimDate");
     }
     private void confrimPwd(tryUpadateDto tryUpadateDto) {
         LOGGER.info("confrimPwd");
@@ -247,22 +247,22 @@ public class userService {
 
         if(utillService.checkBlankOrNull(pwd)||utillService.checkBlankOrNull(pwd2)){
             LOGGER.info("비밀번호 빈칸 발견");
-            throw new RuntimeException("비밀번호 빈칸 발견");
+            throw utillService.makeRuntimeEX("비밀번호 빈칸 발견","confrimPwd");
         }else if(!utillService.checkEquals(pwd, pwd2)){
             LOGGER.info("비밀번호 불일치");
-            throw new RuntimeException("비밀번호 불일치");
+            throw utillService.makeRuntimeEX("비밀번호 불일치","confrimPwd");
         }
         String lengthResult=utillService.checkLength(pwdminLength, pwdmaxLength, pwd);
         if(lengthResult.equals(Stringenums.tooSmall.getString())||lengthResult.equals(Stringenums.tooBig.getString())){
-            throw new RuntimeException("비밀번호는 최소 4자리 최대10자리입니다");
+            throw utillService.makeRuntimeEX("비밀번호는 최소 4자리 최대10자리입니다","confrimPwd");
         }   
         if(tryUpadateDto.getDetail().equals(Stringenums.update.getString())){
             LOGGER.info("마이페이지 비밀번호 변경시도");
             String originPwd=tryUpadateDto.getOriginPwd();
             if(utillService.checkBlankOrNull(originPwd)){
-                throw new RuntimeException("기존 비밀번호를 입력해주세요");
+                throw utillService.makeRuntimeEX("기존 비밀번호를 입력해주세요","confrimPwd");
             }else if(!utillService.checkLength(4, 10, originPwd).equals(Stringenums.collect.getString())){
-                throw new RuntimeException("비밀번호는 최소 4자리 최대10자리입니다");
+                throw utillService.makeRuntimeEX("비밀번호는 최소 4자리 최대10자리입니다","confrimPwd");
             }
         }
         LOGGER.info(" 비밀번효 유효성 통과");

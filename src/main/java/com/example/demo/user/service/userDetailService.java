@@ -22,7 +22,7 @@ public class userDetailService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         LOGGER.info("loadUserByUsername");
         LOGGER.info("로그인 시도 email "+username);
-        uservo uservo=userDao.findByEmail(username).orElseThrow(()->new UsernameNotFoundException("존재하지 않는 이메일입니다"));
+        uservo uservo=userDao.findByEmail(username).orElseThrow(()->new UsernameNotFoundException("메세지: 존재하지 않는 이메일입니다"));
         return new principalDetail(uservo);
     }
     

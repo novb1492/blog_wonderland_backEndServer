@@ -58,7 +58,7 @@ public class phoneService {
             System.out.println("이미 회원가입 되어있는 휴대폰 번호 찾기");
             phoneVo=getPhoneVo(sendSmsDto);
         }else{
-            throw new RuntimeException("detail이 유요하지 않습니다");
+            throw utillService.makeRuntimeEX("detail이 유요하지 않습니다","sendPhone");
         }
         System.out.println("문자메세지 전송"+phoneVo);
         sendRandNumInter sendRandNumInter=new sendInter(phoneVo.getPcount(),phoneVo.getPphoneNum(),phoneVo.getPcreated(),utillService.getRandomNum(intEnums.randNumLength.getInt()),phoneVo.getDonePhone(),sendSmsDto.getScope(),detail);
@@ -71,9 +71,9 @@ public class phoneService {
             delete(phoneVo.getPphoneNum(),detail);
             insert(sendRandNumInter);
         }else if(result.equals(Stringenums.tooMany.getString())){
-            throw new RuntimeException("하루 "+intEnums.maxRequest.getInt()+"회 제한입니다");
+            throw utillService.makeRuntimeEX("하루 "+intEnums.maxRequest.getInt()+"회 제한입니다","sendPhone");
         }else{
-            throw new RuntimeException("알 수없는 오류발생");
+            throw utillService.makeRuntimeEX("알 수없는 오류발생","sendPhone");
         }
         //sendMessage.sendMessege(sendRandNumInter.getEmailOrPhone(),sendRandNumInter.getRandNum()); 
     }
@@ -87,7 +87,7 @@ public class phoneService {
             System.out.println("change입니다");
             getRequestAndusersInter=phoneDao.findPhoneJoinUsers2(phone,detail,phone,detail,phone,detail,phone,detail,phone,detail);
             if(utillService.checkEquals(getRequestAndusersInter.getAlready(), 1)){
-                throw new RuntimeException("이미존재 하는 핸드폰입니다");
+                throw utillService.makeRuntimeEX("이미존재 하는 핸드폰입니다","getGetRequestAndusersInter");
             }
         }else{
             getRequestAndusersInter=phoneDao.findPhoneJoinUsers(detail,sendSmsDto.getUnit());
@@ -111,7 +111,7 @@ public class phoneService {
         System.out.println("confrim");
         String reult=utillService.checkLength(11, 11, phone);
         if(!reult.equals(Stringenums.collect.getString())){
-            throw new RuntimeException("핸드폰 번호를 확인해주세요");
+            throw utillService.makeRuntimeEX("핸드폰 번호를 확인해주세요","confrim");
         }
     }
     private void insert(sendRandNumInter sendRandNumInter){

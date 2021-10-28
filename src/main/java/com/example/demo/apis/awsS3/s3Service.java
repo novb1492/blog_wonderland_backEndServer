@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 import com.amazonaws.services.s3.AmazonS3;
+import com.example.demo.utill.utillService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +39,7 @@ public class s3Service {
         } catch (Exception e) {
             e.printStackTrace();
             LOGGER.info(e.getMessage());
-            throw new RuntimeException("파일형식변환에 실패했습니다");
+            throw utillService.makeRuntimeEX("파일형식변환에 실패했습니다","convert");
         }
         return file;
     }

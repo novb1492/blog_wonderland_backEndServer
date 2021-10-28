@@ -66,7 +66,7 @@ public class kakaoService {
         }else if(scope.equals("pay")){
             LOGGER.info("카카오페이 롤백");
         }else{
-            throw new RuntimeException("카카오 콜백 잘못된 스코프입니다");
+            throw utillService.makeRuntimeEX("카카오 콜백 잘못된 스코프입니다","callback");
         }
     }
     private void tryKakaoLogin(HttpServletRequest request,HttpServletResponse response) {

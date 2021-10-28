@@ -84,7 +84,7 @@ public class paymentService {
         logger.info("confrim");
         List<getJoinProducts>getJoinProducts=tempOrderDao.findJoinProducts(settleDto.getMchtTrdNo());
         if(getJoinProducts.size()==0){
-            throw new RuntimeException("거래요청내역이 존재하지 않습니다");
+            throw utillService.makeRuntimeEX("거래요청내역이 존재하지 않습니다","confrim");
         }
         int totalPrice=getJoinProducts.get(0).getTo_price();
         String mchtTrdNo=getJoinProducts.get(0).getTo_mcht_trd_no();

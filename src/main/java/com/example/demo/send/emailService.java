@@ -67,7 +67,7 @@ public class emailService {
             }
             emailVo.setEemail(trySendSmsDto.getUnit());
         }else{
-            throw new RuntimeException("detail이 유요하지 않습니다");
+            throw utillService.makeRuntimeEX("detail이 유요하지 않습니다","sendEmail");
         }
         LOGGER.info("이메일 전송"+emailVo);
         sendRandNumInter sendRandNumInter=new sendInter(emailVo.getEcount(),emailVo.getEemail(),emailVo.getEcreated(), utillService.getRandomNum(intEnums.randNumLength.getInt()),emailVo.getDoneemail(),trySendSmsDto.getScope(),trySendSmsDto.getDetail());
@@ -80,9 +80,9 @@ public class emailService {
             delete(emailVo.getEemail());
             insert(sendRandNumInter);
         }else if(result.equals(Stringenums.tooMany.getString())){
-            throw new RuntimeException("하루 "+maxReuqest+"회 제한입니다");
+            throw utillService.makeRuntimeEX("하루 "+maxReuqest+"회 제한입니다","sendEmail");
         }else{
-            throw new RuntimeException("알 수없는 오류발생");
+            throw utillService.makeRuntimeEX("알 수없는 오류발생","sendEmail");
         }
         sendMailService.sendEmail(sendRandNumInter.getEmailOrPhone(),"안녕하세요 wonderland입니다","인증번호는 "+sendRandNumInter.getRandNum()+"입니다");
     }
@@ -110,7 +110,7 @@ public class emailService {
     public JSONObject checkNum(tryConfrimRandNumDto tryConfrimRandNumDto) {
         LOGGER.info("checkNum");
         String email=tryConfrimRandNumDto.getPhoneOrEmail();
-        emailVo emailVo=emailDao.findByEemail(email).orElseThrow(()->new IllegalArgumentException("인증요청 내역이 존재하지 않습니다"));
+        emailVo emailVo=emailDao.findByEemail(email).orElseThrow(()->new IllegalArgumentException("메세지: 인증요청 내역이 존재하지 않습니다"));
         confrimService.confrimNum(tryConfrimRandNumDto.getRandNum(), emailVo.getErandNum(),emailVo.getEcreated());
         emailVo.setDoneemail(doneNum);
         return  ifFind(tryConfrimRandNumDto.getScope(),email);

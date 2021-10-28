@@ -61,7 +61,7 @@ public class productService {
         if(kind.equals("product")){
             return getTotalPriceAndOther(itemArray);
         }else {
-            throw new RuntimeException("상품종류가 잘못되었습니다");
+            throw utillService.makeRuntimeEX("상품종류가 잘못되었습니다","getTotalPriceAndOther");
         }
     }
     private List<Map<String,Object>> getTotalPriceAndOther(int[][] itemArray) {
@@ -75,7 +75,7 @@ public class productService {
             Map<String,Object>result=new HashMap<>();
             productVo productVo=productDao.findById(itemArray[i][0]).orElseThrow(()->new IllegalArgumentException("존재하지 않는 상품입니다"));
             if(itemArray[i][1]<=0){
-                throw new RuntimeException("최소 주문수량은 0보다 커야합니다");
+                throw utillService.makeRuntimeEX("최소 주문수량은 0보다 커야합니다","getTotalPriceAndOther");
             }
             totalPrice+=getTotalPrice(productVo.getPrice(),itemArray[i][1]);
             itemNames+=productVo.getProductName();
@@ -84,7 +84,7 @@ public class productService {
             }
             count+=itemArray[i][1];
             if(count>productVo.getCount()){
-                throw new RuntimeException("재고가 부족합니다");
+                throw utillService.makeRuntimeEX("재고가 부족합니다","getTotalPriceAndOther");
             }
             result.put("itemName", productVo.getProductName());
             result.put("count", itemArray[i][1]);
