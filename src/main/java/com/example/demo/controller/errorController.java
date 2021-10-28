@@ -24,8 +24,9 @@ public class errorController {
         String message=exception.getMessage();
         if(!message.startsWith("메")){
             message="알수 없는 오류발생";
+            exception.printStackTrace();
         }
-        exception.printStackTrace();
+        //exception.printStackTrace();
         return utillService.makeJson(false, message);
     }
     @ExceptionHandler(MethodArgumentNotValidException.class)

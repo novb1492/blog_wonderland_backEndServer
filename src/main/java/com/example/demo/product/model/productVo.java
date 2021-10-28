@@ -46,6 +46,18 @@ public class productVo {
     private String bigKind;
 
         
+    @Column(name = "canCoupon" ,nullable = false)
+    private int canCoupon;
+
+        
+    @Column(name = "canCode" ,nullable = false)
+    private int canCode;
+
+        
+    @Column(name = "canPoint" ,nullable = false)
+    private int canPoint;
+
+        
     @Column(name = "middleKind" ,nullable = false,length = 50)
     private String middleKind;
 

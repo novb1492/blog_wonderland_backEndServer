@@ -41,6 +41,7 @@ public class cardService {
     
     private static Logger logger=LoggerFactory.getLogger(cardService.class);
 
+    @Transactional(rollbackFor = Exception.class)
     public JSONObject makeInfor(tryBuyDto tryBuyDto,List<Map<String,Object>>maps) {
         logger.info("makeInfor");
         Map<String,Object>map=maps.get(maps.size()-1);
@@ -129,7 +130,7 @@ public class cardService {
             return utillService.makeJson(true, "구매가 완료되었습니다");
         } catch (Exception e) {
             settleDto.setCnclOrd(1);
-            String message="메시지: 환불에 실패했습니다";
+            String message="환불에 실패했습니다";
             if(!e.getMessage().startsWith("메")){
                 message="구매에 실패하였습니다";
             }
