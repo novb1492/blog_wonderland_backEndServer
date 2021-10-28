@@ -197,6 +197,16 @@ public class productService {
         }
         logger.info("할인코드 존재");
         String[] splite=codeName.split(",");
+        for(String s:splite){
+            for(String ss:splite){
+                if(ss.equals(s)){
+                    throw utillService.makeRuntimeEX("동일코드는 사용불가능합니다", "getTotalPriceAndOther");
+                }
+            }
+        }
+        if(splite.length>count){
+            throw utillService.makeRuntimeEX("주문 개수보다 할인코드 개수가 많습니다", "getTotalPriceAndOther");
+        }
         int temp=0;
             for(String s:splite){
                 codesVo codesVo=codesDao.findByCodeName(s).orElseThrow(()->new IllegalArgumentException("메시지 : 존재하지 않는 할인코드입니다"));
@@ -235,6 +245,16 @@ public class productService {
         }
         logger.info("쿠폰 존재");
         String[] splite=couponName.split(",");
+        if(splite.length>count){
+            throw utillService.makeRuntimeEX("주문 개수보다 쿠폰 개수가 많습니다", "getTotalPriceAndOther");
+        }
+        for(String s:splite){
+            for(String ss:splite){
+                if(ss.equals(s)){
+                    throw utillService.makeRuntimeEX("동일쿠폰은 사용불가능합니다", "getTotalPriceAndOther");
+                }
+            }
+        }
         int temp=0;
             for(String s:splite){
                 couponsVo couponsVo=couponsDao.findByCouponName(s).orElseThrow(()->new IllegalArgumentException("메시지 : 존재하지 않는 쿠폰입니다"));
