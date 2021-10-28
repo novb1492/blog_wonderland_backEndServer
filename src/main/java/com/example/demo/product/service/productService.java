@@ -10,6 +10,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import com.example.demo.apis.settle.service.settleService;
+import com.example.demo.enums.Operator;
 import com.example.demo.product.model.getEventsAndProducts;
 import com.example.demo.product.model.getProductInter;
 import com.example.demo.product.model.productDao;
@@ -93,7 +94,7 @@ public class productService {
             Map<String,Object>eventmap=new HashMap<>();
             confrimCoupon(couponName,getEventsAndProducts,eventmap);
             confrimCode(codeName, getEventsAndProducts,eventmap);
-            onlyCash=getTotalPrice(getEventsAndProducts.getPrice(),count,onlyPoint);
+            onlyCash=getTotalPrice(getEventsAndProducts.getPrice(),count,onlyPoint,eventmap,getEventsAndProducts.getMax_discount_percent());
             totalCash+=onlyCash;
             int price=onlyCash+onlyPoint;
             totalPrice+=onlyCash+onlyPoint;
@@ -124,6 +125,36 @@ public class productService {
 
         return maps;
 
+    }
+    private int getTotalPrice(int  price, int count,int point,Map<String,Object>eventmap,int maxDiscountPercent) {
+        logger.info("getTotalPrice");
+        logger.info(eventmap.toString());
+        String codeAction=(String)eventmap.get("codeaction");
+        int codeNum=(int)eventmap.get("codenum");
+        String couponAction=(String)eventmap.get("couponaction");
+        int couponNum=(int)eventmap.get("couponnum");
+        double totalDiscountPercent=0;
+        if(codeAction.equals("percent")&&couponAction.equals("percent")){
+            logger.info("둘다 퍼센트");
+            totalDiscountPercent=codeNum+couponNum;
+        }else if(codeAction.equals("percent")&&couponAction.equals("minus")){
+            logger.info("쿠폰만 마이너스");
+            totalDiscountPercent=codeNum+(double)couponNum/price*100;
+        }else if(couponAction.equals("percent")&&codeAction.equals("minus")){
+            logger.info("코드만 마이너스");
+            totalDiscountPercent=couponNum+(double)codeNum/price*100;
+        }else if(couponAction.equals("minus")&&codeAction.equals("minus")){
+            logger.info("둘다 마이너스");
+            totalDiscountPercent=codeNum/price+couponNum/price;
+        }else{
+            throw utillService.makeRuntimeEX("지원하는 할인방법이 아닙니다", "getTotalPrice");
+        }
+        logger.info(totalDiscountPercent+"할인 페센트");
+        if(maxDiscountPercent<totalDiscountPercent){
+            throw utillService.makeRuntimeEX("이 상품은 최대 "+maxDiscountPercent+"%까지 할인 가능합니다 현재 "+totalDiscountPercent+"%", "getTotalPrice");
+        }
+
+        return price*count-point;
     }
     private void confrimCode(String codeName,getEventsAndProducts getEventsAndProducts,Map<String,Object>eventmap) {
         logger.info("confrimCode");
@@ -193,10 +224,6 @@ public class productService {
             throw utillService.makeRuntimeEX("재고가 부족합니다","getTotalPriceAndOther");
         }
         logger.info("개수 유효성 통과");
-    }
-    private int getTotalPrice(int  price, int count,int point) {
-        logger.info("getTotalPrice");
-        return price*count-point;
     }
     public JSONObject selectProduct(HttpServletRequest request) {
         logger.info("selectProduct");

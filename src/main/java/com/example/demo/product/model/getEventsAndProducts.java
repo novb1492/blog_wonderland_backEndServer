@@ -9,6 +9,7 @@ public interface getEventsAndProducts {
     String getProduct_name();
     String getBig_kind();
     int getCount();
+    int getMax_discount_percent();
     //쿠폰정보
     int getUsed_flag();
     Timestamp getCo_expired();
