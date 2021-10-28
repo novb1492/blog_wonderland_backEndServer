@@ -84,7 +84,11 @@ public class utillService {
     }
     public static boolean checkBlankOrNull(String object) {
         logger.info("checkBlankOrNull");
-        if(object.isBlank()||object==null||object.equals("null")){
+        if(object==null){
+            return true;
+        }else if(object.isBlank()){
+            return true;
+        }else if(object.equals("null")){
             return true;
         }
         return false;

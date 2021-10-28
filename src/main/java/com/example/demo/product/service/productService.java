@@ -90,6 +90,8 @@ public class productService {
             Map<String,Integer>map=confrimPoint(onlyPoint, point, getEventsAndProducts.getPo_having(), totalPoint);
             onlyPoint=map.get("onlyPoint");
             totalPoint=map.get("totalPoint");
+            confrimCoupon(couponName,getEventsAndProducts);
+            confrimCode(codeName, getEventsAndProducts);
             onlyCash=getTotalPrice(getEventsAndProducts.getPrice(),count,onlyPoint);
             totalCash+=onlyCash;
             int price=onlyCash+onlyPoint;
@@ -120,6 +122,29 @@ public class productService {
         return maps;
 
     }
+    private void confrimCode(String codeName,getEventsAndProducts getEventsAndProducts) {
+        logger.info("confrimCode");
+        boolean flag=utillService.checkBlankOrNull(codeName);
+        if(flag==false&&utillService.checkBlankOrNull(getEventsAndProducts.getCode_name())){
+            throw utillService.makeRuntimeEX("존재하지 않는 추천코드입니다", "getTotalPriceAndOther");
+        }else if(flag==false&&LocalDateTime.now().isAfter(getEventsAndProducts.getCd_expired().toLocalDateTime())){
+            throw utillService.makeRuntimeEX("기간이 지난 추천코드입니다", "getTotalPriceAndOther");
+        }
+        logger.info("추천코드 유효성 통과");
+    }
+    private void confrimCoupon(String couponName,getEventsAndProducts getEventsAndProducts){
+        logger.info("confrimCoupon");
+        boolean flag=utillService.checkBlankOrNull(couponName);
+        if(flag==false&&utillService.checkBlankOrNull(getEventsAndProducts.getCoupon_name())){
+            throw utillService.makeRuntimeEX("존재하지 않는 쿠폰입니다", "getTotalPriceAndOther");
+        }else if(flag==false&&LocalDateTime.now().isAfter(getEventsAndProducts.getCo_expired().toLocalDateTime())){
+            throw utillService.makeRuntimeEX("기간이 지난 쿠폰입니다", "getTotalPriceAndOther");
+        }else if(flag==false&&getEventsAndProducts.getUsed_flag()!=0){
+            throw utillService.makeRuntimeEX("이미 사용된 쿠폰입니다", "getTotalPriceAndOther");
+        }
+        logger.info("쿠폰 유효성 통과");
+
+    }
     private Map<String,Integer> confrimPoint(int onlyPoint,String point,int dbPoint,int totalPoint) {
         logger.info("confrimPoint");
         Map<String,Integer>map=new HashMap<>();
@@ -130,7 +155,6 @@ public class productService {
                 throw utillService.makeRuntimeEX("포인트는 숫자만가능합니다","getTotalPriceAndOther");
             }
         }
-        logger.info("포인트 유효성 통과");
         totalPoint+=onlyPoint;
         if(dbPoint<totalPoint){
             throw utillService.makeRuntimeEX("포인트가 부족합니다","getTotalPriceAndOther");
