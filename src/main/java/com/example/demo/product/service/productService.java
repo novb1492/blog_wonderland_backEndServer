@@ -236,9 +236,9 @@ public class productService {
         if(flag){
             for(int i=0;i<count;i++){
                 Map<String,Object>map=new HashMap<>();
-                    map.put("couponaction"+i,"minus");
-                    map.put("couponnum"+i,0);
-                    eventmap.put("coupon"+i, map);
+                    map.put("couponaction","minus");
+                    map.put("couponnum",0);
+                    eventmap.put("coupon", map);
             }
             logger.info("쿠폰이 없습니다");
             return;
