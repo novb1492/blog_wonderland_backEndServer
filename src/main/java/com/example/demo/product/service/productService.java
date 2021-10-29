@@ -92,8 +92,7 @@ public class productService {
             if(utillService.checkBlankOrNull(getPointAndProducts.getProduct_name())){
                 throw utillService.makeRuntimeEX("상품이 존재하지 않습니다", "getTotalPriceAndOther");
             }
-            int count=Integer.parseInt(itemArray[i][1].toString());
-            confrimCount(count, getPointAndProducts.getCount());
+            int count=confrimCount(itemArray[i][1], getPointAndProducts.getCount());
             LinkedHashMap<String,LinkedHashMap<String,Object>>eventmap=new LinkedHashMap<>();
             confrimCoupon(couponName,count,eventmap);
             confrimCode(codeName, count, eventmap);
@@ -307,15 +306,22 @@ public class productService {
         }
         return onlyPoint;
     } 
-    private void confrimCount(int count,int dbCount) {
+    private int  confrimCount(Object count,int dbCount) {
         logger.info("confrimCount");
-        if(count<=0){
+        int intcount=0;
+        try {
+            intcount=Integer.parseInt(count.toString());
+        } catch (NumberFormatException e) {
+            throw utillService.makeRuntimeEX("수량은 숫자여야합니다", "getTotalPriceAndOther");
+        }
+        if(intcount<=0){
             throw utillService.makeRuntimeEX("최소 주문수량은 0보다 커야합니다","getTotalPriceAndOther");
         }
-        if(count>dbCount){
+        if(intcount>dbCount){
             throw utillService.makeRuntimeEX("재고가 부족합니다","getTotalPriceAndOther");
         }
         logger.info("개수 유효성 통과");
+        return intcount;
     }
     public JSONObject selectProduct(HttpServletRequest request) {
         logger.info("selectProduct");
