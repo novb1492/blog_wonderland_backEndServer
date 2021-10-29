@@ -77,8 +77,8 @@ public class paymentService {
                                                         .topPrice((int)m.get("price"))
                                                         .topemail(email)
                                                         .topDoneFlag(0)
-                                                        .topUsecoupon((String)m.get("couponName"))
-                                                        .topUsecode((String)m.get("codeName"))
+                                                        .topUsecoupon((String)m.get("coupon"))
+                                                        .topUsecode((String)m.get("code"))
                                                         .build();
                                                         tempOrderProudctsDao.save(dto);
                                                         temp+=1;
