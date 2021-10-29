@@ -42,15 +42,17 @@ public class paymentService {
             tempOrderDao.updateTempProducts(doneFlag,doneFlag,now,now,mchtTrdNo);
         }
     }
-    public  void insertTemp(String mchtTrdNo,int price,String email,String buyKind) {
-        System.out.println(mchtTrdNo+price+email);
+    public  void insertTemp(String mchtTrdNo,String email,String buyKind,int toCash,int toPoint) {
+        System.out.println(mchtTrdNo+email);
         logger.info("insertTemp");
         tempOrderDto  dto=tempOrderDto.builder()
                                         .toMchtTrdNo(mchtTrdNo)
-                                        .toPrice(price)
+                                        .toPrice(toCash+toPoint)
                                         .toemail(email)
                                         .toDoneFlag(0)
                                         .buyKind(buyKind)
+                                        .toCash(toCash)
+                                        .toPoint(toPoint)
                                         .build();
                                         tempOrderDao.save(dto);
     }

@@ -66,7 +66,7 @@ public class cardService {
         response.put("trdTm", requestTime);
         response.put("pktHash", hashText);
         response.put("flag", true);
-        //paymentService.insertTemp(mchtTrdNo,Integer.parseInt(totalPrice), email,"card");
+        paymentService.insertTemp(mchtTrdNo,email,"card",(int)map.get("totalCash"),(int)map.get("totalPoint"));
         paymentService.insertTemp(maps, mchtTrdNo, email);
         return response;
     }
