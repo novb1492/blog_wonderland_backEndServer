@@ -49,12 +49,8 @@ public class productService {
     @Transactional(rollbackFor = Exception.class)
     public JSONObject tryBuy(tryBuyDto tryBuyDto) {
         logger.info("tryBuy");
-        String buyKind=tryBuyDto.getBuyKind();
         List<Map<String,Object>>maps=getTotalPriceAndOther(tryBuyDto);
         logger.info(maps.toString());
-        /*if(buyKind.equals("vbank")){
-            map.put("limitedDate", getVbankExpriedDate(tryBuyDto));
-        }*/
         return settleService.makeBuyInfor(tryBuyDto, maps);
         
     }
@@ -155,7 +151,7 @@ public class productService {
                 logger.info(couponAction+" getOnlyCash");
                 int couponNum=(int)eventmap.get("coupon"+i).get("couponnum");
                 logger.info(couponNum+" getOnlyCash");
-                double totalDiscountPercent=0;
+                double totalDiscountPercent=0.00;
                 result.put("codeName", codeName);
                 result.put("codeAction", codeAction);
                 result.put("codeNum", codeNum);
@@ -173,7 +169,7 @@ public class productService {
                     totalDiscountPercent=couponNum+(double)codeNum/price*100;
                 }else if(couponAction.equals("minus")&&codeAction.equals("minus")){
                     logger.info("둘다 마이너스");
-                    totalDiscountPercent=codeNum/price+couponNum/price;
+                    totalDiscountPercent=((double)codeNum/price+(double)couponNum/price)*100;
                 }else{
                     throw utillService.makeRuntimeEX("지원하는 할인방법이 아닙니다", "getTotalPrice");
                 }

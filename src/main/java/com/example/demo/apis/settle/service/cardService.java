@@ -57,6 +57,8 @@ public class cardService {
         String priceHash=aes256.encrypt(totalCash);
         JSONObject response=new JSONObject();
         String  email=userService.sendUserInfor().getEmail();
+        JSONObject mchtParam=new JSONObject();
+        mchtParam.put("kind", maps.get(0).get("bigKind"));
         response.put("itemName", map.get("itemNames"));
         response.put("mchtId", MchtId);
         response.put("mchtCustId", aes256.encrypt(email));
@@ -65,6 +67,7 @@ public class cardService {
         response.put("trdDt", requestDate);
         response.put("trdTm", requestTime);
         response.put("pktHash", hashText);
+        response.put("mchtParam",mchtParam);
         response.put("flag", true);
         paymentService.insertTemp(mchtTrdNo,email,"card",(int)map.get("totalCash"),(int)map.get("totalPoint"));
         paymentService.insertTemp(maps, mchtTrdNo, email);
