@@ -32,17 +32,11 @@ public class tempOrderProudctsDto {
     @Column(name = "topEmail",nullable = false,length = 50)
     private String topemail;
 
-    @Column(name = "topMchtTrdNo",nullable = false,unique=true)
+    @Column(name = "topMchtTrdNo",nullable = false)
     private String topMchtTrdNo;
     
     @Column(name = "topPrice",nullable = false)
     private int topPrice;
-
-    @Column(name = "topCash",nullable = false)
-    private int topCash;
-
-    @Column(name = "topPoint",nullable = false)
-    private int topPoint;
 
     @Column(name = "topName",nullable = false)
     private String topName;
