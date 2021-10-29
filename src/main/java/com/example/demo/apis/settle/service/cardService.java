@@ -49,12 +49,12 @@ public class cardService {
         String mchtTrdNo=maps.get(0).get("bigKind")+utillService.getRandomNum(10);
         String requestDate=trdDtTrdTm.get("trdDt");
         String requestTime=trdDtTrdTm.get("trdTm");
-        String totalPrice=Integer.toString((int)map.get("totalPrice"));
-        String settleText=utillService.getSettleText(MchtId,"card", mchtTrdNo, requestDate, requestTime, totalPrice);
+        String totalCash=Integer.toString((int)map.get("totalCash"));
+        String settleText=utillService.getSettleText(MchtId,"card", mchtTrdNo, requestDate, requestTime, totalCash);
         logger.info(settleText+" 해쉬예정문자열");
         String hashText=sha256.encrypt(settleText);
         logger.info(hashText+" 해쉬문자열");
-        String priceHash=aes256.encrypt(totalPrice);
+        String priceHash=aes256.encrypt(totalCash);
         JSONObject response=new JSONObject();
         String  email=userService.sendUserInfor().getEmail();
         response.put("itemName", map.get("itemNames"));

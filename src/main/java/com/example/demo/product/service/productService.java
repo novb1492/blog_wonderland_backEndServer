@@ -81,12 +81,10 @@ public class productService {
     private List<Map<String,Object>> getTotalPriceAndOther(Object[][] itemArray,String point) {
         logger.info("getTotalPriceAndOther");
         int itemArraySize=itemArray.length;
-        int totalPrice=0;
         String itemNames="";
         int onlyCash=0;
         int onlyPoint=0;
         int totalCash=0;
-        int totalPoint=0;
         String email=userService.sendUserInfor().getEmail();
         List<Map<String,Object>>maps=new ArrayList<>();
         for(int i=0;i<itemArraySize;i++){
@@ -104,7 +102,7 @@ public class productService {
             confrimCoupon(couponName,count,eventmap);
             confrimCode(codeName, count, eventmap);
             logger.info(eventmap.toString()+" 코드쿠폰"+onlyPoint+"사용요청 포인트");
-            onlyCash=getOnlyCash(getPointAndProducts.getPrice(),count,eventmap,getPointAndProducts.getMax_discount_percent());
+            onlyCash=getOnlyCash(getPointAndProducts.getPrice(),count,eventmap,getPointAndProducts.getMax_discount_percent(),result);
             totalCash+=onlyCash;
             itemNames+=getPointAndProducts.getProduct_name();
             if(i<itemArraySize-1){
@@ -120,16 +118,14 @@ public class productService {
             result.put("code", codeName);
             maps.add(result);
             if(i==itemArraySize-1){
-                Map<String,Object> map2=getTotalPrice(totalCash, onlyPoint);
-                map2.put("itemNames", itemNames);
-                maps.add(map2);
+                maps.add(getTotalPrice(totalCash, onlyPoint,itemNames));
             }
         }
 
         return maps;
 
     }
-    private Map<String,Object> getTotalPrice(int totalCash,int point){
+    private Map<String,Object> getTotalPrice(int totalCash,int point,String itemNames){
         logger.info("getTotalPrice");
         Map<String,Object>map=new HashMap<>();
         int temp=totalCash-point;
@@ -140,22 +136,32 @@ public class productService {
         logger.info(temp+" 지불가격");
         map.put("totalCash", temp);
         map.put("totalPoint", point);
+        map.put("itemNames", itemNames);
         return map;
     }
-    private int getOnlyCash(int  price,int count,LinkedHashMap<String,LinkedHashMap<String,Object>>eventmap,int maxDiscountPercent) {
+    private int getOnlyCash(int  price,int count,LinkedHashMap<String,LinkedHashMap<String,Object>>eventmap,int maxDiscountPercent,Map<String,Object>result) {
         logger.info("getOnlyCash");
         int tempPrice=0;
         try {
             for(int i=0;i<count;i++){
+                String codeName=(String)eventmap.get("code"+i).get("codeName");
+                logger.info(codeName+" getOnlyCash");
                 String codeAction=(String)eventmap.get("code"+i).get("codeaction");
                 logger.info(codeAction+" getOnlyCash");
                 int codeNum=(int)eventmap.get("code"+i).get("codenum");
                 logger.info(codeNum+" getOnlyCash");
+                String couponName=(String)eventmap.get("coupon"+i).get("couponName");
                 String couponAction=(String)eventmap.get("coupon"+i).get("couponaction");
                 logger.info(couponAction+" getOnlyCash");
                 int couponNum=(int)eventmap.get("coupon"+i).get("couponnum");
                 logger.info(couponNum+" getOnlyCash");
                 double totalDiscountPercent=0;
+                result.put("codeName", codeName);
+                result.put("codeAction", codeAction);
+                result.put("codeNum", codeNum);
+                result.put("couponName", couponName);
+                result.put("couponAction", couponAction);
+                result.put("couponNum", couponNum);
                 if(codeAction.equals("percent")&&couponAction.equals("percent")){
                     logger.info("둘다 퍼센트");
                     totalDiscountPercent=codeNum+couponNum;
@@ -197,6 +203,7 @@ public class productService {
         if(flag){
             for(int i=0;i<count;i++){
                 LinkedHashMap<String,Object>map=new LinkedHashMap<>();
+                map.put("codeName", "emthy");
                 map.put("codeaction","minus");
                 map.put("codenum",0);
                 eventmap.put("code"+i, map);
@@ -227,6 +234,7 @@ public class productService {
                 if(LocalDateTime.now().isAfter(codesVo.getCdExpired().toLocalDateTime())){
                     throw utillService.makeRuntimeEX("기간이 지난 할인코드입니다", "getTotalPriceAndOther");
                 }
+                map.put("codeName", codesVo.getCodeName());
                 map.put("codeaction",codesVo.getCdKind());
                 map.put("codenum",codesVo.getCdNum());
                 eventmap.put("code"+temp, map);
@@ -235,6 +243,7 @@ public class productService {
             if(temp<count){
                 for(int i=temp;i<count;i++){
                     LinkedHashMap<String,Object>map=new LinkedHashMap<>();
+                    map.put("codeName", "emthy");
                     map.put("codeaction","minus");
                     map.put("codenum",0);
                     eventmap.put("code"+i, map);
@@ -249,6 +258,7 @@ public class productService {
         if(flag){
             for(int i=0;i<count;i++){
                 LinkedHashMap<String,Object>map=new LinkedHashMap<>();
+                    map.put("couponName", "emthy");
                     map.put("couponaction","minus");
                     map.put("couponnum",0);
                     eventmap.put("coupon"+i, map);
@@ -281,6 +291,7 @@ public class productService {
                 }else if(couponsVo.getUsedFlag()!=0){
                     throw utillService.makeRuntimeEX("이미 사용된 쿠폰입니다", "getTotalPriceAndOther");
                 }
+                map.put("couponName", couponsVo.getCouponName());
                 map.put("couponaction",couponsVo.getCoKind());
                 map.put("couponnum",couponsVo.getCoNum());
                 eventmap.put("coupon"+temp, map);
@@ -289,6 +300,7 @@ public class productService {
             if(temp<count){
                 for(int i=temp;i<count;i++){
                     LinkedHashMap<String,Object>map=new LinkedHashMap<>();
+                    map.put("couponName", "emthy");
                     map.put("couponaction","minus");
                     map.put("couponnum",0);
                     eventmap.put("coupon"+i, map);
