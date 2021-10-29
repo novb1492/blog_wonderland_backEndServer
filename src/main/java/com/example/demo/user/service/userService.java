@@ -74,7 +74,7 @@ public class userService {
         if(Optional.ofNullable(request.getParameter("scope")).orElseGet(()->"emthy").equals("all")){
             pointsVo pointsVo=pointsDao.findByPoEmail(uservo.getEmail());
             int point=0;
-            if(pointsVo.getPoExpired().toLocalDateTime().isBefore(LocalDateTime.now())){
+            if(pointsVo.getPoExpired().toLocalDateTime().isAfter(LocalDateTime.now())){
                 point=pointsVo.getPoHaving();
             }
             response.put("point", point);
