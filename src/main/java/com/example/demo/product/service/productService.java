@@ -108,7 +108,7 @@ public class productService {
             totalCash+=onlyCash;
             itemNames+=getPointAndProducts.getProduct_name();
             if(i<itemArraySize-1){
-                itemNames=",";
+                itemNames+=",";
             }
             result.put("coupone", couponName);
             result.put("code", codeName);
@@ -121,7 +121,6 @@ public class productService {
             maps.add(result);
             if(i==itemArraySize-1){
                 Map<String,Object> map2=getTotalPrice(totalCash, onlyPoint);
-                map2.put("totalCash", totalCash);
                 map2.put("itemNames", itemNames);
                 maps.add(map2);
             }
@@ -139,7 +138,7 @@ public class productService {
             point=point-totalCash;
         }
         logger.info(temp+" 지불가격");
-        map.put("totalPrice", temp);
+        map.put("totalCash", temp);
         map.put("totalPoint", point);
         return map;
     }
