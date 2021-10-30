@@ -44,6 +44,12 @@ public class paidProductsDto {
     @Column(name = "poCount",nullable = false)
     private int poCount;
 
+    @Column(name = "poCode")
+    private String poCode;
+
+    @Column(name = "poCoupon")
+    private String poCoupon;
+
         
     @Column(name = "poCancleFlag",nullable = false)
     private int poCancleFlag;

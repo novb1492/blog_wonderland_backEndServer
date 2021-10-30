@@ -16,6 +16,9 @@ import com.example.demo.payment.service.paymentService;
 import com.example.demo.product.model.tryBuyDto;
 import com.example.demo.user.service.userService;
 import com.example.demo.utill.utillService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
 import org.slf4j.Logger;
@@ -57,8 +60,6 @@ public class cardService {
         String priceHash=aes256.encrypt(totalCash);
         JSONObject response=new JSONObject();
         String  email=userService.sendUserInfor().getEmail();
-        JSONObject mchtParam=new JSONObject();
-        mchtParam.put("kind", maps.get(0).get("bigKind"));
         response.put("itemName", map.get("itemNames"));
         response.put("mchtId", MchtId);
         response.put("mchtCustId", aes256.encrypt(email));
@@ -67,7 +68,7 @@ public class cardService {
         response.put("trdDt", requestDate);
         response.put("trdTm", requestTime);
         response.put("pktHash", hashText);
-        response.put("mchtParam",mchtParam);
+        response.put("mchtParam","key:test,key2:test2");
         response.put("flag", true);
         paymentService.insertTemp(mchtTrdNo,email,"card",(int)map.get("totalCash"),(int)map.get("totalPoint"));
         paymentService.insertTemp(maps, mchtTrdNo, email);
@@ -155,6 +156,7 @@ public class cardService {
                                     .pcMethod(settleDto.getMethod())
                                     .pcTrd_amt(Integer.parseInt(settleDto.getTrdAmt()))
                                     .pcTrd_no(settleDto.getTrdNo())
+                                    .pcPoint(settleDto.getPoint())
                                     .pcCancleFlag(0)
                                     .build();
                                     paidCardsDao.save(dto);

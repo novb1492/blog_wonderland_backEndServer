@@ -90,10 +90,11 @@ public class paymentService {
         if(getJoinProducts.size()==0){
             throw utillService.makeRuntimeEX("거래요청내역이 존재하지 않습니다","confrim");
         }
-        int totalPrice=getJoinProducts.get(0).getTo_price();
+        int totalPrice=getJoinProducts.get(0).getTo_cash();
         String mchtTrdNo=getJoinProducts.get(0).getTo_mcht_trd_no();
         confrim(totalPrice, mchtTrdNo, settleDto);
         insert(getJoinProducts);
+        settleDto.setPoint(getJoinProducts.get(0).getTo_point());
     }
     private void insert( List<getJoinProducts>getJoinProducts) {
         logger.info("productsTempToMain");
@@ -105,6 +106,8 @@ public class paymentService {
                                                 .poName(getJoinProducts.get(i).getTop_name())
                                                 .poPrice(getJoinProducts.get(i).getTop_price())
                                                 .poemail(getJoinProducts.get(0).getTo_email())
+                                                .poCode(getJoinProducts.get(i).gettop_usecode())
+                                                .poCoupon(getJoinProducts.get(i).gettop_usecoupon())
                                                 .build();
                                                 paidProductsDao.save(dto);
         }

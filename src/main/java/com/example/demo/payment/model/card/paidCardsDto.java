@@ -45,6 +45,9 @@ public class paidCardsDto {
     @Column(name = "pcTrd_amt",nullable = false)
     private int pcTrd_amt;
 
+    @Column(name = "pcPoint",nullable = false)
+    private int pcPoint;
+
     @Column(name = "pcTrd_no",nullable = false)
     private String pcTrd_no;
 

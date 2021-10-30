@@ -11,6 +11,8 @@ public interface getJoinProducts {
     String getTo_mcht_trd_no();
     int getTo_price();
     String getTo_email();
+    int getTo_cash();
+    int getTo_point();
     //tempproducts
     int getTopid();
     int getTop_count();
@@ -19,6 +21,8 @@ public interface getJoinProducts {
     String getTop_name();
     int getTop_price();
     String getTop_email();
+    String gettop_usecode();
+    String gettop_usecoupon();
     //tempreservations 추후 작업예정
     int getTrid();
     String getTr_mcht_trd_no();
