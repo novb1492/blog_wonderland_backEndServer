@@ -101,7 +101,7 @@ public class productService {
                     
                 }
             if(tempCount>getPointAndProducts.getCount()){
-                throw utillService.makeRuntimeEX("재고가 부족합니다 최대 수량 "+getPointAndProducts.getCount()+" 주문수량 "+tempCount, "getTotalPriceAndOther");
+                throw utillService.makeRuntimeEX("재고가 부족합니다 제품명:"+getPointAndProducts.getProduct_name()+" 최대 수량 "+getPointAndProducts.getCount()+" 주문수량 "+tempCount, "getTotalPriceAndOther");
             }
             tempCount=0;
             LinkedHashMap<String,LinkedHashMap<String,Object>>eventmap=new LinkedHashMap<>();
