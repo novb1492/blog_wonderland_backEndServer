@@ -87,12 +87,23 @@ public class productService {
             Map<String,Object>result=new HashMap<>();
             String couponName=itemArray[i][2].toString();
             String codeName=itemArray[i][3].toString();
+            int count=confrimCount(itemArray[i][1]);
             getPointAndProducts getPointAndProducts=productDao.findProductJoinPoints(email,Integer.parseInt(itemArray[i][0].toString()));
             onlyPoint=confrimPoint(point,getPointAndProducts.getPo_having());
             if(utillService.checkBlankOrNull(getPointAndProducts.getProduct_name())){
                 throw utillService.makeRuntimeEX("상품이 존재하지 않습니다", "getTotalPriceAndOther");
             }
-            int count=confrimCount(itemArray[i][1], getPointAndProducts.getCount());
+            int tempCount=0;
+                for(int ii=0;ii<itemArraySize;ii++){
+                    if(Integer.parseInt(itemArray[i][0].toString())==Integer.parseInt(itemArray[ii][0].toString())){
+                        tempCount+=Integer.parseInt(itemArray[ii][1].toString());
+                    }
+                    
+                }
+            if(tempCount>getPointAndProducts.getCount()){
+                throw utillService.makeRuntimeEX("재고가 부족합니다 최대 수량 "+getPointAndProducts.getCount()+" 주문수량 "+tempCount, "getTotalPriceAndOther");
+            }
+            tempCount=0;
             LinkedHashMap<String,LinkedHashMap<String,Object>>eventmap=new LinkedHashMap<>();
             confrimCoupon(couponName,count,eventmap);
             confrimCode(codeName, count, eventmap);
@@ -306,7 +317,7 @@ public class productService {
         }
         return onlyPoint;
     } 
-    private int  confrimCount(Object count,int dbCount) {
+    private int  confrimCount(Object count) {
         logger.info("confrimCount");
         int intcount=0;
         try {
@@ -317,10 +328,6 @@ public class productService {
         if(intcount<=0){
             throw utillService.makeRuntimeEX("최소 주문수량은 0보다 커야합니다","getTotalPriceAndOther");
         }
-        if(intcount>dbCount){
-            throw utillService.makeRuntimeEX("재고가 부족합니다","getTotalPriceAndOther");
-        }
-        logger.info("개수 유효성 통과");
         return intcount;
     }
     public JSONObject selectProduct(HttpServletRequest request) {
