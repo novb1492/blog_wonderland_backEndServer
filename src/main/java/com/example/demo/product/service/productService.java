@@ -15,7 +15,8 @@ import com.example.demo.events.code.model.codesDao;
 import com.example.demo.events.code.model.codesVo;
 import com.example.demo.events.coupon.model.couponsDao;
 import com.example.demo.events.coupon.model.couponsVo;
-import com.example.demo.product.model.getPointAndProducts;
+import com.example.demo.events.point.model.pointsDao;
+import com.example.demo.events.point.model.pointsVo;
 import com.example.demo.product.model.getProductInter;
 import com.example.demo.product.model.productDao;
 import com.example.demo.product.model.productVo;
@@ -45,6 +46,8 @@ public class productService {
     private couponsDao couponsDao;
     @Autowired
     private codesDao codesDao;
+    @Autowired
+    private pointsDao pointsDao;
 
     @Transactional(rollbackFor = Exception.class)
     public JSONObject tryBuy(tryBuyDto tryBuyDto) {
@@ -82,17 +85,18 @@ public class productService {
         int onlyPoint=0;
         int totalCash=0;
         String email=userService.sendUserInfor().getEmail();
+        pointsVo pointsVo=pointsDao.findByPoEmail(email);
         List<Map<String,Object>>maps=new ArrayList<>();
+        List<String>couponNamesAndCodeNames=new ArrayList<>();
         for(int i=0;i<itemArraySize;i++){
             Map<String,Object>result=new HashMap<>();
             String couponName=itemArray[i][2].toString();
             String codeName=itemArray[i][3].toString();
             int count=confrimCount(itemArray[i][1]);
-            getPointAndProducts getPointAndProducts=productDao.findProductJoinPoints(email,Integer.parseInt(itemArray[i][0].toString()));
-            onlyPoint=confrimPoint(point,getPointAndProducts.getPo_having());
-            if(utillService.checkBlankOrNull(getPointAndProducts.getProduct_name())){
-                throw utillService.makeRuntimeEX("상품이 존재하지 않습니다", "getTotalPriceAndOther");
-            }
+            productVo productVo=productDao.findById(Integer.parseInt(itemArray[i][0].toString())).orElseThrow(()->new IllegalArgumentException("메세지: 존재하지 않는 상품입니다"));
+            onlyPoint=confrimPoint(point,pointsVo.getPoHaving());
+            String productName=productVo.getProductName();
+            int dbCount=productVo.getCount();
             int tempCount=0;
                 for(int ii=0;ii<itemArraySize;ii++){
                     if(Integer.parseInt(itemArray[i][0].toString())==Integer.parseInt(itemArray[ii][0].toString())){
@@ -100,24 +104,24 @@ public class productService {
                     }
                     
                 }
-            if(tempCount>getPointAndProducts.getCount()){
-                throw utillService.makeRuntimeEX("재고가 부족합니다 제품명:"+getPointAndProducts.getProduct_name()+" 최대 수량 "+getPointAndProducts.getCount()+" 주문수량 "+tempCount, "getTotalPriceAndOther");
+            if(tempCount>dbCount){
+                throw utillService.makeRuntimeEX("재고가 부족합니다 제품명:"+productName+" 최대 수량 "+dbCount+" 주문수량 "+tempCount, "getTotalPriceAndOther");
             }
             tempCount=0;
             LinkedHashMap<String,LinkedHashMap<String,Object>>eventmap=new LinkedHashMap<>();
-            confrimCoupon(couponName,count,eventmap);
-            confrimCode(codeName, count, eventmap);
+            confrimCoupon(couponName,count,eventmap,couponNamesAndCodeNames);
+            confrimCode(codeName, count, eventmap,couponNamesAndCodeNames);
             logger.info(eventmap.toString()+" 코드쿠폰"+onlyPoint+"사용요청 포인트");
-            onlyCash=getOnlyCash(getPointAndProducts.getPrice(),count,eventmap,getPointAndProducts.getMax_discount_percent(),result);
+            onlyCash=getOnlyCash(productVo.getPrice(),count,eventmap,productVo.getMaxDiscountPercent(),result);
             totalCash+=onlyCash;
-            itemNames+=getPointAndProducts.getProduct_name();
+            itemNames+=productName;
             if(i<itemArraySize-1){
                 itemNames+=",";
             }
-            result.put("itemName", getPointAndProducts.getProduct_name());
+            result.put("itemName",productName);
             result.put("count", count);
             result.put("price",onlyCash);
-            result.put("bigKind",getPointAndProducts.getBig_kind());
+            result.put("bigKind",productVo.getBigKind());
             result.put("coupon", couponName);
             result.put("code", codeName);
             maps.add(result);
@@ -196,7 +200,7 @@ public class productService {
       
 
     }
-    private void confrimCode(String codeName,int count,LinkedHashMap<String,LinkedHashMap<String,Object>>eventmap) {
+    private void confrimCode(String codeName,int count,LinkedHashMap<String,LinkedHashMap<String,Object>>eventmap,List<String>couponNamesAndCodeNames) {
         logger.info("confrimCode");
         boolean flag=utillService.checkBlankOrNull(codeName);
         if(flag){
@@ -211,17 +215,6 @@ public class productService {
         }
         logger.info("할인코드 존재");
         String[] splite=codeName.split(",");
-        int size=splite.length;
-        for(int i=0;i<size;i++){
-            for(int ii=0;ii<size;ii++){
-                if(i==ii){
-                    continue;
-                }
-                if(splite[i].equals(splite[ii])){
-                    throw utillService.makeRuntimeEX("동일코드는 사용불가능합니다", "getTotalPriceAndOther");
-                }
-            }
-        }
         if(splite.length>count){
             throw utillService.makeRuntimeEX("주문 개수보다 할인코드 개수가 많습니다", "getTotalPriceAndOther");
         }
@@ -232,6 +225,10 @@ public class productService {
                 if(LocalDateTime.now().isAfter(codesVo.getCdExpired().toLocalDateTime())){
                     throw utillService.makeRuntimeEX("기간이 지난 할인코드입니다", "getTotalPriceAndOther");
                 }
+                if(couponNamesAndCodeNames.contains(s)){
+                    throw utillService.makeRuntimeEX("같은할인코드가 중복으로 발견되었습니다", "confrimCoupon");
+                }
+                couponNamesAndCodeNames.add(s);
                 map.put("codeaction",codesVo.getCdKind());
                 map.put("codenum",codesVo.getCdNum());
                 eventmap.put("code"+temp, map);
@@ -248,7 +245,7 @@ public class productService {
             logger.info("코드액션 담기완료");
         logger.info("코드액션 담기완료");
     }
-    private void confrimCoupon(String couponName,int count,LinkedHashMap<String,LinkedHashMap<String,Object>>eventmap){
+    private void confrimCoupon(String couponName,int count,LinkedHashMap<String,LinkedHashMap<String,Object>>eventmap,List<String>couponNamesAndCodeNames){
         logger.info("confrimCoupon");
         boolean flag=utillService.checkBlankOrNull(couponName);
         if(flag){
@@ -263,19 +260,8 @@ public class productService {
         }
         logger.info("쿠폰 존재");
         String[] splite=couponName.split(",");
-        int size=splite.length;
         if(splite.length>count){
             throw utillService.makeRuntimeEX("주문 개수보다 쿠폰 개수가 많습니다", "getTotalPriceAndOther");
-        }
-        for(int i=0;i<size;i++){
-            for(int ii=0;ii<size;ii++){
-                if(i==ii){
-                    continue;
-                }
-                if(splite[i].equals(splite[ii])){
-                    throw utillService.makeRuntimeEX("동일쿠폰는 사용불가능합니다", "getTotalPriceAndOther");
-                }
-            }
         }
         int temp=0;
             for(String s:splite){
@@ -286,6 +272,10 @@ public class productService {
                 }else if(couponsVo.getUsedFlag()!=0){
                     throw utillService.makeRuntimeEX("이미 사용된 쿠폰입니다", "getTotalPriceAndOther");
                 }
+                if(couponNamesAndCodeNames.contains(s)){
+                    throw utillService.makeRuntimeEX("같은쿠폰이 중복으로 발견되었습니다", "confrimCoupon");
+                }
+                couponNamesAndCodeNames.add(s);
                 map.put("couponaction",couponsVo.getCoKind());
                 map.put("couponnum",couponsVo.getCoNum());
                 eventmap.put("coupon"+temp, map);
