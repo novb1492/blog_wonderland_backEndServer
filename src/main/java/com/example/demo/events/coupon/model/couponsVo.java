@@ -41,8 +41,8 @@ public class couponsVo {
     @Column(name = "usedFlag",nullable = false)
     private int usedFlag;
 
-    @Column(name = "usedItem")
-    private String usedItem;
+    @Column(name = "usedDate")
+    private Timestamp usedDate;
 
     @Column(name = "coMchtTrdNo")
     private String coMchtTrdNo;
