@@ -29,7 +29,7 @@ public class usedCodesVo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int ucdid;
 
-    @Column(name = "ucodeName",nullable = false,unique = true)
+    @Column(name = "ucodeName",nullable = true)
     private String ucodeName;
 
 

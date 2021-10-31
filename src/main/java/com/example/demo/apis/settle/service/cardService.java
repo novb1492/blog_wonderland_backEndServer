@@ -8,6 +8,10 @@ import java.util.Map;
 import com.example.demo.apis.requestTo;
 import com.example.demo.apis.settle.model.settleDto;
 import com.example.demo.enums.Stringenums;
+import com.example.demo.events.point.model.pointsDao;
+import com.example.demo.events.point.model.pointsVo;
+import com.example.demo.events.point.model.usedPointDao;
+import com.example.demo.events.point.model.usedPointVo;
 import com.example.demo.hash.aes256;
 import com.example.demo.hash.sha256;
 import com.example.demo.payment.model.card.paidCardsDao;
@@ -16,9 +20,6 @@ import com.example.demo.payment.service.paymentService;
 import com.example.demo.product.model.tryBuyDto;
 import com.example.demo.user.service.userService;
 import com.example.demo.utill.utillService;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.shaded.json.JSONObject;
 
 import org.slf4j.Logger;
@@ -38,6 +39,10 @@ public class cardService {
     private paymentService  paymentService;
     @Autowired
     private paidCardsDao paidCardsDao;
+    @Autowired
+    private pointsDao pointsDao;
+    @Autowired
+    private usedPointDao usedPointDao;
 
     private final String sucPayNum=Stringenums.sucPayNum.getString();
     private final String MchtId=Stringenums.cardMchtId.getString();
@@ -147,20 +152,44 @@ public class cardService {
     }
     private void insert(settleDto settleDto) {
         logger.info("insert");
+        String email=userService.sendUserInfor().getEmail();
+        int point=settleDto.getPoint();
+        String mchtTrdNo=settleDto.getMchtTrdNo();
+        minusCount(email,point,mchtTrdNo);
         paidCardsDto dto=paidCardsDto.builder()
                                     .pcCncl_ord(0)
-                                    .pcEmail(userService.sendUserInfor().getEmail())
+                                    .pcEmail(email)
                                     .pcFn_nm(settleDto.getFnNm())
-                                    .pcMchtTrdNo(settleDto.getMchtTrdNo())
+                                    .pcMchtTrdNo(mchtTrdNo)
                                     .pcMcht_id(settleDto.getMchtId())
                                     .pcMethod(settleDto.getMethod())
                                     .pcTrd_amt(Integer.parseInt(settleDto.getTrdAmt()))
                                     .pcTrd_no(settleDto.getTrdNo())
-                                    .pcPoint(settleDto.getPoint())
+                                    .pcPoint(point)
                                     .pcCancleFlag(0)
                                     .build();
                                     paidCardsDao.save(dto);
                                     
+    }
+    private void minusCount(String email,int point,String mchtTrdNo) {
+        logger.info("minusCount");
+        pointsVo pointsVo=pointsDao.findByPoEmail(email);
+        int dbPoint=pointsVo.getPoHaving();
+        if(point<0){
+            return;
+        }
+        if(point>dbPoint){
+            throw new RuntimeException("보유포인트가 부족합니다 보유포인트 "+dbPoint+"지불 요청 포인트 "+point);
+        }
+        pointsVo.setPoHaving(dbPoint-point);
+        usedPointVo vo=usedPointVo.builder()
+                                    .upCancelFlag(0)
+                                    .upoEmail(email)
+                                    .upoMchtTrdNo(mchtTrdNo)
+                                    .upoint(point)
+                                    .build();
+        usedPointDao.save(vo);
+
     }
 
 }
