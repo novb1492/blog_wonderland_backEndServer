@@ -243,7 +243,6 @@ public class productService {
                 }
             }
             logger.info("코드액션 담기완료");
-        logger.info("코드액션 담기완료");
     }
     private void confrimCoupon(String couponName,int count,LinkedHashMap<String,LinkedHashMap<String,Object>>eventmap,List<String>couponNamesAndCodeNames){
         logger.info("confrimCoupon");

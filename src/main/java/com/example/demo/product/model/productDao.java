@@ -1,7 +1,7 @@
 package com.example.demo.product.model;
 
 import java.util.List;
-
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -17,6 +17,7 @@ public interface productDao extends JpaRepository<productVo,Integer> {
     @Query(value = "SELECT a.*,d.* FROM products a left JOIN (SELECT * FROM points  where po_email=? )d ON 1 = 1  where a.pid=?",nativeQuery = true)
     getPointAndProducts findProductJoinPoints(String email,int productName);
 
+    Optional<productVo> findByProductName(String productName);
     
 
 

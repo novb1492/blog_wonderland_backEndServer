@@ -15,6 +15,8 @@ import com.example.demo.payment.model.tempOrderDao;
 import com.example.demo.payment.model.tempOrderDto;
 import com.example.demo.payment.model.tempOrderProudctsDao;
 import com.example.demo.payment.model.tempOrderProudctsDto;
+import com.example.demo.product.model.productDao;
+import com.example.demo.product.model.productVo;
 import com.example.demo.utill.utillService;
 
 import org.slf4j.Logger;
@@ -32,6 +34,8 @@ public class paymentService {
     private tempOrderProudctsDao tempOrderProudctsDao;
     @Autowired
     private paidProductsDao paidProductsDao;
+    @Autowired
+    private productDao productDao;
 
 
     public void updateTemp(String mchtTrdNo) {
@@ -100,10 +104,13 @@ public class paymentService {
         logger.info("productsTempToMain");
         int size=getJoinProducts.size();
         for(int i=0;i<size;i++){
+            String productName=getJoinProducts.get(i).getTop_name();
+            int count=getJoinProducts.get(i).getTop_count();
+            minusCount(productName, count);
             paidProductsDto dto=paidProductsDto.builder()
-                                                .poCount(getJoinProducts.get(i).getTop_count())
+                                                .poCount(count)
                                                 .poMchtTrdNo(getJoinProducts.get(0).getTo_mcht_trd_no())
-                                                .poName(getJoinProducts.get(i).getTop_name())
+                                                .poName(productName)
                                                 .poPrice(getJoinProducts.get(i).getTop_price())
                                                 .poemail(getJoinProducts.get(0).getTo_email())
                                                 .poCode(getJoinProducts.get(i).gettop_usecode())
@@ -111,6 +118,15 @@ public class paymentService {
                                                 .build();
                                                 paidProductsDao.save(dto);
         }
+    }
+    private void minusCount(String productName,int count){
+        logger.info("minusCount");
+        productVo productVo=productDao.findByProductName(productName).orElseThrow(()->new IllegalArgumentException("메시지 : 존재하지 않는 상품결제 시도입니다"));
+        int afterMinus=productVo.getCount()-count;
+        if(afterMinus<0){
+            throw utillService.makeRuntimeEX(productName+"의 재고가 부족합니다 ", "minusCount");
+        }
+        productVo.setCount(afterMinus);
     }
     private void confrim(int totalPrice,String mchtTrdNo,settleDto settleDto) {
         logger.info("confrim");
