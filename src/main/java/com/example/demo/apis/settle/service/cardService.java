@@ -9,9 +9,7 @@ import com.example.demo.apis.requestTo;
 import com.example.demo.apis.settle.model.settleDto;
 import com.example.demo.enums.Stringenums;
 import com.example.demo.events.point.model.pointsDao;
-import com.example.demo.events.point.model.pointsVo;
 import com.example.demo.events.point.model.usedPointDao;
-import com.example.demo.events.point.model.usedPointVo;
 import com.example.demo.hash.aes256;
 import com.example.demo.hash.sha256;
 import com.example.demo.payment.model.card.paidCardsDao;
@@ -122,6 +120,7 @@ public class cardService {
     @Transactional(rollbackFor = Exception.class)
     public JSONObject cardConfrim(settleDto settleDto) {
         logger.info("cardConfrim");
+        JSONObject reseponse=new JSONObject();
         String mchtTrdNo=settleDto.getMchtTrdNo();
         try {
             settleDto.setTrdAmt(utillService.aesToNomal(settleDto.getTrdAmt()));
@@ -135,8 +134,11 @@ public class cardService {
             paymentService.confrimAndInsert(settleDto);
             paymentService.updateTemp(mchtTrdNo);
             insert(settleDto);
+            reseponse.put("flag", true);
+            reseponse.put("mchtTrdNo", mchtTrdNo);
+            reseponse.put("price", settleDto.getTrdAmt());
+            return reseponse;
             //throw new RuntimeException();
-            return utillService.makeJson(true, "구매가 완료되었습니다");
         } catch (Exception e) {
             settleDto.setCnclOrd(1);
             String message="환불에 실패했습니다";

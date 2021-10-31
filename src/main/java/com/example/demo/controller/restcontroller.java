@@ -138,8 +138,13 @@ public class restcontroller {
     public void settleCallbck(HttpServletRequest request,HttpServletResponse response) {
         LOGGER.info("settleCallbck restcontroller"); 
         JSONObject result=settleService.confrimPayment(request);
-        LOGGER.info(result.toString());
-        //doRedirect(response, frontDamain+"popUpClose?result="+result.get("flag")+"&message="+result.get("message"));
+        boolean flag=(boolean)result.get("flag");
+        if(flag){
+            doRedirect(response, frontDamain+"popUpClose?result="+flag+"&detail=settle&mchtTrdNo="+result.get("mchtTrdNo")+"&price="+result.get("price"));
+        }else{
+            doRedirect(response, frontDamain+"popUpClose?result="+flag+"&message="+result.get("message")+"&detail=settle");
+        }
+
     }
     private void doRedirect(HttpServletResponse response,String url) {
         LOGGER.info("doRedirect");

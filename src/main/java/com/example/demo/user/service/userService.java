@@ -177,6 +177,7 @@ public class userService {
             uservo.setPwd(securityConfig.pwdEncoder().encode(oauthPwd));
             userDao.save(uservo);
             dbVo=uservo;
+            insertPoints(uservo.getEmail());
         }
         return dbVo;
     }
