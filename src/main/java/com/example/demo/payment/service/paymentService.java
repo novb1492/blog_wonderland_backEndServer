@@ -8,6 +8,10 @@ import java.util.List;
 import java.util.Map;
 
 import com.example.demo.apis.settle.model.settleDto;
+import com.example.demo.events.code.model.codesDao;
+import com.example.demo.events.code.model.codesVo;
+import com.example.demo.events.code.model.usedCodesDao;
+import com.example.demo.events.code.model.usedCodesVo;
 import com.example.demo.events.coupon.model.couponsDao;
 import com.example.demo.events.coupon.model.couponsVo;
 import com.example.demo.payment.model.getJoinProducts;
@@ -40,6 +44,10 @@ public class paymentService {
     private productDao productDao;
     @Autowired
     private couponsDao couponsDao;
+    @Autowired
+    private codesDao codesDao;
+    @Autowired
+    private usedCodesDao usedCodesDao;
 
 
     public void updateTemp(String mchtTrdNo) {
@@ -113,18 +121,41 @@ public class paymentService {
             String mchtTrdNo=getJoinProducts.get(0).getTo_mcht_trd_no();
             String email=getJoinProducts.get(0).getTo_email();
             String coupons=getJoinProducts.get(i).gettop_usecoupon();
+            String codes=getJoinProducts.get(i).gettop_usecode();
             minusCount(productName, count);
             couponOn(coupons,mchtTrdNo,email);
+            insertCode(codes, mchtTrdNo, email);
             paidProductsDto dto=paidProductsDto.builder()
                                                 .poCount(count)
                                                 .poMchtTrdNo(mchtTrdNo)
                                                 .poName(productName)
                                                 .poPrice(getJoinProducts.get(i).getTop_price())
                                                 .poemail(email)
-                                                .poCode(getJoinProducts.get(i).gettop_usecode())
+                                                .poCode(codes)
                                                 .poCoupon(coupons)
                                                 .build();
                                                 paidProductsDao.save(dto);
+        }
+    }
+    private void insertCode(String codes,String mchtTrdNo,String email) {
+        logger.info("insertCode");
+        if(utillService.checkBlankOrNull(codes)){
+            return;
+        }
+        String[] codeNameArray=codes.split(",");
+        for(String codeName:codeNameArray){
+            codesVo codesVo=codesDao.findByCodeName(codeName).orElseThrow(()->new IllegalArgumentException("존재하지 않는 할인코드입니다"));
+            if(codesVo.getCdExpired().toLocalDateTime().isBefore(LocalDateTime.now())){
+                throw new RuntimeException(codeName+"만료된 할인쿠폰 입니다");
+            }
+            usedCodesVo vo=usedCodesVo.builder()    
+                                    .ucdEmail(email)
+                                    .ucdcreated(Timestamp.valueOf(LocalDateTime.now()))
+                                    .ucdmchtTrdNo(mchtTrdNo)
+                                    .ucodeName(codeName)
+                                    .ucdCancleFlag(0)
+                                    .build();
+                                    usedCodesDao.save(vo);
         }
     }
     private void couponOn(String coupons,String mchtTrdNo,String email) {
