@@ -8,12 +8,17 @@ import java.util.List;
 import java.util.Map;
 
 import com.example.demo.apis.settle.model.settleDto;
+import com.example.demo.enums.Stringenums;
 import com.example.demo.events.code.model.codesDao;
 import com.example.demo.events.code.model.codesVo;
 import com.example.demo.events.code.model.usedCodesDao;
 import com.example.demo.events.code.model.usedCodesVo;
 import com.example.demo.events.coupon.model.couponsDao;
 import com.example.demo.events.coupon.model.couponsVo;
+import com.example.demo.events.point.model.pointsDao;
+import com.example.demo.events.point.model.pointsVo;
+import com.example.demo.events.point.model.usedPointDao;
+import com.example.demo.events.point.model.usedPointVo;
 import com.example.demo.payment.model.getJoinProducts;
 import com.example.demo.payment.model.paidProductsDao;
 import com.example.demo.payment.model.paidProductsDto;
@@ -23,6 +28,7 @@ import com.example.demo.payment.model.tempOrderProudctsDao;
 import com.example.demo.payment.model.tempOrderProudctsDto;
 import com.example.demo.product.model.productDao;
 import com.example.demo.product.model.productVo;
+import com.example.demo.user.service.userService;
 import com.example.demo.utill.utillService;
 
 import org.slf4j.Logger;
@@ -34,6 +40,7 @@ import org.springframework.stereotype.Service;
 public class paymentService {
     private static Logger logger=LoggerFactory.getLogger(paymentService.class);
     private final int doneFlag=1;
+    private final String cardMchtId=Stringenums.cardMchtId.getString();
     @Autowired
     private  tempOrderDao tempOrderDao;
     @Autowired
@@ -48,6 +55,12 @@ public class paymentService {
     private codesDao codesDao;
     @Autowired
     private usedCodesDao usedCodesDao;
+    @Autowired
+    private pointsDao pointsDao;
+    @Autowired
+    private usedPointDao usedPointDao;
+    @Autowired
+    private userService userService;
 
 
     public void updateTemp(String mchtTrdNo) {
@@ -100,7 +113,7 @@ public class paymentService {
                                                         temp+=1;
         }
     }  
-    public void confrim(settleDto settleDto) {
+    public void confrimAndInsert(settleDto settleDto) {
         logger.info("confrim");
         List<getJoinProducts>getJoinProducts=tempOrderDao.findJoinProducts(settleDto.getMchtTrdNo());
         if(getJoinProducts.size()==0){
@@ -108,9 +121,23 @@ public class paymentService {
         }
         int totalPrice=getJoinProducts.get(0).getTo_cash();
         String mchtTrdNo=getJoinProducts.get(0).getTo_mcht_trd_no();
+        int point=getJoinProducts.get(0).getTo_point();
+        String email=userService.sendUserInfor().getEmail();
         confrim(totalPrice, mchtTrdNo, settleDto);
         insert(getJoinProducts);
-        settleDto.setPoint(getJoinProducts.get(0).getTo_point());
+        pointsVo pointsVo=pointsDao.findByPoEmail(email);
+        minusPoint(email, point,pointsVo);
+        insertPoint(email, point, mchtTrdNo);
+        plusPoint(settleDto,pointsVo);
+    }
+    private void plusPoint(settleDto settleDto,pointsVo pointsVo) {
+        logger.info("plusPoint");
+        String mchtId=settleDto.getMchtId();
+        int poHaving= pointsVo.getPoHaving();
+        if(mchtId.equals(cardMchtId)){
+            poHaving+=Integer.parseInt(settleDto.getTrdAmt())*0.1;
+        }
+        pointsVo.setPoHaving(poHaving);
     }
     private void insert( List<getJoinProducts>getJoinProducts) {
         logger.info("productsTempToMain");
@@ -199,6 +226,28 @@ public class paymentService {
         }
         throw utillService.makeRuntimeEX(message, "confrim");
     }
+    private void minusPoint(String email,int point,pointsVo pointsVo) {
+        logger.info("minusPoint");
+        int dbPoint=pointsVo.getPoHaving();
+        if(point<0){
+            return;
+        }
+        if(point>dbPoint){
+            throw new RuntimeException("보유포인트가 부족합니다 보유포인트 "+dbPoint+"지불 요청 포인트 "+point);
+        }
+        pointsVo.setPoHaving(dbPoint-point);
+      
+    }
+    private void insertPoint(String email,int point,String mchtTrdNo) {
+        usedPointVo vo=usedPointVo.builder()
+                                .upCancelFlag(0)
+                                .upoEmail(email)
+                                .upoMchtTrdNo(mchtTrdNo)
+                                .upoint(point)
+                                .build();
+        usedPointDao.save(vo);
+    }
+
     
     
 }

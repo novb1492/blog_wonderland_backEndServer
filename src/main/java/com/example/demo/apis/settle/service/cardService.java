@@ -132,9 +132,9 @@ public class cardService {
                 logger.info("결제실패 실패 코드 "+settleDto.getOutRsltCd());
                 throw new RuntimeException("결제실패");
             }
-            paymentService.confrim(settleDto);
-            insert(settleDto);
+            paymentService.confrimAndInsert(settleDto);
             paymentService.updateTemp(mchtTrdNo);
+            insert(settleDto);
             //throw new RuntimeException();
             return utillService.makeJson(true, "구매가 완료되었습니다");
         } catch (Exception e) {
@@ -155,7 +155,6 @@ public class cardService {
         String email=userService.sendUserInfor().getEmail();
         int point=settleDto.getPoint();
         String mchtTrdNo=settleDto.getMchtTrdNo();
-        minusCount(email,point,mchtTrdNo);
         paidCardsDto dto=paidCardsDto.builder()
                                     .pcCncl_ord(0)
                                     .pcEmail(email)
@@ -170,26 +169,6 @@ public class cardService {
                                     .build();
                                     paidCardsDao.save(dto);
                                     
-    }
-    private void minusCount(String email,int point,String mchtTrdNo) {
-        logger.info("minusCount");
-        pointsVo pointsVo=pointsDao.findByPoEmail(email);
-        int dbPoint=pointsVo.getPoHaving();
-        if(point<0){
-            return;
-        }
-        if(point>dbPoint){
-            throw new RuntimeException("보유포인트가 부족합니다 보유포인트 "+dbPoint+"지불 요청 포인트 "+point);
-        }
-        pointsVo.setPoHaving(dbPoint-point);
-        usedPointVo vo=usedPointVo.builder()
-                                    .upCancelFlag(0)
-                                    .upoEmail(email)
-                                    .upoMchtTrdNo(mchtTrdNo)
-                                    .upoint(point)
-                                    .build();
-        usedPointDao.save(vo);
-
     }
 
 }

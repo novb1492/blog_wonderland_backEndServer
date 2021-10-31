@@ -112,7 +112,7 @@ public class productService {
             confrimCoupon(couponName,count,eventmap,couponNamesAndCodeNames);
             confrimCode(codeName, count, eventmap,couponNamesAndCodeNames);
             logger.info(eventmap.toString()+" 코드쿠폰"+onlyPoint+"사용요청 포인트");
-            onlyCash=getOnlyCash(productVo.getPrice(),count,eventmap,productVo.getMaxDiscountPercent(),result);
+            onlyCash=getOnlyCash(productVo.getPrice(),count,eventmap,productVo.getMaxDiscountPercent());
             totalCash+=onlyCash;
             itemNames+=productName;
             if(i<itemArraySize-1){
@@ -147,7 +147,7 @@ public class productService {
         map.put("itemNames", itemNames);
         return map;
     }
-    private int getOnlyCash(int  price,int count,LinkedHashMap<String,LinkedHashMap<String,Object>>eventmap,int maxDiscountPercent,Map<String,Object>result) {
+    private int getOnlyCash(int  price,int count,LinkedHashMap<String,LinkedHashMap<String,Object>>eventmap,int maxDiscountPercent) {
         logger.info("getOnlyCash");
         int tempPrice=0;
         try {
@@ -161,10 +161,6 @@ public class productService {
                 int couponNum=(int)eventmap.get("coupon"+i).get("couponnum");
                 logger.info(couponNum+" getOnlyCash");
                 double totalDiscountPercent=0.00;
-                result.put("codeAction", codeAction);
-                result.put("codeNum", codeNum);
-                result.put("couponAction", couponAction);
-                result.put("couponNum", couponNum);
                 if(codeAction.equals("percent")&&couponAction.equals("percent")){
                     logger.info("둘다 퍼센트");
                     totalDiscountPercent=codeNum+couponNum;
