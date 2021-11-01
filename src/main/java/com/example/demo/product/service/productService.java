@@ -35,7 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class productService {
     private final static Logger logger=LoggerFactory.getLogger(productService.class);
     private final int pageSize=10;
-    private final int fullProductDay=7;
+    private final int fullProductMin=10;
     @Autowired
     private productDao productDao;
     @Autowired
@@ -57,27 +57,16 @@ public class productService {
         return settleService.makeBuyInfor(tryBuyDto, maps);
         
     }
-    private Timestamp getVbankExpriedDate(tryBuyDto tryBuyDto) {
-        logger.info("getVbankExpriedDate");
-        if(tryBuyDto.getKind().equals("reservation")){
-            logger.info("예약상품 가상계좌 요청");
-            return null;
-        }else{
-            logger.info("일반상품 가상계좌 요청");
-            return Timestamp.valueOf(LocalDateTime.now().plusDays(fullProductDay));
-        }
-
-    }
     private List<Map<String,Object>> getTotalPriceAndOther(tryBuyDto tryBuyDto) {
         logger.info("getTotalPriceAndOther");
         String kind=tryBuyDto.getKind();
         if(kind.equals("product")){
-            return getTotalPriceAndOther(tryBuyDto.getBuy(),tryBuyDto.getPoint());
+            return getTotalPriceAndOther(tryBuyDto.getBuy(),tryBuyDto.getPoint(),tryBuyDto.getBuyKind(),tryBuyDto.getKind());
         }else {
             throw utillService.makeRuntimeEX("상품종류가 잘못되었습니다","getTotalPriceAndOther");
         }
     }
-    private List<Map<String,Object>> getTotalPriceAndOther(Object[][] itemArray,String point) {
+    private List<Map<String,Object>> getTotalPriceAndOther(Object[][] itemArray,String point,String buyKind,String kind) {
         logger.info("getTotalPriceAndOther");
         int itemArraySize=itemArray.length;
         String itemNames="";
@@ -126,14 +115,25 @@ public class productService {
             result.put("code", codeName);
             maps.add(result);
             if(i==itemArraySize-1){
-                maps.add(getTotalPrice(totalCash, onlyPoint,itemNames));
+                maps.add(getTotalPrice(totalCash, onlyPoint,itemNames,kind,buyKind));
             }
         }
 
         return maps;
 
     }
-    private Map<String,Object> getTotalPrice(int totalCash,int point,String itemNames){
+    private Timestamp getVbankExpriedDate(String kind) {
+        logger.info("getVbankExpriedDate");
+        if(kind.equals("reservation")){
+            logger.info("예약상품 가상계좌 요청");
+            return null;
+        }else{
+            logger.info("일반상품 가상계좌 요청");
+            return Timestamp.valueOf(LocalDateTime.now().plusMinutes(fullProductMin));
+        }
+
+    }
+    private Map<String,Object> getTotalPrice(int totalCash,int point,String itemNames,String kind,String buyKind){
         logger.info("getTotalPrice");
         Map<String,Object>map=new HashMap<>();
         int temp=totalCash-point;
@@ -145,6 +145,9 @@ public class productService {
         map.put("totalCash", temp);
         map.put("totalPoint", point);
         map.put("itemNames", itemNames);
+        if(buyKind.equals("vbank")){
+            map.put("expireDate", getVbankExpriedDate(kind));
+        }
         return map;
     }
     private int getOnlyCash(int  price,int count,LinkedHashMap<String,LinkedHashMap<String,Object>>eventmap,int maxDiscountPercent) {

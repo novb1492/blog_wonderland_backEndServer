@@ -8,8 +8,6 @@ import java.util.Map;
 import com.example.demo.apis.requestTo;
 import com.example.demo.apis.settle.model.settleDto;
 import com.example.demo.enums.Stringenums;
-import com.example.demo.events.point.model.pointsDao;
-import com.example.demo.events.point.model.usedPointDao;
 import com.example.demo.hash.aes256;
 import com.example.demo.hash.sha256;
 import com.example.demo.payment.model.card.paidCardsDao;
@@ -37,10 +35,7 @@ public class cardService {
     private paymentService  paymentService;
     @Autowired
     private paidCardsDao paidCardsDao;
-    @Autowired
-    private pointsDao pointsDao;
-    @Autowired
-    private usedPointDao usedPointDao;
+
 
     private final String sucPayNum=Stringenums.sucPayNum.getString();
     private final String MchtId=Stringenums.cardMchtId.getString();
