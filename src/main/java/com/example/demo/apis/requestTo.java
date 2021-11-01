@@ -23,7 +23,7 @@ public class requestTo {
     private MultiValueMap<String,Object> multiValueBody=new LinkedMultiValueMap<>();
     private JSONObject jsonBody=new JSONObject();
 
-    public JSONObject requestToApi(MultiValueMap<String,Object> body,String url,HttpHeaders headerss) {
+    public JSONObject requestToApi(MultiValueMap<String,Object> body,String url,HttpHeaders headers) {
         logger.info("requestToApi");
         try {
             HttpEntity<MultiValueMap<String,Object>>entity=new HttpEntity<>(body,headers);
@@ -34,7 +34,7 @@ public class requestTo {
             throw utillService.makeRuntimeEX("통신에 실패하였습니다", "requestToApi");
         }finally{
             body.clear();
-            headerss.clear();
+            headers.clear();
         }
     }
     public JSONObject requestToApi(JSONObject body,String url,HttpHeaders headers) {
