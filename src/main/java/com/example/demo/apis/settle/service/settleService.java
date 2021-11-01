@@ -53,9 +53,11 @@ public class settleService {
         String priceHash=aes256.encrypt(totalCash);
         JSONObject response=new JSONObject();
         String  email=userService.sendUserInfor().getEmail();
+        String expireDate=null;
         if(buyKind.equals("vbank")){
             logger.info("가상계좌 만료시간 담기");
-            response.put("expireDt", map.get("expireDate"));
+            expireDate=(String)map.get("expireDate");
+            response.put("expireDt", expireDate);
         }
         response.put("itemName", map.get("itemNames"));
         response.put("mchtId", idAndText[0]);
@@ -66,7 +68,7 @@ public class settleService {
         response.put("trdTm", requestTime);
         response.put("pktHash", hashText);
         response.put("flag", true);
-        paymentService.insertTemp(mchtTrdNo,email,tryBuyDto.getBuyKind(),(int)map.get("totalCash"),(int)map.get("totalPoint"));
+        paymentService.insertTemp(mchtTrdNo,email,tryBuyDto.getBuyKind(),(int)map.get("totalCash"),(int)map.get("totalPoint"),expireDate);
         paymentService.insertTemp(maps, mchtTrdNo, email);
         return response;
     }

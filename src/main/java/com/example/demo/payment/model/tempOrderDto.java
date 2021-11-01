@@ -58,6 +58,9 @@ public class tempOrderDto {
     @Column(name = "toDoneDate")
     private Timestamp toDoneDate;
 
+    @Column(name = "vbankDate")
+    private String vbankDate;
+
 
 
   

@@ -71,7 +71,7 @@ public class paymentService {
             tempOrderDao.updateTempProducts(doneFlag,doneFlag,now,now,mchtTrdNo);
         }
     }
-    public  void insertTemp(String mchtTrdNo,String email,String buyKind,int toCash,int toPoint) {
+    public  void insertTemp(String mchtTrdNo,String email,String buyKind,int toCash,int toPoint,String expireDate) {
         System.out.println(mchtTrdNo+email);
         logger.info("insertTemp");
         tempOrderDto  dto=tempOrderDto.builder()
@@ -82,6 +82,7 @@ public class paymentService {
                                         .buyKind(buyKind)
                                         .toCash(toCash)
                                         .toPoint(toPoint)
+                                        .vbankDate(expireDate)
                                         .build();
                                         tempOrderDao.save(dto);
     }

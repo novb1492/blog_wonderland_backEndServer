@@ -122,14 +122,14 @@ public class productService {
         return maps;
 
     }
-    private Timestamp getVbankExpriedDate(String kind) {
+    private String getVbankExpriedDate(String kind) {
         logger.info("getVbankExpriedDate");
         if(kind.equals("reservation")){
             logger.info("예약상품 가상계좌 요청");
             return null;
         }else{
             logger.info("일반상품 가상계좌 요청");
-            return Timestamp.valueOf(LocalDateTime.now().plusMinutes(fullProductMin));
+            return utillService.getSettleVBankExpireDate(LocalDateTime.now().plusMinutes(fullProductMin).toString());  
         }
 
     }

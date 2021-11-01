@@ -215,4 +215,12 @@ public class utillService {
             throw new RuntimeException("복호화 실패");
         }
     }
+    public static String getSettleVBankExpireDate(String expireDate) {
+        logger.info("requestToSettleDto");
+        String[] dateAndTime=expireDate.split("T");
+        dateAndTime[0]=dateAndTime[0].replace("-", "");
+        dateAndTime[1]=dateAndTime[1].replace(":", "");
+        dateAndTime[1]=dateAndTime[1].substring(0, 6);
+        return dateAndTime[0]+dateAndTime[1];
+    }
 }

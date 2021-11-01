@@ -13,7 +13,6 @@ import com.example.demo.hash.sha256;
 import com.example.demo.payment.model.card.paidCardsDao;
 import com.example.demo.payment.model.card.paidCardsDto;
 import com.example.demo.payment.service.paymentService;
-import com.example.demo.product.model.tryBuyDto;
 import com.example.demo.user.service.userService;
 import com.example.demo.utill.utillService;
 import com.nimbusds.jose.shaded.json.JSONObject;
@@ -42,36 +41,6 @@ public class cardService {
     
     private static Logger logger=LoggerFactory.getLogger(cardService.class);
 
-    @Transactional(rollbackFor = Exception.class)
-    public JSONObject makeInfor(tryBuyDto tryBuyDto,List<Map<String,Object>>maps) {
-        logger.info("makeInfor");
-        Map<String,Object>map=maps.get(maps.size()-1);
-        Map<String,String>trdDtTrdTm=utillService.getTrdDtTrdTm();
-        String mchtTrdNo=maps.get(0).get("bigKind")+utillService.getRandomNum(10);
-        String requestDate=trdDtTrdTm.get("trdDt");
-        String requestTime=trdDtTrdTm.get("trdTm");
-        String totalCash=Integer.toString((int)map.get("totalCash"));
-        String settleText=utillService.getSettleText(MchtId,"card", mchtTrdNo, requestDate, requestTime, totalCash);
-        logger.info(settleText+" 해쉬예정문자열");
-        String hashText=sha256.encrypt(settleText);
-        logger.info(hashText+" 해쉬문자열");
-        String priceHash=aes256.encrypt(totalCash);
-        JSONObject response=new JSONObject();
-        String  email=userService.sendUserInfor().getEmail();
-        response.put("itemName", map.get("itemNames"));
-        response.put("mchtId", MchtId);
-        response.put("mchtCustId", aes256.encrypt(email));
-        response.put("mchtTrdNo", mchtTrdNo);
-        response.put("trdAmt", priceHash);
-        response.put("trdDt", requestDate);
-        response.put("trdTm", requestTime);
-        response.put("pktHash", hashText);
-        response.put("mchtParam","key:test,key2:test2");
-        response.put("flag", true);
-        paymentService.insertTemp(mchtTrdNo,email,"card",(int)map.get("totalCash"),(int)map.get("totalPoint"));
-        paymentService.insertTemp(maps, mchtTrdNo, email);
-        return response;
-    }
     private JSONObject cancle(settleDto settleDto){
         logger.info("cancle");
         Map<String,String>map=utillService.getTrdDtTrdTm();
