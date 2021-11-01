@@ -10,6 +10,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.example.demo.apis.kakao.login.kakaoPayService;
 import com.example.demo.apis.settle.service.settleService;
 import com.example.demo.events.code.model.codesDao;
 import com.example.demo.events.code.model.codesVo;
@@ -48,12 +49,17 @@ public class productService {
     private codesDao codesDao;
     @Autowired
     private pointsDao pointsDao;
+    @Autowired
+    private kakaoPayService kakaoPayService;
 
     @Transactional(rollbackFor = Exception.class)
     public JSONObject tryBuy(tryBuyDto tryBuyDto) {
         logger.info("tryBuy");
         List<Map<String,Object>>maps=getTotalPriceAndOther(tryBuyDto);
         logger.info(maps.toString());
+        if(tryBuyDto.getBuyKind().equals("kakaoPay")){
+            return kakaoPayService.getKaKaoPayLink(tryBuyDto, maps);
+        }
         return settleService.makeBuyInfor(tryBuyDto, maps);
         
     }
@@ -129,7 +135,9 @@ public class productService {
             return null;
         }else{
             logger.info("일반상품 가상계좌 요청");
-            return utillService.getSettleVBankExpireDate(LocalDateTime.now().plusMinutes(fullProductMin).toString());  
+            return utillService.getSettleVBankExpireDate(LocalDateTime.now().plusMinutes(fullProductMin).toString());
+           
+          
         }
 
     }
