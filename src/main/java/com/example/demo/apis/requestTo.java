@@ -23,21 +23,20 @@ public class requestTo {
     private MultiValueMap<String,Object> multiValueBody=new LinkedMultiValueMap<>();
     private JSONObject jsonBody=new JSONObject();
 
-    public JSONObject requestToApi(MultiValueMap<String,Object> body,String url,HttpHeaders headers) {
+    public <T> JSONObject requestToApi(T body,String url,HttpHeaders headers) {
         logger.info("requestToApi");
         try {
-            HttpEntity<MultiValueMap<String,Object>>entity=new HttpEntity<>(body,headers);
+            HttpEntity<T>entity=new HttpEntity<>(body,headers);
             System.out.println(entity.toString());
             return restTemplate.postForObject(url, entity, JSONObject.class);
         } catch (Exception e) {
             e.getStackTrace();
             throw utillService.makeRuntimeEX("통신에 실패하였습니다", "requestToApi");
         }finally{
-            body.clear();
             headers.clear();
         }
     }
-    public JSONObject requestToApi(JSONObject body,String url,HttpHeaders headers) {
+   /* public JSONObject requestToApi(JSONObject body,String url,HttpHeaders headers) {
         logger.info("requestToApi");
         try {
             HttpEntity<JSONObject>entity=new HttpEntity<>(body,headers);
@@ -50,7 +49,7 @@ public class requestTo {
             headers.clear();
         }
       
-    }
+    }*/
     public JSONObject requestToApi(String url,HttpHeaders headers) {
         logger.info("requestToApi");
         try {
@@ -63,13 +62,13 @@ public class requestTo {
             headers.clear();
         }
     }
-    public JSONObject requestToSettle(String url,JSONObject body) {
+    public <T> JSONObject requestToSettle(String url,T body) {
         logger.info("reuqestToSettle");
         try {
             headers.add(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
             headers.set("charset", "UTF-8");
       
-            HttpEntity<JSONObject>entity=new HttpEntity<>(body,headers);
+            HttpEntity<T>entity=new HttpEntity<>(body,headers);
             logger.info(entity.getBody()+" 요청정보"+entity.getHeaders());
             JSONObject response= restTemplate.postForObject(url,entity,JSONObject.class);
             logger.info(response+" 세틀뱅크 통신결과");
@@ -79,7 +78,7 @@ public class requestTo {
             logger.info("requestToSettle error "+ e.getMessage());
             throw utillService.makeRuntimeEX("통신에 실패하였습니다", "requestToApi");
         }finally{
-            body.clear();
+           // body.clear();
             headers.clear();
         }
     }
