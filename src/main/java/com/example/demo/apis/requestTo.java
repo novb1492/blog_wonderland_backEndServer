@@ -62,7 +62,7 @@ public class requestTo {
             headers.clear();
         }
     }
-    public <T> JSONObject requestToSettle(String url,T body) {
+    /*public <T> JSONObject requestToSettle(String url,T body) {
         logger.info("reuqestToSettle");
         try {
             headers.add(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
@@ -81,5 +81,5 @@ public class requestTo {
            // body.clear();
             headers.clear();
         }
-    }
+    }*/
 }

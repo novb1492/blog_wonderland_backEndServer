@@ -20,6 +20,8 @@ import com.nimbusds.jose.shaded.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -70,7 +72,10 @@ public class cardService {
         return body;
     }
     private boolean requestToSettle(JSONObject body){
-        JSONObject  response=requestTo.requestToSettle("https://tbgw.settlebank.co.kr/spay/APICancel.do", body);
+        HttpHeaders headers=requestTo.getHeaders();
+        headers.add(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
+        headers.set("charset", "UTF-8");
+        JSONObject  response=requestTo.requestToApi(body,"https://tbgw.settlebank.co.kr/spay/APICancel.do",headers);
         LinkedHashMap<String,Object>params=(LinkedHashMap<String, Object>) response.get("params");
         if(params.get("outStatCd").equals("0021")){
             return true;
@@ -101,8 +106,8 @@ public class cardService {
             reseponse.put("flag", true);
             reseponse.put("mchtTrdNo", mchtTrdNo);
             reseponse.put("price", settleDto.getTrdAmt());
-            return reseponse;
-            //throw new RuntimeException();
+           // return reseponse;
+            throw new RuntimeException();
         } catch (Exception e) {
             settleDto.setCnclOrd(1);
             String message="환불에 실패했습니다";
